@@ -9,18 +9,26 @@ SRCS = 	main.cpp \
 		srcs/userInfos.class.cpp	\
 		srcs/terminal.class.cpp
 
-OBJS = $(SRCS:%.cpp=%.o)
+OBJ_DIR = objs
+OBJS := $(SRCS:srcs/%=%)
+OBJS := $(OBJS:%.cpp=$(OBJ_DIR)/%.o)
+  # Strip 'srcs/' from the object file paths
 
 all: $(NAME)
 
-%.o: %.cpp
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(NAME):$(OBJS)
+$(OBJ_DIR)/%.o: srcs/%.cpp
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(NAME): $(OBJS)
 	$(CC) $(OBJS) -o $(NAME)
 
 clean:
-	rm -rf $(OBJS)
+	rm -rf $(OBJ_DIR)
 
 fclean: clean
 	rm -f $(NAME)

@@ -14,6 +14,7 @@ using namespace std;
 class Server {
 
 	private:
+		string			_servername;
 		int				_port;
 		int 			_sockfd;
 		sockaddr_in		_sockaddr;
@@ -21,7 +22,7 @@ class Server {
 		int				_msg_nb;
 		int				_connection_nb;
 		int				_initialized;
-		userList		_users;
+		userList*		_users;
 		Terminal		_term;
 
 		int		pollFds(int timeout);
@@ -32,6 +33,7 @@ class Server {
 		void	bindToPort(int port);
 		void	getConnection(void);
 		void	drawInterface(void);
+		void	performAction(userInfos* user);
 
 	public:
 		Server(void);
@@ -42,10 +44,10 @@ class Server {
 		int		init(int port);
 		void	shutdown(void);
 		void	handleEvents(void);
-
 };
 
-
+// Fermer fd apres timeout si pas registered
+// Refaire le systeme de registration (accepter infos dans le desordre)
 
 
 #endif

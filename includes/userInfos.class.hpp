@@ -2,32 +2,36 @@
 # define USERINFOS_CLASS_HPP
 
 #include <string>
-#include "terminal.class.hpp"
+
+#define ACT_REGISTRATION 1
 
 using namespace std;
+
+class Terminal;
 
 class userInfos {
 
 	private:
-		int			_index;
-		int			_initialized;
+		int			_index;				// index in the vector list
+		int			_registered;		// correctly registered
 		int			_registration_step;
 		string		_nickname;
 		string		_username;
 		string		_realname;
 		int			_fd;
 		int			_nb_msg;
-		Terminal	_term;
+		int			_actionType;		// tell the server what the client is waiting for
+		Terminal*	_term;
 
 	public:
-		userInfos(int fd);
+		userInfos(int fd, Terminal* term);
 		~userInfos(void);
 		userInfos(userInfos & src);
 		userInfos &operator=(const userInfos & src);
 
-		void	setNickname(string& nickname);
-		void	setUsername(string& username);
-		void	setRealname(string& realname);
+		int		setNickname(string& nickname);
+		int		setUsername(string& username);
+		int		setRealname(string& realname);
 		void	setIndex(int index);
 
 		void	incMsgs(void);
@@ -38,6 +42,11 @@ class userInfos {
 		int		getFd(void) const;
 		int		getNbMsg(void) const;
 		int		getIndex(void) const;
+		int		getAction(void) const;
+
+		int		isRegistered(void);
+		void	setRegistered(void);
+
 };
 
 #endif

@@ -7,11 +7,16 @@
 #include <poll.h>
 #include <cerrno>
 #include "../includes/toString.hpp"
+#include "../includes/numerics.hpp"
 
 using namespace std;
 
-Server::Server(void):_initialized(0){};
+Server::Server(void):_initialized(0){
+	_servername = "IRis.Chat";
+	_users = new userList(&_term);
+};
 Server::~Server(void){
+	delete _users;
 	this->shutdown();
 };
 Server::Server(Server &rhs){(void)rhs;};
@@ -37,49 +42,8 @@ void Server::shutdown(void){
 }
 
 void Server::drawInterface(void){
-	static int dec = 1;
-	int	h = 10;
-	_term.saveCursor();
-	for(int i = 1; i <= h + 1; ++i){
-		_term.clearLine(i);
-	}
-	_term.setCursor(3, dec);
-	_term.prtColor(">>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>", Terminal::BLUE);
-	for(int i = 1; i <= h; ++i){
-		_term.setCursor(i, 1);
-		_term.prtColor("*", Terminal::BLUE);
-		_term.setCursor(i, 80);
-		_term.prtColor("*", Terminal::BLUE);
-		_term.clearLineAfter();
-	}
-	_term.setCursor(1, 1);
-	_term.prtColor("********************************************************************************", Terminal::BLUE);
-	_term.setCursor(h, 1);
-	_term.prtColor("********************************************************************************", Terminal::BLUE);
-
-	// TITLE
-	_term.setCursor(3, 25);
-	_term.prtColor(" (ﾟ◥益◤ﾟ) İ͍͔R̲̟͍̯ͬĈ̝̙̻̬͊̒ͪ ̳̹͎̂̈́̏ͪS̏̅ͮ͆ͩEŔ̲̪̓V̙̘ͭE͕̺̝ͣ̇ͧͯͅR̗̽͌̍ͯͪ  (ʘ言ʘ╬) ", Terminal::CYAN);
-	// LEFT SIDE
-	_term.setCursor(5, 5);
-	_term.prtColor("   Port: " + toString(_port), Terminal::CYAN);
-	_term.setCursor(6, 5);
-	_term.prtColor("Clients: " + toString(_connection_nb) + "/" + toString(MAX_CON), Terminal::GREEN);
-	int not_reg = _users.getNbNotRegistered();
-	if (not_reg) {
-		_term.setCursor(6, 22);
-		_term.prtColor("! " + toString(not_reg) + " not reg", Terminal::RED);
-	}
-	// RIGHT SIDE
-	_term.setCursor(6, 54);
-	_term.prtColor("Channels: " + toString(0), Terminal::MAGENTA);
-	_term.setCursor(7, 54);
-	_term.prtColor("Messages: " + toString(_msg_nb), Terminal::MAGENTA);
-
-	_term.restoreCursor();
-	cout << flush;	// update display
-	++dec;
-	if (dec > 6) dec = 1;
+	_term.updateTitle(_port, _connection_nb, _users->getNbNotRegistered(), 0, _msg_nb, MAX_CON);
+	_term.updateMenu(_users);
 }
 
 int Server::init(int port){
@@ -91,7 +55,6 @@ int Server::init(int port){
 
 	_term.clearScreen();
 	drawInterface();
-	_term.setCursor(12, 1);
 	_term.prtTmColor("------ STARTING SERVER ------\n", Terminal::CYAN);
 	if (port <= 0 || port > 65535){
 		_term.prtTmColor("Error: PORT " + toString(port) + " not valid\n", Terminal::RED);
@@ -165,10 +128,9 @@ void Server::getConnection(void){
 	_fds[i].fd = connection;
 	_fds[i].events = POLLIN;// | POLLHUP;
 
-	_users.addUser(i);
+	_users->addUser(i);
 
-	_term.prtTmColor(">>> Connection FD." + toString(i), Terminal::GREEN);
-	_term.prtColor(" | " + toString(_connection_nb) + " / " + toString(MAX_CON) + " clients\n", Terminal::CYAN);
+	_term.prtTmColor(">>> Connection FD." + toString(i) + Terminal::CYAN + " | " + toString(_connection_nb) + " / " + toString(MAX_CON) + " clients\n", Terminal::GREEN);
 }
 
 int Server::pollFds(int timeout){
@@ -189,23 +151,45 @@ void Server::handleEvents(void){
 		// Check for connection
 		if (_fds[0].revents & POLLIN){
 			this->getConnection();
-		}
-		// Check for new messages
-		int i = 0;
-		int fd = 1;
-		while (i < _connection_nb){
-			if (_fds[fd].fd != -1){
-				if (_fds[fd].revents & POLLIN){
-					this->getMessages(fd);
+		} else {
+			// Check for new messages
+			int i = 0;
+			int fd = 1;
+			while (i < _connection_nb){
+				if (_fds[fd].fd != -1){
+					if (_fds[fd].revents & POLLIN){
+						this->getMessages(fd);
+					}
+					++i;
 				}
-				++i;
+				++fd;
 			}
-			++fd;
 		}
 	} else {
 		// _term.prtTmColor(" ....", Terminal::RESET);
 	}
+	// Check if a user waits for an action from the server
+	userInfos* user;
+	while ((user = _users->getUserActionRequests()) != NULL){
+		performAction(user);
+	}
 	drawInterface();
+}
+
+void Server::performAction(userInfos* user){
+	int action_type = user->getAction();
+	_term.prtTmColor("User " + user->getNickname() + " request action #" + toString(action_type) + "\n", Terminal::CYAN);
+
+	int fd = user->getFd();
+
+	if (action_type == ACT_REGISTRATION){
+		string message = ":" + _servername + " 001 " + user->getNickname() + " :Welcome to the iRisChat network, " + user->getNickname() + "!" + user->getUsername() + "@" + _servername;
+		sendMessage(fd, message);
+		_users->validateRegistration(user);
+	}
+
+
+	_users->rmFirstAction();
 }
 
 void Server::parseMessage(string& msg, int fd){
@@ -215,7 +199,7 @@ void Server::parseMessage(string& msg, int fd){
 	// Split the message at ':' if exists
 	size_t	colonPos = msg.find(" :");
     string	beforeColon = (colonPos != string::npos) ? msg.substr(0, colonPos) : msg;
-    string	afterColon = (colonPos != string::npos) ? msg.substr(colonPos + 1) : "";
+    string	afterColon = (colonPos != string::npos) ? msg.substr(colonPos + 2) : "";
 
 	// Split at spaces
 	stringstream 	ss(beforeColon);
@@ -227,25 +211,49 @@ void Server::parseMessage(string& msg, int fd){
 	// Push back after ':' part
 	if (!afterColon.empty()) tokens.push_back(afterColon);
 
-	_term.prtTmColor("CMD: '" + tokens[0] + "'\n", Terminal::YELLOW);
+
+	// Print message
+	userInfos* user = _users->getUserByFd(fd);
+	string name = user->getNickname();
+	if (name.empty()) name = "FD." + toString(fd);
+	string str = "IN: " + name + " | Msg#" + toString(user->getNbMsg()) + ": " + Terminal::YELLOW + tokens[0] + Terminal::WHITE;
+	for(size_t ind = 1; ind < tokens.size(); ++ind)
+		str = str + " " + tokens[ind];
+	_term.prtTmColor(str, Terminal::WHITE);
+
+	// _term.prtTmColor("CMD: '" + tokens[0] + "'\n", Terminal::YELLOW);
 
 	if (tokens[0] == "NICK"){
-		_users.setNickname(fd, tokens[1]);
+		int ret = _users->setNickname(fd, tokens[1]);
+		if (ret == ERR_NICKNAMEINUSE){
+			string nick = _users->getUserByFd(fd)->getNickname();
+			if (nick.empty()) nick = "*";
+			sendMessage(fd, string(":" + _servername + " " + toString(ERR_NICKNAMEINUSE) + " " + nick + " " + tokens[1] + " :Nickname already in use"));
+			_term.prtTmColor("FD. " + toString(fd) + " nickname already in use\n", Terminal::RED);
+		}
 	}
 	if (tokens[0] == "USER"){
-		if (tokens[1].length() > 1)
-			_users.setUsername(fd, tokens[1]);
+		if (tokens[1].length() > 1){
+			_users->setUsername(fd, tokens[1]);
+			_users->setRealname(fd, tokens[4]);
+		}
+	}
+	if (tokens[0] == "PING"){
+		if (tokens[1].empty())
+			sendMessage(fd, string("PONG"));
+		else
+			sendMessage(fd, string("PONG " + tokens[1]));
 	}
 	if (msg == "CAP LS 302"){
-		sendMessage(fd, string("CAP * LS :\r\n"));
+		sendMessage(fd, string("CAP * LS :"));
 	}
 
 
 	if (tokens[0] == "MAPID"){
-		_users.getUserByFd(atoi(tokens[1].c_str()));
+		_users->getUserByFd(atoi(tokens[1].c_str()));
 	}
 	if (tokens[0] == "RMID"){
-		_users.rmUser(atoi(tokens[1].c_str()));
+		_users->rmUser(atoi(tokens[1].c_str()));
 	}
 
 }
@@ -253,11 +261,11 @@ void Server::parseMessage(string& msg, int fd){
 void Server::getMessages(int fd){
 	// cout << "---> Reading Fd " << fd, Terminal::RESET);
 	char buffer[10000];
-	ssize_t bytesRead = read(_fds[fd].fd, buffer, sizeof(buffer));
+	ssize_t bytesRead = recv(_fds[fd].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
 
 	if (bytesRead == 0){	// CLIENT DISCONNECTED
 		_term.prtTmColor("X Client # " + toString(fd) + " has disconnected\n", Terminal::RED);
-		_users.rmUser(fd);
+		_users->rmUser(fd);
 		_fds[fd].fd = -1;
 		--_connection_nb;
 	} else {				// TREAT MESSAGE
@@ -265,8 +273,8 @@ void Server::getMessages(int fd){
 		size_t pos;
 		while ((pos = answer.find("\r\n", 0)) != string::npos){
 			string msg = answer.substr(0, pos);
-			userInfos* user = _users.getUserByFd(fd);
-			_term.prtTmColor(">> " + user->getNickname() + ", Msg #" + toString(user->getNbMsg()) + ": '" + toString(msg) + "'\n", Terminal::RESET);
+			userInfos* user = _users->getUserByFd(fd);
+			user->incMsgs();
 			this->parseMessage(msg, fd);
 			answer = answer.substr(pos + 2);
 			++_msg_nb;
@@ -277,6 +285,7 @@ void Server::getMessages(int fd){
 }
 
 void Server::sendMessage(int fd, const string& msg){
-	send(_fds[fd].fd, msg.c_str(), msg.size(), 0);
-	_term.prtTmColor("sending: '" + msg + "' to fd " + toString(fd) + "\n", Terminal::RESET);
+	string final_msg = msg + "\r\n";
+	send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
+	_term.prtTmColor("OUT: '" + msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_BLUE);
 }
