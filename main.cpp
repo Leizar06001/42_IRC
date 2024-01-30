@@ -10,11 +10,6 @@
 
 #include "includes/server.class.hpp"
 
-std::string username;
-std::string nickname;
-
-
-
 namespace {
   volatile sig_atomic_t quitok = false;
   void handle_break(int a) {
@@ -22,15 +17,13 @@ namespace {
   }
 }
 
-
-
 void	init_sigaction(){
 	struct	sigaction sigbreak;
 	sigbreak.sa_handler = &handle_break;
 	sigemptyset(&sigbreak.sa_mask);
 	sigbreak.sa_flags = 0;
 	if (sigaction(SIGINT, &sigbreak, NULL) != 0)
-		std::perror("Error: sigaction\n");
+		std::cerr << "Error: sigaction\n";
 }
 
 int main() {
@@ -38,10 +31,18 @@ int main() {
 
 	Server serv;
 
-	serv.init(6667);
+	if (serv.init(6667) == -1)
+		return 1;
 	while (!quitok)
 		serv.handleEvents();
 
 
 	return 0;
 }
+
+/* 	PASS password > ret: PASS ERR_PASSWDMISMATCH if wrong
+	NICK nickname > :dan!d@localhost NICK Mamoped
+	USER username 0 * (:)realname
+
+
+*/

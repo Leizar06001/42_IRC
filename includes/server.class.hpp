@@ -4,10 +4,13 @@
 #include <string>
 #include <netinet/in.h> // For sockaddr_in
 #include <poll.h>
+#include "userList.class.hpp"
+#include "terminal.class.hpp"
+
 
 #define MAX_CON	100
 
-
+using namespace std;
 class Server {
 
 	private:
@@ -18,27 +21,29 @@ class Server {
 		int				_msg_nb;
 		int				_connection_nb;
 		int				_initialized;
+		userList		_users;
+		Terminal		_term;
 
+		string 	timestamp(void);
 
-		std::string timestamp(void);
-
-		int			pollFds(int timeout);
-		void		getMessages(int fd);
-		void		parseMessage(std::string& msg, int fd);
-
+		int		pollFds(int timeout);
+		void	getMessages(int fd);
+		void	parseMessage(string& msg, int fd);
+		void	sendMessage(int fd, const string& msg);
+		void	createSocket(int domain, int type, int protocol);
+		void	bindToPort(int port);
+		void	getConnection(void);
+		void	drawInterface(void);
 
 	public:
 		Server(void);
 		~Server(void);
 		Server(Server &rhs);
 		Server &operator=(Server &rhs);
-		void	init(int port);
-		void	shutdown(void);
-		void	createSocket(int domain, int type, int protocol);
-		void	bindToPort(int port);
-		void	getConnection(void);
 
-		void		handleEvents(void);
+		int		init(int port);
+		void	shutdown(void);
+		void	handleEvents(void);
 
 };
 

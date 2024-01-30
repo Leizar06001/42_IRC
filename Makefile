@@ -1,10 +1,13 @@
 NAME = irc_server
 
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
 SRCS = 	main.cpp \
-		srcs/server.class.cpp
+		srcs/server.class.cpp	\
+		srcs/userList.class.cpp	\
+		srcs/userInfos.class.cpp	\
+		srcs/terminal.class.cpp
 
 OBJS = $(SRCS:%.cpp=%.o)
 

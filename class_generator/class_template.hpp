@@ -1,5 +1,5 @@
-#ifndef CLASSNAME_HPP
-# define CLASSNAME_HPP
+#ifndef CLASSNAME_CLASS_HPP
+# define CLASSNAME_CLASS_HPP
 
 #include <string>
 

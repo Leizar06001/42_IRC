@@ -41,11 +41,11 @@ void createFiles(const std::string& className){
 	std::string hppContent = replace(hppTemplate, className);
 	std::string cppContent = replace(cppTemplate, className);
 
-	std::ofstream hppFile(className + ".hpp");
+	std::ofstream hppFile(className + ".class.hpp");
 	hppFile << hppContent;
 	hppFile.close();
 
-	std::ofstream cppFile(className + ".cpp");
+	std::ofstream cppFile(className + ".class.cpp");
 	cppFile << cppContent;
 	cppFile.close();
 }
