@@ -11,10 +11,10 @@
 #include "includes/server.class.hpp"
 
 namespace {
-  volatile sig_atomic_t quitok = false;
-  void handle_break(int a) {
-    if (a == SIGINT) quitok = true;
-  }
+	volatile sig_atomic_t quitok = false;
+	void handle_break(int a) {
+		if (a == SIGINT) quitok = true;
+	}
 }
 
 void	init_sigaction(){

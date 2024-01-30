@@ -1,22 +1,21 @@
 #include "../includes/userList.class.hpp"
 #include <iostream>
 #include <stdexcept>
+#include "../includes/toString.hpp"
 
 userList::userList(void):_nbUsers(0){
-	cout << "USER LIST CREATED" << endl;
+	_term.prtTmColor("USER LIST CREATED\n", Terminal::MAGENTA);
 };
 userList::~userList(void){
-	cout << "User list size : " << _userlist.size() << endl;
+	_term.prtTmColor("User list size : " + toString(_userlist.size()) + "\n", Terminal::MAGENTA);
 	for (size_t i = 0; i < _userlist.size(); ++i) {
 		if (_userlist[i]){
-			cout << "deleting ";
-			cout << i << endl;
-			cout << _userlist[i]->getNickname() << endl;
+			_term.prtTmColor("deleting " + toString(i) + " : " + toString(_userlist[i]->getNickname()) + "\n", Terminal::MAGENTA);
 			delete _userlist[i];
 		}
 	}
 	_userlist.clear();
-	cout << "USER LIST DELETED" << endl;
+	_term.prtTmColor("USER LIST DELETED\n", Terminal::MAGENTA);
 };
 userList::userList(userList & src){*this = src;};
 userList& userList::operator=(const userList & src){
@@ -24,19 +23,35 @@ userList& userList::operator=(const userList & src){
 	return *this;
 }
 
-void userList::addUser(int fd, string &nickname){
+void userList::addUser(int fd){
 	if (_nbUsers >= MAX_USERS){
 		throw length_error("USER DB FULL");
 	}
-	userInfos* user = new userInfos(nickname);
-	user->setFd(fd);
+	userInfos* user = new userInfos(fd);
 	_userlist.push_back(user);
 	size_t	index = _userlist.size() - 1;
+	user->setIndex(index);
 	_mapID.insert(make_pair(fd, index));
-	_mapNick.insert(make_pair(nickname, index));
+	_mapInit.insert(make_pair(fd, index));
 
 	++_nbUsers;
-	cout << "User '" << nickname << "' added, fd: " << fd << std::endl;
+	_term.prtTmColor("FD." + toString(fd) + " User added\n", Terminal::MAGENTA);
+}
+
+void userList::setNickname(int fd, string& nickname){
+	userInfos* user = getUserByFd(fd);
+	user->setNickname(nickname);
+	_mapNick.insert(make_pair(nickname, user->getIndex()));
+}
+
+void userList::setUsername(int fd, string& username){
+	userInfos* user = getUserByFd(fd);
+	user->setUsername(username);
+}
+
+void userList::setRealname(int fd, string& realname){
+	userInfos* user = getUserByFd(fd);
+	user->setRealname(realname);
 }
 
 void userList::rmUser(int fd){
@@ -46,28 +61,32 @@ void userList::rmUser(int fd){
 		map<string, size_t>::iterator itNick = _mapNick.find(_userlist[index]->getNickname());
 		if (itNick != _mapNick.end()){
 			_mapNick.erase(itNick);
-			cout << "User fd '" << fd << "' removed from mapNick" << endl;
+			_term.prtTmColor("FD.'" + toString(fd) + "' removed from mapNick\n", Terminal::MAGENTA);
 		} else {
-			cout << "User fd '" << fd << "' not found, cannot remove from mapNick" << endl;
+			_term.prtTmColor("FD.'" + toString(fd) + "' not found, cannot remove from mapNick\n", Terminal::MAGENTA);
 		}
 		delete _userlist[index];
 		_userlist[index] = NULL;
-		cout << "User fd '" << fd << "' deleted from vector" << endl;
+		_term.prtTmColor("FD.'" + toString(fd) + "' deleted from vector\n", Terminal::MAGENTA);
 		_mapID.erase(itID);
 		--_nbUsers;
-		cout << "User fd '" << fd << "' removed from mapID" << endl;
+		_term.prtTmColor("FD.'" + toString(fd) + "' removed from mapID\n", Terminal::MAGENTA);
 	} else {
-		cout << "User fd '" << fd << "' not found, cannot remove from mapID" << endl;
+		_term.prtTmColor("FD.'" + toString(fd) + "' not found, cannot remove from mapID\n", Terminal::MAGENTA);
 	}
 }
 
 userInfos* userList::getUserByFd(int fd){
 	map<int, size_t>::iterator it = _mapID.find(fd);
 	size_t	index = it->second;
-	if (it != _mapID.end()){
-		cout << "User fd '" << fd << "' found, Nick: " << _userlist[index]->getNickname() << endl;
-	} else {
-		cout << "User fd '" << fd << "' not found" << endl;
-	}
+	// if (it != _mapID.end()){
+	// 	_term.prtTmColor("FD.'" + toString(fd) + "' found, Nick: " + _userlist[index]->getNickname() + "\n", Terminal::MAGENTA);
+	// } else {
+	// 	_term.prtTmColor("FD.'" + toString(fd) + "' not found\n", Terminal::MAGENTA);
+	// }
 	return _userlist[index];
+}
+
+int userList::getNbNotRegistered(void) const {
+	return _mapInit.size();
 }

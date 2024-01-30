@@ -24,8 +24,6 @@ class Server {
 		userList		_users;
 		Terminal		_term;
 
-		string 	timestamp(void);
-
 		int		pollFds(int timeout);
 		void	getMessages(int fd);
 		void	parseMessage(string& msg, int fd);

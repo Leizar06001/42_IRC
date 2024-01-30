@@ -6,7 +6,6 @@
 
 class Terminal {
 public:
-	// ANSI color codes
 	static const std::string RED;
 	static const std::string GREEN;
 	static const std::string YELLOW;
@@ -15,40 +14,14 @@ public:
 	static const std::string CYAN;
 	static const std::string RESET;
 
-	// Clear the screen
-	void clearScreen() const {
-		// CSI[2J clears screen, CSI[H moves the cursor to top-left corner
-		std::cout << "\033[2J\033[H";
-	}
-
-	void clearLine(int row) const {
-		setCursor(row, 0);
-		std::cout << "\033[2K";
-	}
-
-	void clearLineAfter(void) const {
-		std::cout << "\033[0K";
-	}
-
-	// Set cursor position
-	void setCursor(int row, int col) const {
-		std::cout << "\033[" << row << ";" << col << "H";
-	}
-
-	// Print text in a specific color
-	void prtColor(const std::string& text, const std::string& color) const {
-		std::cout << color << text << RESET;
-	}
-
-	void saveCursor(void) const {
-		std::cout << "\033[s";
-	}
-
-	void restoreCursor(void) const {
-		std::cout << "\033[u";
-	}
+	void clearScreen() const;
+	void clearLine(int row) const;
+	void clearLineAfter(void) const;
+	void setCursor(int row, int col) const;
+	void prtColor(const std::string& text, const std::string& color) const;
+	void prtTmColor(const std::string& text, const std::string& color) const;
+	void saveCursor(void) const;
+	void restoreCursor(void) const;
 };
-
-
 
 #endif

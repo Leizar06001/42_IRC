@@ -7,6 +7,7 @@
 #include "userInfos.class.hpp"
 #include <vector>
 #include <map>
+#include "terminal.class.hpp"
 
 using namespace std;
 
@@ -17,6 +18,8 @@ class userList {
 		int						_nbUsers;
 		map<int, size_t>		_mapID;
 		map<string, size_t>		_mapNick;
+		map<int, size_t>		_mapInit;
+		Terminal				_term;
 
 	public:
 		userList(void);
@@ -24,10 +27,14 @@ class userList {
 		userList(userList & src);
 		userList &operator=(const userList & src);
 
-		void	addUser(int fd, string &nickname);
+		void	addUser(int fd);
+		void	setNickname(int fd, string& nickname);
+		void	setRealname(int fd, string& realname);
+		void	setUsername(int fd, string& username);
 
-		void	rmUser(int fd);
+		void		rmUser(int fd);
 		userInfos*	getUserByFd(int fd);
+		int			getNbNotRegistered(void) const;
 };
 
 #endif
