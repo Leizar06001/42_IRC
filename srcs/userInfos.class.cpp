@@ -70,16 +70,16 @@ void	userInfos::incMsgs(void){
 	++_nb_msg;
 }
 
-string userInfos::getNickname(void) const{
+string const &userInfos::getNickname(void) const{
 	return _nickname;
 }
-string userInfos::getPrevNick(void) const{
+string const &userInfos::getPrevNick(void) const{
 	return _prev_nick;
 }
-string userInfos::getUsername(void) const{
+string const &userInfos::getUsername(void) const{
 	return _username;
 }
-string userInfos::getRealname(void) const{
+string const &userInfos::getRealname(void) const{
 	return _realname;
 }
 int	userInfos::getFd(void) const {

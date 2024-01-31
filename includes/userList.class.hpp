@@ -36,7 +36,7 @@ class userList {
 		int		setUsername(int fd, string& username);
 		void		rmUser(int fd);
 
-		int			getNbUsers(void);
+		int			getNbUsers(void) const;
 		userInfos*	getUserByFd(int fd);
 		userInfos*	getUserByNick(string& nickname);
 		userInfos*	getNextUser(int reset);

@@ -102,7 +102,7 @@ void userList::rmUser(int fd){
 	}
 }
 
-int userList::getNbUsers(void){
+int userList::getNbUsers(void) const {
 	return _nbUsers;
 }
 

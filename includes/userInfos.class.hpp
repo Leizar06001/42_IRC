@@ -39,10 +39,10 @@ class userInfos {
 
 		void	incMsgs(void);
 
-		string	getNickname(void) const;
-		string	getPrevNick(void) const;
-		string	getUsername(void) const;
-		string	getRealname(void) const;
+		string	const &getNickname(void) const;
+		string	const &getPrevNick(void) const;
+		string	const &getUsername(void) const;
+		string	const &getRealname(void) const;
 		int		getFd(void) const;
 		int		getNbMsg(void) const;
 		int		getIndex(void) const;
