@@ -218,7 +218,7 @@ void Server::parseMessage(string& msg, int fd){
 	userInfos* user = _users->getUserByFd(fd);
 	string name = user->getNickname();
 	if (name.empty()) name = "FD." + toString(fd);
-	_term.prtTmColor("IN: " + name + " | Msg#" + toString(user->getNbMsg()) + ": " + msg, Terminal::BRIGHT_WHITE);
+	_term.prtTmColor("IN: " + Terminal::YELLOW + name + " | Msg#" + toString(user->getNbMsg()) + ": " + msg, Terminal::BRIGHT_WHITE);
 	string str = "  > " + Terminal::YELLOW + tokens[0] + Terminal::BRIGHT_WHITE;
 	for(size_t ind = 1; ind < tokens.size(); ++ind)
 		str = str + " [" + tokens[ind] + "]";
@@ -270,10 +270,13 @@ void Server::parseMessage(string& msg, int fd){
 			}
 		}
 	}
-	// :Angel PRIVMSG Wiz :Hello
 
-	if (msg == "CAP LS 302"){
-		sendMessage(fd, string("CAP * LS :"));
+	if (tokens[0] == "CAP"){
+		if (!tokens[1].empty()){
+			if (tokens[1] == "LS"){
+				sendMessage(fd, string("CAP * LS :"));
+			}
+		}
 	}
 
 
