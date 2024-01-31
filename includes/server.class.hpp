@@ -25,15 +25,25 @@ class Server {
 		userList*		_users;
 		Terminal		_term;
 
-		int		pollFds(int timeout);
-		void	getMessages(int fd);
-		void	parseMessage(string& msg, int fd);
-		void	sendMessage(int fd, const string& msg);
 		void	createSocket(int domain, int type, int protocol);
 		void	bindToPort(int port);
 		void	getConnection(void);
-		void	drawInterface(void);
+
+		int				pollFds(int timeout);
+		string const 	getMessages(int fd);
+		vector<string>	parseMessage(int fd, string& msg);
+		void			analyseCommands(int fd, vector<string>& tokens);
+		void			sendMessage(int fd, const string& msg);
+
 		void	performAction(userInfos* user);
+		void	drawInterface(void);
+
+
+		void	cmd_cap(int fd, vector<string> tokens);
+		void	cmd_nick(int fd, vector<string> tokens);
+		void	cmd_user(int fd, vector<string> tokens);
+		void	cmd_ping(int fd, vector<string> tokens);
+		void	cmd_msg(int fd, vector<string> tokens);
 
 	public:
 		Server(void);

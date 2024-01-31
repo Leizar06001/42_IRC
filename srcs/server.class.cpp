@@ -158,15 +158,17 @@ void Server::handleEvents(void){
 			while (i < _connection_nb){
 				if (_fds[fd].fd != -1){
 					if (_fds[fd].revents & POLLIN){
-						this->getMessages(fd);
+						string msg = this->getMessages(fd);
+						if (!msg.empty()){
+							vector<string> tokens = parseMessage(fd, msg);
+							analyseCommands(fd, tokens);
+						}
 					}
 					++i;
 				}
 				++fd;
 			}
 		}
-	} else {
-		// _term.prtTmColor(" ....", Terminal::RESET);
 	}
 	// Check if a user waits for an action from the server
 	userInfos* user;
@@ -194,7 +196,7 @@ void Server::performAction(userInfos* user){
 	_users->rmFirstAction();
 }
 
-void Server::parseMessage(string& msg, int fd){
+vector<string> Server::parseMessage(int fd, string& msg){
 	vector<string> 	tokens;
 	string 			token;
 
@@ -213,7 +215,6 @@ void Server::parseMessage(string& msg, int fd){
 	// Push back after ':' part
 	if (!afterColon.empty()) tokens.push_back(afterColon);
 
-
 	// Print message
 	userInfos* user = _users->getUserByFd(fd);
 	string name = user->getNickname();
@@ -224,72 +225,80 @@ void Server::parseMessage(string& msg, int fd){
 		str = str + " [" + tokens[ind] + "]";
 	_term.prtTmColor(str, Terminal::WHITE);
 
-	// _term.prtTmColor("CMD: '" + tokens[0] + "'\n", Terminal::YELLOW);
-
-	if (tokens[0] == "NICK"){
-		int ret = _users->setNickname(fd, tokens[1]);
-		if (ret == ERR_NICKNAMEINUSE){
-			string nick = _users->getUserByFd(fd)->getNickname();
-			if (nick.empty()) nick = "*";
-			_term.prtTmColor("FD. " + toString(fd) + " nickname already in use\n", Terminal::RED);
-			sendMessage(fd, string(":" + _servername + " " + toString(ERR_NICKNAMEINUSE) + " " + nick + " " + tokens[1] + " :Nickname already in use"));
-		} else {
-			_users->checkForRegistration(fd);
-		}
-	}
-	if (tokens[0] == "USER"){
-		if (_users->getUserByFd(fd)->isRegistered()) {
-			// SEND ERROR ALREADY REGISTERED
-		} else {
-			if (tokens[1].length() > 1){
-				int ret = _users->setUsername(fd, tokens[1]);
-				if (!ret)
-					ret = _users->setRealname(fd, tokens[4]);
-				if (!ret){
-					_users->checkForRegistration(fd);
-				} else {
-					// ERROR USER
-				}
-			}
-		}
-	}
-	if (tokens[0] == "PING"){
-		if (tokens[1].empty())
-			sendMessage(fd, string("PONG"));
-		else
-			sendMessage(fd, string("PONG " + tokens[1]));
-	}
-
-	if (tokens[0] == "PRIVMSG"){
-		if (!tokens[1].empty() && !tokens[2].empty()){
-			userInfos* dest = _users->getUserByNick(tokens[1]);
-			if (dest){
-				sendMessage(dest->getFd(), ":" + _users->getUserByFd(fd)->getNickname() + " PRIVMSG " + tokens[1] + " :" + tokens[2]);
-			} else {
-				// ERR DEST NOT EXISTS
-			}
-		}
-	}
-
-	if (tokens[0] == "CAP"){
-		if (!tokens[1].empty()){
-			if (tokens[1] == "LS"){
-				sendMessage(fd, string("CAP * LS :"));
-			}
-		}
-	}
-
-
-	if (tokens[0] == "MAPID"){
-		_users->getUserByFd(atoi(tokens[1].c_str()));
-	}
-	if (tokens[0] == "RMID"){
-		_users->rmUser(atoi(tokens[1].c_str()));
-	}
-
+	return tokens;
 }
 
-void Server::getMessages(int fd){
+void Server::analyseCommands(int fd, vector<string>& tokens){
+	void (Server::*functionsPTRS[])(int fd,  vector<string> tokens) = {
+		&Server::cmd_cap,
+		&Server::cmd_nick,
+		&Server::cmd_user,
+		&Server::cmd_ping,
+		&Server::cmd_msg
+	};
+	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PRIVMSG"};
+
+	for (size_t i = 0; i < 5; ++i){
+		if (cmds[i] == tokens[0]){
+			_term.prtTmColor("'" + cmds[i] + "'", Terminal::BRIGHT_CYAN);
+			(this->*functionsPTRS[i])(fd, tokens);
+		}
+	}
+}
+
+void Server::cmd_cap(int fd, vector<string> tokens){
+	if (!tokens[1].empty()){
+		if (tokens[1] == "LS"){
+			sendMessage(fd, string("CAP * LS :"));
+		}
+	}
+}
+void Server::cmd_nick(int fd, vector<string> tokens){
+	int ret = _users->setNickname(fd, tokens[1]);
+	if (ret == ERR_NICKNAMEINUSE){
+		string nick = _users->getUserByFd(fd)->getNickname();
+		if (nick.empty()) nick = "*";
+		_term.prtTmColor("FD. " + toString(fd) + " nickname already in use\n", Terminal::RED);
+		sendMessage(fd, string(":" + _servername + " " + toString(ERR_NICKNAMEINUSE) + " " + nick + " " + tokens[1] + " :Nickname already in use"));
+	} else {
+		_users->checkForRegistration(fd);
+	}
+}
+void Server::cmd_user(int fd, vector<string> tokens){
+	if (_users->getUserByFd(fd)->isRegistered()) {
+		// SEND ERROR ALREADY REGISTERED
+	} else {
+		if (tokens[1].length() > 1){
+			int ret = _users->setUsername(fd, tokens[1]);
+			if (!ret)
+				ret = _users->setRealname(fd, tokens[4]);
+			if (!ret){
+				_users->checkForRegistration(fd);
+			} else {
+				// ERROR USER
+			}
+		}
+	}
+}
+void Server::cmd_ping(int fd, vector<string> tokens){
+	if (tokens[1].empty())
+		sendMessage(fd, string("PONG"));
+	else
+		sendMessage(fd, string("PONG :" + tokens[1]));
+}
+void Server::cmd_msg(int fd, vector<string> tokens){
+	_term.prtTmColor("PRIVATE", Terminal::BRIGHT_RED);
+	if (!tokens[1].empty() && !tokens[2].empty()){
+		userInfos* dest = _users->getUserByNick(tokens[1]);
+		if (dest){
+			sendMessage(dest->getFd(), ":" + _users->getUserByFd(fd)->getNickname() + " PRIVMSG " + tokens[1] + " :" + tokens[2]);
+		} else {
+			// ERR DEST NOT EXISTS
+		}
+	}
+}
+
+string const Server::getMessages(int fd){
 	// cout << "---> Reading Fd " << fd, Terminal::RESET);
 	char buffer[10000];
 	ssize_t bytesRead = recv(_fds[fd].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
@@ -302,18 +311,46 @@ void Server::getMessages(int fd){
 	} else {				// TREAT MESSAGE
 		string answer(buffer, bytesRead);
 		size_t pos;
-		while ((pos = answer.find("\r\n", 0)) != string::npos){
+		if ((pos = answer.find("\r\n", 0)) != string::npos){
 			string msg = answer.substr(0, pos);
-			userInfos* user = _users->getUserByFd(fd);
-			user->incMsgs();
-			this->parseMessage(msg, fd);
-			answer = answer.substr(pos + 2);
-			++_msg_nb;
+			if (!msg.empty()){
+				_users->getUserByFd(fd)->incMsgs();
+				++_msg_nb;
+				return msg;
+			} else return "";
 			// cout << "---> Reading again " << fd, Terminal::RESET);
 		}
 	}
+	return "";
 	// cout << "---> Reading END " << fd, Terminal::RESET);
 }
+
+
+// void Server::getMessages(int fd){
+// 	// cout << "---> Reading Fd " << fd, Terminal::RESET);
+// 	char buffer[10000];
+// 	ssize_t bytesRead = recv(_fds[fd].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
+
+// 	if (bytesRead == 0){	// CLIENT DISCONNECTED
+// 		_term.prtTmColor("X Client # " + toString(fd) + " has disconnected\n", Terminal::RED);
+// 		_users->rmUser(fd);
+// 		_fds[fd].fd = -1;
+// 		--_connection_nb;
+// 	} else {				// TREAT MESSAGE
+// 		string answer(buffer, bytesRead);
+// 		size_t pos;
+// 		while ((pos = answer.find("\r\n", 0)) != string::npos){
+// 			string msg = answer.substr(0, pos);
+// 			userInfos* user = _users->getUserByFd(fd);
+// 			user->incMsgs();
+// 			this->parseMessage(msg, fd);
+// 			answer = answer.substr(pos + 2);
+// 			++_msg_nb;
+// 			// cout << "---> Reading again " << fd, Terminal::RESET);
+// 		}
+// 	}
+// 	// cout << "---> Reading END " << fd, Terminal::RESET);
+// }
 
 void Server::sendMessage(int fd, const string& msg){
 	string final_msg = msg + "\r\n";
