@@ -351,8 +351,10 @@ void Server::getMessages(int fd){
 			userInfos* user = _users->getUserByFd(fd);
 			user->incMsgs();
 
-			vector<string> tokens = parseMessage(fd, msg);
-			analyseCommands(fd, tokens);
+			if (!msg.empty()){
+				vector<string> tokens = parseMessage(fd, msg);
+				analyseCommands(fd, tokens);
+			}
 
 			answer = answer.substr(pos + 2);
 			++_msg_nb;
