@@ -44,6 +44,7 @@ class userList {
 		int			getNbNotRegistered(void) const;
 		void		validateRegistration(userInfos* user);
 		void		checkForRegistration(int fd);
+		int			checkRegistrationTimeout(int timeout);
 
 		userInfos*	getUserActionRequests(void) const;
 		void		rmFirstAction(void);

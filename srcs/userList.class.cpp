@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include "../includes/toString.hpp"
 #include "../includes/terminal.class.hpp"
+#include <ctime>
 
 userList::userList(Terminal* term):_nbUsers(0), _term(term){
 	_term->prtTmColor("USER LIST CREATED\n", Terminal::MAGENTA);
@@ -139,6 +140,17 @@ void userList::validateRegistration(userInfos* user){
 		_mapInit.erase(it);
 		user->setRegistered();
 	}
+}
+
+int userList::checkRegistrationTimeout(int timeout){
+	map<int, size_t>::iterator it = _mapInit.begin();
+	while (it != _mapInit.end()){
+		if (time(NULL) - _userlist[it->second]->getConnectionStart() > timeout){
+			return _userlist[it->second]->getFd();
+		}
+		++it;
+	}
+	return -1;
 }
 
 userInfos* userList::getUserActionRequests(void) const {

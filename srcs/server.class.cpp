@@ -6,6 +6,7 @@
 #include <unistd.h> // For read
 #include <poll.h>
 #include <cerrno>
+#include <ctime>
 #include "../includes/toString.hpp"
 #include "../includes/numerics.hpp"
 
@@ -148,7 +149,7 @@ void Server::handleEvents(void){
 	}
 	//drawInterface();
 	if (pollFds(500) > 0){
-		// Check for connection
+		// Check for new clients
 		if (_fds[0].revents & POLLIN){
 			this->getConnection();
 		} else {
@@ -170,6 +171,15 @@ void Server::handleEvents(void){
 	userInfos* user;
 	while ((user = _users->getUserActionRequests()) != NULL){
 		performAction(user);
+	}
+	// Check for user not registered in time
+	int fdtm = _users->checkRegistrationTimeout(REGISTRATION_TIMEOUT);
+	if (fdtm >= 0){
+		_term.prtTmColor("X Client # " + toString(fdtm) + " registration timeout\n", Terminal::RED);
+		_users->rmUser(fdtm);
+		close(_fds[fdtm].fd);
+		_fds[fdtm].fd = -1;
+		--_connection_nb;
 	}
 	drawInterface();
 }
@@ -217,8 +227,8 @@ vector<string> Server::parseMessage(int fd, string& msg){
 	userInfos* user = _users->getUserByFd(fd);
 	string name = user->getNickname();
 	if (name.empty()) name = "FD." + toString(fd);
-	_term.prtTmColor("IN: " + Terminal::YELLOW + name + " | Msg#" + toString(user->getNbMsg()) + ": " + msg, Terminal::BRIGHT_WHITE);
-	string str = "  > " + Terminal::YELLOW + tokens[0] + Terminal::BRIGHT_WHITE;
+	_term.prtTmColor("IN: " + name + ": " + msg, Terminal::BRIGHT_YELLOW);
+	string str = "  > " + Terminal::BRIGHT_GREEN + tokens[0] + Terminal::BRIGHT_WHITE;
 	for(size_t ind = 1; ind < tokens.size(); ++ind)
 		str = str + " [" + tokens[ind] + "]";
 	_term.prtTmColor(str, Terminal::WHITE);
@@ -288,7 +298,6 @@ void Server::cmd_ping(int fd, vector<string> tokens){
 		sendMessage(fd, string("PONG :" + tokens[1]));
 }
 void Server::cmd_msg(int fd, vector<string> tokens){
-	_term.prtTmColor("PRIVATE", Terminal::BRIGHT_RED);
 	if (!tokens[1].empty() && !tokens[2].empty()){
 		userInfos* dest = _users->getUserByNick(tokens[1]);
 		if (dest){
@@ -367,5 +376,5 @@ void Server::getMessages(int fd){
 void Server::sendMessage(int fd, const string& msg){
 	string final_msg = msg + "\r\n";
 	send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
-	_term.prtTmColor("OUT: '" + msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_BLUE);
+	_term.prtTmColor("OUT: '" + msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }

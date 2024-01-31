@@ -9,6 +9,7 @@
 
 
 #define MAX_CON	100
+#define REGISTRATION_TIMEOUT	10
 
 using namespace std;
 class Server {

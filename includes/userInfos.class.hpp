@@ -2,6 +2,7 @@
 # define USERINFOS_CLASS_HPP
 
 #include <string>
+#include <ctime>
 
 #define ACT_REGISTRATION	1
 #define ACT_CHANGED_NICK	2
@@ -17,6 +18,7 @@ class userInfos {
 		int			_registered;		// correctly registered
 		int			_nickname_registered;
 		int			_username_registered;
+		time_t		_connection_start;
 		string		_nickname;
 		string		_prev_nick;
 		string		_username;
@@ -47,6 +49,7 @@ class userInfos {
 		int		getNbMsg(void) const;
 		int		getIndex(void) const;
 		int		getAction(void) const;
+		time_t	getConnectionStart(void) const;
 
 		int		checkReg(void);
 

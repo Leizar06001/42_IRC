@@ -10,6 +10,7 @@ userInfos::userInfos(int fd, Terminal* term):_term(term){
 	_actionType = 0;
 	_nickname_registered = 0;
 	_username_registered = 0;
+	_connection_start = time(NULL);
 	_fd = fd;
 	_nickname = "";
 	_username = "";
@@ -93,6 +94,9 @@ int userInfos::getIndex(void) const {
 }
 int userInfos::getAction(void) const {
 	return _actionType;
+}
+time_t	userInfos::getConnectionStart(void) const {
+	return _connection_start;
 }
 
 int userInfos::checkReg(void) {
