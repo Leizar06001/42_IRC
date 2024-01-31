@@ -30,7 +30,7 @@ class Server {
 		void	getConnection(void);
 
 		int				pollFds(int timeout);
-		string const 	getMessages(int fd);
+		void		 	getMessages(int fd);
 		vector<string>	parseMessage(int fd, string& msg);
 		void			analyseCommands(int fd, vector<string>& tokens);
 		void			sendMessage(int fd, const string& msg);
@@ -44,6 +44,7 @@ class Server {
 		void	cmd_user(int fd, vector<string> tokens);
 		void	cmd_ping(int fd, vector<string> tokens);
 		void	cmd_msg(int fd, vector<string> tokens);
+		void	cmd_who(int fd, vector<string> tokens);
 
 	public:
 		Server(void);

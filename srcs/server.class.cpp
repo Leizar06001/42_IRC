@@ -158,11 +158,7 @@ void Server::handleEvents(void){
 			while (i < _connection_nb){
 				if (_fds[fd].fd != -1){
 					if (_fds[fd].revents & POLLIN){
-						string msg = this->getMessages(fd);
-						if (!msg.empty()){
-							vector<string> tokens = parseMessage(fd, msg);
-							analyseCommands(fd, tokens);
-						}
+						this->getMessages(fd);
 					}
 					++i;
 				}
@@ -186,6 +182,8 @@ void Server::performAction(userInfos* user){
 
 	if (action_type == ACT_REGISTRATION){
 		string message = ":" + _servername + " 001 " + user->getNickname() + " :Welcome to the iRisChat network, " + user->getNickname() + "!" + user->getUsername() + "@" + _servername;
+		sendMessage(fd, message);
+		message = ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1";
 		sendMessage(fd, message);
 		_users->validateRegistration(user);
 	} else if (action_type == ACT_CHANGED_NICK){
@@ -234,20 +232,20 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_nick,
 		&Server::cmd_user,
 		&Server::cmd_ping,
-		&Server::cmd_msg
+		&Server::cmd_msg,
+		&Server::cmd_who
 	};
-	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PRIVMSG"};
+	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PRIVMSG", "WHO"};
 
 	for (size_t i = 0; i < 5; ++i){
 		if (cmds[i] == tokens[0]){
-			_term.prtTmColor("'" + cmds[i] + "'", Terminal::BRIGHT_CYAN);
+			//_term.prtTmColor("'" + cmds[i] + "'", Terminal::BRIGHT_CYAN);
 			(this->*functionsPTRS[i])(fd, tokens);
 		}
 	}
 }
 
 void Server::cmd_cap(int fd, vector<string> tokens){
-	(void)fd;
 	if (!tokens[1].empty()){
 		if (tokens[1] == "LS"){
 			sendMessage(fd, string("CAP * LS :"));
@@ -300,36 +298,12 @@ void Server::cmd_msg(int fd, vector<string> tokens){
 		}
 	}
 }
-
-string const Server::getMessages(int fd){
-	// cout << "---> Reading Fd " << fd, Terminal::RESET);
-	char buffer[10000];
-	ssize_t bytesRead = recv(_fds[fd].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
-
-	if (bytesRead == 0){	// CLIENT DISCONNECTED
-		_term.prtTmColor("X Client # " + toString(fd) + " has disconnected\n", Terminal::RED);
-		_users->rmUser(fd);
-		_fds[fd].fd = -1;
-		--_connection_nb;
-	} else {				// TREAT MESSAGE
-		string answer(buffer, bytesRead);
-		size_t pos;
-		if ((pos = answer.find("\r\n", 0)) != string::npos){
-			string msg = answer.substr(0, pos);
-			if (!msg.empty()){
-				_users->getUserByFd(fd)->incMsgs();
-				++_msg_nb;
-				return msg;
-			} else return "";
-			// cout << "---> Reading again " << fd, Terminal::RESET);
-		}
-	}
-	return "";
-	// cout << "---> Reading END " << fd, Terminal::RESET);
+void Server::cmd_who(int fd, vector<string> tokens){
+	(void)fd; (void)tokens;
 }
 
 
-// void Server::getMessages(int fd){
+// string const Server::getMessages(int fd){
 // 	// cout << "---> Reading Fd " << fd, Terminal::RESET);
 // 	char buffer[10000];
 // 	ssize_t bytesRead = recv(_fds[fd].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
@@ -342,18 +316,51 @@ string const Server::getMessages(int fd){
 // 	} else {				// TREAT MESSAGE
 // 		string answer(buffer, bytesRead);
 // 		size_t pos;
-// 		while ((pos = answer.find("\r\n", 0)) != string::npos){
+// 		if ((pos = answer.find("\n", 0)) != string::npos){
+// 			if (answer[pos - 1] == '\r') --pos;
 // 			string msg = answer.substr(0, pos);
-// 			userInfos* user = _users->getUserByFd(fd);
-// 			user->incMsgs();
-// 			this->parseMessage(msg, fd);
-// 			answer = answer.substr(pos + 2);
-// 			++_msg_nb;
+// 			if (!msg.empty()){
+// 				_users->getUserByFd(fd)->incMsgs();
+// 				++_msg_nb;
+// 				return msg;
+// 			} else return "";
 // 			// cout << "---> Reading again " << fd, Terminal::RESET);
 // 		}
 // 	}
+// 	return "";
 // 	// cout << "---> Reading END " << fd, Terminal::RESET);
 // }
+
+
+void Server::getMessages(int fd){
+	// cout << "---> Reading Fd " << fd, Terminal::RESET);
+	char buffer[10000];
+	ssize_t bytesRead = recv(_fds[fd].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
+
+	if (bytesRead == 0){	// CLIENT DISCONNECTED
+		_term.prtTmColor("X Client # " + toString(fd) + " has disconnected\n", Terminal::RED);
+		_users->rmUser(fd);
+		_fds[fd].fd = -1;
+		--_connection_nb;
+	} else {				// TREAT MESSAGE
+		string answer(buffer, bytesRead);
+		size_t pos;
+		while ((pos = answer.find("\n", 0)) != string::npos){
+			if (answer[pos - 1] == '\r') --pos;
+			string msg = answer.substr(0, pos);
+			userInfos* user = _users->getUserByFd(fd);
+			user->incMsgs();
+
+			vector<string> tokens = parseMessage(fd, msg);
+			analyseCommands(fd, tokens);
+
+			answer = answer.substr(pos + 2);
+			++_msg_nb;
+			// cout << "---> Reading again " << fd, Terminal::RESET);
+		}
+	}
+	// cout << "---> Reading END " << fd, Terminal::RESET);
+}
 
 void Server::sendMessage(int fd, const string& msg){
 	string final_msg = msg + "\r\n";
