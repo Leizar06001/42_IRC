@@ -249,7 +249,7 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 void Server::cmd_cap(int fd, vector<string> tokens){
 	if (!tokens[1].empty()){
 		if (tokens[1] == "LS"){
-			sendMessage(fd, string("CAP * LS :"));
+			//sendMessage(fd, string("CAP * LS :"));
 		}
 	}
 }
