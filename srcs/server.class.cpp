@@ -175,11 +175,7 @@ void Server::handleEvents(void){
 	// Check for user not registered in time
 	int fdtm = _users->checkRegistrationTimeout(REGISTRATION_TIMEOUT);
 	if (fdtm >= 0){
-		_term.prtTmColor("X Client # " + toString(fdtm) + " registration timeout\n", Terminal::RED);
-		_users->rmUser(fdtm);
-		close(_fds[fdtm].fd);
-		_fds[fdtm].fd = -1;
-		--_connection_nb;
+		rmUser(fdtm, string("REGISTRATION TIMEOUT"));
 	}
 	drawInterface();
 }
@@ -243,13 +239,14 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_user,
 		&Server::cmd_ping,
 		&Server::cmd_msg,
-		&Server::cmd_who
+		&Server::cmd_who,
+		&Server::cmd_names,
+		&Server::cmd_quit
 	};
-	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PRIVMSG", "WHO"};
+	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PRIVMSG", "WHO", "NAMES", "QUIT"};
 
-	for (size_t i = 0; i < 5; ++i){
+	for (size_t i = 0; i < sizeof(cmds) / sizeof(cmds[0]); ++i){
 		if (cmds[i] == tokens[0]){
-			//_term.prtTmColor("'" + cmds[i] + "'", Terminal::BRIGHT_CYAN);
 			(this->*functionsPTRS[i])(fd, tokens);
 		}
 	}
@@ -310,6 +307,31 @@ void Server::cmd_msg(int fd, vector<string> tokens){
 void Server::cmd_who(int fd, vector<string> tokens){
 	(void)fd; (void)tokens;
 }
+void Server::cmd_names(int fd, vector<string> tokens){
+	string	msg;
+	string	nick = _users->getUserByFd(fd)->getNickname();
+
+	if (tokens.size() > 1){	// list users of a channel
+		_term.prtTmColor("'" + tokens[1] + "'", Terminal::RED);
+	} else {		// list all users
+		msg = ":" + _servername + " " + toString(RPL_NAMREPLY) + " " + nick + " = * :" + _users->getListOfUsers();
+		sendMessage(fd, msg);
+		msg = ":" + _servername + " " + toString(RPL_ENDOFNAMES) + " " + nick + " * :End of /NAMES list";
+		sendMessage(fd, msg);
+	}
+}
+void Server::cmd_quit(int fd, vector<string> tokens){
+	(void)tokens;
+	rmUser(fd, string("QUIT"));
+}
+
+void Server::rmUser(int fd, const string& reason){
+	_term.prtTmColor("X Client # " + toString(fd) + " disconnected: " + reason + "\n", Terminal::RED);
+	_users->rmUser(fd);
+	close(_fds[fd].fd);
+	_fds[fd].fd = -1;
+	--_connection_nb;
+}
 
 
 // string const Server::getMessages(int fd){
@@ -347,10 +369,7 @@ void Server::getMessages(int fd){
 	ssize_t bytesRead = recv(_fds[fd].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
 
 	if (bytesRead == 0){	// CLIENT DISCONNECTED
-		_term.prtTmColor("X Client # " + toString(fd) + " has disconnected\n", Terminal::RED);
-		_users->rmUser(fd);
-		_fds[fd].fd = -1;
-		--_connection_nb;
+		rmUser(fd, string("CONNECTION LOST"));
 	} else {				// TREAT MESSAGE
 		string answer(buffer, bytesRead);
 		size_t pos;

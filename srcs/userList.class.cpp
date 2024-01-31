@@ -130,6 +130,16 @@ userInfos* userList::getNextUser(int reset){
 	return user;
 }
 
+const string userList::getListOfUsers(void){
+	map<string, size_t>::iterator it = _mapNick.begin();
+	string	list;
+	while (it != _mapNick.end()){
+		list += it->first + " ";
+		++it;
+	}
+	return list;
+}
+
 int userList::getNbNotRegistered(void) const {
 	return _mapInit.size();
 }

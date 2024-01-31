@@ -41,6 +41,8 @@ class userList {
 		userInfos*	getUserByNick(string& nickname);
 		userInfos*	getNextUser(int reset);
 
+		const string	getListOfUsers(void);
+
 		int			getNbNotRegistered(void) const;
 		void		validateRegistration(userInfos* user);
 		void		checkForRegistration(int fd);
