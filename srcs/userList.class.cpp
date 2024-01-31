@@ -45,18 +45,37 @@ int userList::setNickname(int fd, string& nickname){
 	userInfos* user = getUserByFd(fd);
 	if (user->setNickname(nickname) == 0)
 		_mapNick.insert(make_pair(nickname, user->getIndex()));
+	if (user->isRegistered()){
+		_mapAction.insert(make_pair(fd, user->getIndex()));
+	}
 	return 0;
 }
 
-void userList::setUsername(int fd, string& username){
+int userList::setUsername(int fd, string& username){
 	userInfos* user = getUserByFd(fd);
-	user->setUsername(username);
+	if (user){
+		return user->setUsername(username);
+	}
+	return -1;
 }
 
-void userList::setRealname(int fd, string& realname){
+int userList::setRealname(int fd, string& realname){
 	userInfos* user = getUserByFd(fd);
-	if (user->setRealname(realname) == 0)
-		_mapAction.insert(make_pair(fd, user->getIndex()));
+	if (user){
+		int ret = user->setRealname(realname);
+		return ret;
+	}
+	return -1;
+}
+
+void userList::checkForRegistration(int fd){
+	userInfos* user = getUserByFd(fd);
+	if (user){
+		if (user->checkReg() && !user->isRegistered()){
+			validateRegistration(user);
+			_mapAction.insert(make_pair(fd, user->getIndex()));
+		}
+	}
 }
 
 void userList::rmUser(int fd){

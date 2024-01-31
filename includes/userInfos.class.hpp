@@ -3,7 +3,8 @@
 
 #include <string>
 
-#define ACT_REGISTRATION 1
+#define ACT_REGISTRATION	1
+#define ACT_CHANGED_NICK	2
 
 using namespace std;
 
@@ -14,8 +15,10 @@ class userInfos {
 	private:
 		int			_index;				// index in the vector list
 		int			_registered;		// correctly registered
-		int			_registration_step;
+		int			_nickname_registered;
+		int			_username_registered;
 		string		_nickname;
+		string		_prev_nick;
 		string		_username;
 		string		_realname;
 		int			_fd;
@@ -37,12 +40,15 @@ class userInfos {
 		void	incMsgs(void);
 
 		string	getNickname(void) const;
+		string	getPrevNick(void) const;
 		string	getUsername(void) const;
 		string	getRealname(void) const;
 		int		getFd(void) const;
 		int		getNbMsg(void) const;
 		int		getIndex(void) const;
 		int		getAction(void) const;
+
+		int		checkReg(void);
 
 		int		isRegistered(void);
 		void	setRegistered(void);

@@ -60,7 +60,7 @@ void Terminal::updateMenu(userList* users){
 	userInfos*	user = users->getNextUser(1);
 	while ((h < WIN_H - 1) && (ind < nb_users)){
 		if (user){
-			setCursor(h, x + 3);
+			setCursor(h, x + 4);
 			prtColor("◎ " + user->getNickname() + "", Terminal::WHITE);
 			++h;
 			++ind;

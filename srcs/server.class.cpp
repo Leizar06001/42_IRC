@@ -27,7 +27,7 @@ Server &Server::operator=(Server &rhs){
 
 void Server::shutdown(void){
 	cout << endl;
-	_term.prtTmColor("------ END SERVER ------\n", Terminal::CYAN);
+	_term.prtTmColor("------ END SERVER ------\n", Terminal::BRIGHT_CYAN);
 	for(int i = 1; i <= MAX_CON; ++i){
 		if (_fds[i].fd >= 0){
 			_term.prtTmColor("Closing Connection.. " + toString(i) + "\n", Terminal::RESET);
@@ -38,7 +38,7 @@ void Server::shutdown(void){
 		_term.prtTmColor("Closing Socket..\n", Terminal::RESET);
 		close(_sockfd);
 	}
-	_term.prtTmColor("------ GOODBYE ------\n", Terminal::CYAN);
+	_term.prtTmColor("------ GOODBYE ------\n", Terminal::BRIGHT_CYAN);
 }
 
 void Server::drawInterface(void){
@@ -55,7 +55,7 @@ int Server::init(int port){
 
 	_term.clearScreen();
 	drawInterface();
-	_term.prtTmColor("------ STARTING SERVER ------\n", Terminal::CYAN);
+	_term.prtTmColor("------ STARTING SERVER ------\n", Terminal::BRIGHT_CYAN);
 	if (port <= 0 || port > 65535){
 		_term.prtTmColor("Error: PORT " + toString(port) + " not valid\n", Terminal::RED);
 		return -1;
@@ -63,7 +63,7 @@ int Server::init(int port){
 	createSocket(AF_INET, SOCK_STREAM, 0);
 	bindToPort(_port);
 	_initialized = 1;
-	_term.prtTmColor("------ INIT DONE ------\n", Terminal::CYAN);
+	_term.prtTmColor("------ INIT DONE ------\n", Terminal::BRIGHT_CYAN);
 	return 0;
 }
 
@@ -130,7 +130,7 @@ void Server::getConnection(void){
 
 	_users->addUser(i);
 
-	_term.prtTmColor(">>> Connection FD." + toString(i) + Terminal::CYAN + " | " + toString(_connection_nb) + " / " + toString(MAX_CON) + " clients\n", Terminal::GREEN);
+	_term.prtTmColor(">>> Connection FD." + toString(i) + Terminal::BRIGHT_CYAN + " | " + toString(_connection_nb) + " / " + toString(MAX_CON) + " clients\n", Terminal::GREEN);
 }
 
 int Server::pollFds(int timeout){
@@ -178,7 +178,7 @@ void Server::handleEvents(void){
 
 void Server::performAction(userInfos* user){
 	int action_type = user->getAction();
-	_term.prtTmColor("User " + user->getNickname() + " request action #" + toString(action_type) + "\n", Terminal::CYAN);
+	_term.prtTmColor("User " + user->getNickname() + " request action #" + toString(action_type) + "\n", Terminal::BRIGHT_CYAN);
 
 	int fd = user->getFd();
 
@@ -186,8 +186,10 @@ void Server::performAction(userInfos* user){
 		string message = ":" + _servername + " 001 " + user->getNickname() + " :Welcome to the iRisChat network, " + user->getNickname() + "!" + user->getUsername() + "@" + _servername;
 		sendMessage(fd, message);
 		_users->validateRegistration(user);
+	} else if (action_type == ACT_CHANGED_NICK){
+		string message = ":" + user->getPrevNick() + " NICK " + user->getNickname();
+		sendMessage(fd, message);
 	}
-
 
 	_users->rmFirstAction();
 }
@@ -216,9 +218,10 @@ void Server::parseMessage(string& msg, int fd){
 	userInfos* user = _users->getUserByFd(fd);
 	string name = user->getNickname();
 	if (name.empty()) name = "FD." + toString(fd);
-	string str = "IN: " + name + " | Msg#" + toString(user->getNbMsg()) + ": " + Terminal::YELLOW + tokens[0] + Terminal::WHITE;
+	_term.prtTmColor("IN: " + name + " | Msg#" + toString(user->getNbMsg()) + ": " + msg, Terminal::BRIGHT_WHITE);
+	string str = "  > " + Terminal::YELLOW + tokens[0] + Terminal::BRIGHT_WHITE;
 	for(size_t ind = 1; ind < tokens.size(); ++ind)
-		str = str + " " + tokens[ind];
+		str = str + " [" + tokens[ind] + "]";
 	_term.prtTmColor(str, Terminal::WHITE);
 
 	// _term.prtTmColor("CMD: '" + tokens[0] + "'\n", Terminal::YELLOW);
@@ -228,14 +231,26 @@ void Server::parseMessage(string& msg, int fd){
 		if (ret == ERR_NICKNAMEINUSE){
 			string nick = _users->getUserByFd(fd)->getNickname();
 			if (nick.empty()) nick = "*";
-			sendMessage(fd, string(":" + _servername + " " + toString(ERR_NICKNAMEINUSE) + " " + nick + " " + tokens[1] + " :Nickname already in use"));
 			_term.prtTmColor("FD. " + toString(fd) + " nickname already in use\n", Terminal::RED);
+			sendMessage(fd, string(":" + _servername + " " + toString(ERR_NICKNAMEINUSE) + " " + nick + " " + tokens[1] + " :Nickname already in use"));
+		} else {
+			_users->checkForRegistration(fd);
 		}
 	}
 	if (tokens[0] == "USER"){
-		if (tokens[1].length() > 1){
-			_users->setUsername(fd, tokens[1]);
-			_users->setRealname(fd, tokens[4]);
+		if (_users->getUserByFd(fd)->isRegistered()) {
+			// SEND ERROR ALREADY REGISTERED
+		} else {
+			if (tokens[1].length() > 1){
+				int ret = _users->setUsername(fd, tokens[1]);
+				if (!ret)
+					ret = _users->setRealname(fd, tokens[4]);
+				if (!ret){
+					_users->checkForRegistration(fd);
+				} else {
+					// ERROR USER
+				}
+			}
 		}
 	}
 	if (tokens[0] == "PING"){
@@ -244,6 +259,19 @@ void Server::parseMessage(string& msg, int fd){
 		else
 			sendMessage(fd, string("PONG " + tokens[1]));
 	}
+
+	if (tokens[0] == "PRIVMSG"){
+		if (!tokens[1].empty() && !tokens[2].empty()){
+			userInfos* dest = _users->getUserByNick(tokens[1]);
+			if (dest){
+				sendMessage(dest->getFd(), ":" + _users->getUserByFd(fd)->getNickname() + " PRIVMSG " + tokens[1] + " :" + tokens[2]);
+			} else {
+				// ERR DEST NOT EXISTS
+			}
+		}
+	}
+	// :Angel PRIVMSG Wiz :Hello
+
 	if (msg == "CAP LS 302"){
 		sendMessage(fd, string("CAP * LS :"));
 	}

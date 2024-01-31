@@ -5,10 +5,11 @@
 
 userInfos::userInfos(int fd, Terminal* term):_term(term){
 	_registered = 0;
-	_registration_step = 0;
 	_index = 0;
 	_nb_msg = 0;
 	_actionType = 0;
+	_nickname_registered = 0;
+	_username_registered = 0;
 	_fd = fd;
 	_nickname = "";
 	_username = "";
@@ -32,22 +33,19 @@ userInfos& userInfos::operator=(const userInfos & src){
 }
 
 int userInfos::setNickname(string& nickname){
-	if (_registration_step == 0 || _registered){
-		_nickname = nickname;
-		if (_registration_step == 0) ++_registration_step;
-		_term->prtTmColor("FD." + toString(_fd) + " set nickname: " + nickname + "\n", Terminal::BLUE);
-		return 0;
-	} else {
-		// cout << "ERREUR REG" << endl;
-		return 1;
-	}
+	_prev_nick = _nickname;
+	_nickname = nickname;
+	_term->prtTmColor("FD." + toString(_fd) + " set nickname: " + nickname + "\n", Terminal::BLUE);
+	if (!_registered)
+		_nickname_registered = 1;
+	else
+		_actionType = ACT_CHANGED_NICK;
+	return 0;
 }
 int userInfos::setRealname(string& realname){
-	if (_registration_step == 2 || _registered){
+	if (!_registered){
 		_realname = realname;
 		_term->prtTmColor("FD." + toString(_fd) + " " + _nickname + " set realname: " + realname + "\n", Terminal::BLUE);
-		++_registration_step;
-		_actionType = ACT_REGISTRATION;
 		return 0;
 	} else {
 		// cout << "ERREUR REG" << endl;
@@ -55,10 +53,10 @@ int userInfos::setRealname(string& realname){
 	}
 }
 int userInfos::setUsername(string& username){
-	if (_registration_step == 1 || _registered){
+	if (!_registered){
 		_username = username;
-		if (_registration_step == 1) ++_registration_step;
 		_term->prtTmColor("FD." + toString(_fd) + " " + _nickname + " set username: " + username + "\n", Terminal::BLUE);
+		_username_registered = 1;
 		return 0;
 	} else {
 		// cout << "ERREUR REG" << endl;
@@ -74,6 +72,9 @@ void	userInfos::incMsgs(void){
 
 string userInfos::getNickname(void) const{
 	return _nickname;
+}
+string userInfos::getPrevNick(void) const{
+	return _prev_nick;
 }
 string userInfos::getUsername(void) const{
 	return _username;
@@ -92,6 +93,14 @@ int userInfos::getIndex(void) const {
 }
 int userInfos::getAction(void) const {
 	return _actionType;
+}
+
+int userInfos::checkReg(void) {
+	if (!_registered && _username_registered && _nickname_registered){
+		_actionType = ACT_REGISTRATION;
+		return 1;
+	}
+	return 0;
 }
 
 int userInfos::isRegistered(void) {

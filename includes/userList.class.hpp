@@ -32,8 +32,8 @@ class userList {
 
 		void	addUser(int fd);
 		int		setNickname(int fd, string& nickname);
-		void	setRealname(int fd, string& realname);
-		void	setUsername(int fd, string& username);
+		int		setRealname(int fd, string& realname);
+		int		setUsername(int fd, string& username);
 		void		rmUser(int fd);
 
 		int			getNbUsers(void);
@@ -43,6 +43,7 @@ class userList {
 
 		int			getNbNotRegistered(void) const;
 		void		validateRegistration(userInfos* user);
+		void		checkForRegistration(int fd);
 
 		userInfos*	getUserActionRequests(void) const;
 		void		rmFirstAction(void);
