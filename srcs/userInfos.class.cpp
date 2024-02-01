@@ -42,8 +42,10 @@ int userInfos::setNickname(string& nickname){
 		_term->prtTmColor("FD." + toString(_fd) + " set nickname: " + nickname + "\n", Terminal::BLUE);
 	if (!_registered)
 		_nickname_registered = 1;
-	else
+	else {
 		_actionType = ACT_CHANGED_NICK;
+		return 1;
+	}
 	return 0;
 }
 int userInfos::setRealname(string& realname){

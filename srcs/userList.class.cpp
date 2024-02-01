@@ -49,8 +49,13 @@ int userList::setNickname(int fd, string& nickname){
 	userInfos* check = getUserByNick(nickname);
 	if (check) return ERR_NICKNAMEINUSE;
 	userInfos* user = getUserByFd(fd);
-	if (user->setNickname(nickname) == 0)
+	int ret = user->setNickname(nickname);
+	if (ret >= 0){	// Worked
+		if (ret == 1) {		// changed nick
+			_mapNick.erase(user->getPrevNick());
+		}
 		_mapNick.insert(make_pair(nickname, user->getIndex()));
+	}
 	if (user->isRegistered()){
 		_mapAction.insert(make_pair(fd, user->getIndex()));
 	}
