@@ -1,4 +1,6 @@
 #include "../includes/server.class.hpp"
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 Server::Server(void):_initialized(0){
 	_servername = "IRis.Chat";
@@ -108,13 +110,17 @@ void Server::getConnection(void){
 		_term.prtTmColor("ERROR: TOO MANY CONNEXIONS\n", Terminal::RED);
 		return ;
 	}
-	int	connection;
-	unsigned long addrlen = sizeof(sockaddr);
-	connection = accept(_sockfd, (struct sockaddr*)&_sockaddr, (socklen_t*)&addrlen);
+
+	struct sockaddr_in client_addr;
+	unsigned long addrlen = sizeof(client_addr);
+	int connection = accept(_sockfd, (struct sockaddr*)&client_addr, (socklen_t*)&addrlen);
 	if (connection < 0) {
 		_term.prtTmColor("Failed to grab connection. errno: " + toString(errno) + "\n", Terminal::RED);
 		exit(EXIT_FAILURE);
 	}
+
+	char client_ip[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
 
 	++_connection_nb;
 	int i = 1;
@@ -124,7 +130,7 @@ void Server::getConnection(void){
 
 	_users->addUser(i);
 
-	_term.prtTmColor(">>> Connection FD." + toString(i) + Terminal::BRIGHT_CYAN + " | " + toString(_connection_nb) + " / " + toString(MAX_CON) + " clients\n", Terminal::GREEN);
+	_term.prtTmColor(">>> " + string(client_ip) + " FD." + toString(i) + Terminal::BRIGHT_CYAN + " | " + toString(_connection_nb) + " / " + toString(MAX_CON) + " clients\n", Terminal::GREEN);
 }
 
 void Server::handleEvents(void){
