@@ -477,25 +477,26 @@ void Server::getMessages(int fd){
 			cmd_quit(fd, tokens);
 		} else {				// TREAT MESSAGE
 			string answer(buffer, bytesRead);
-			size_t pos;
+			size_t pos = 0;
 			_term.prtTmColor(answer, Terminal::BRIGHT_RED);
-			while ((pos = answer.find("\n", 0)) != string::npos){
+			while ((pos = answer.find("\n")) != string::npos){
 				int inc = 1;
-				if (answer[pos - 1] == '\r') {--pos; ++inc;}
-				string msg;
-
-				msg = answer.substr(0, pos);
-
-				userInfos* user = _users->getUserByFd(fd);
-				user->incMsgs();
+				if (pos > 0 && answer[pos - 1] == '\r') {
+					--pos;
+					++inc;
+				}
+				string msg = answer.substr(0, pos);
 
 				if (!msg.empty()){
-					vector<string> tokens = parseMessage(fd, msg);
-					analyseCommands(fd, tokens);
+					userInfos* user = _users->getUserByFd(fd);
+					if (user){
+						user->incMsgs();
+						vector<string> tokens = parseMessage(fd, msg);
+						analyseCommands(fd, tokens);
+					}
 				}
 
 				answer = answer.substr(pos + inc);
-
 				++_msg_nb;
 			}
 		}
