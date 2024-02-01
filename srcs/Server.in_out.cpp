@@ -34,51 +34,49 @@ void Server::getMessages(int fd){
 	char buffer[1000] = {0};
 	ssize_t bytesRead = recv(_fds[fd].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
 
-	try {
-		if (bytesRead < 0 ){
-			// ERROR
-			_term.prtTmColor("RECV ERROR", Terminal::BRIGHT_RED);
+
+	if (bytesRead < 0 ){
+		// ERROR
+		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+			_term.prtTmColor("RECV ERROR " + toString(strerror(errno)), Terminal::BRIGHT_RED);
 			vector<string> tokens;
 			tokens.push_back("QUIT");
 			tokens.push_back("???");
 			cmd_quit(fd, tokens);
-		} else if (bytesRead == 0){	// CLIENT DISCONNECTED
-			vector<string> tokens;
-			tokens.push_back("QUIT");
-			tokens.push_back("Connection lost");
-			cmd_quit(fd, tokens);
-		} else if (bytesRead >= 999){
-			vector<string> tokens;
-			tokens.push_back("QUIT");
-			tokens.push_back("Msgs too long !");
-			cmd_quit(fd, tokens);
-		} else {				// TREAT MESSAGE
-			string answer(buffer, bytesRead);
-			size_t pos = 0;
-			//_term.prtTmColor(answer, Terminal::BRIGHT_RED);
-			while ((pos = answer.find("\n")) != string::npos){
-				int inc = 1;
-				if (pos > 0 && answer[pos - 1] == '\r') {
-					--pos;
-					++inc;
-				}
-				string msg = answer.substr(0, pos);
-
-				if (!msg.empty()){
-					userInfos* user = _users->getUserByFd(fd);
-					if (user){
-						user->incMsgs();
-						vector<string> tokens = parseMessage(fd, msg);
-						analyseCommands(fd, tokens);
-					}
-				}
-
-				answer = answer.substr(pos + inc);
-				++_msg_nb;
-			}
 		}
-	} catch (const std::out_of_range& e){
-		_term.prtTmColor("Exception caught reading messages: " + toString(e.what()), Terminal::RED);
+        // If EAGAIN or EWOULDBLOCK, simply no data available now, not an error
+	} else if (bytesRead == 0){	// CLIENT DISCONNECTED
+		vector<string> tokens;
+		tokens.push_back("QUIT");
+		tokens.push_back("Connection lost");
+		cmd_quit(fd, tokens);
+	} else if (bytesRead >= 999){
+		vector<string> tokens;
+		tokens.push_back("QUIT");
+		tokens.push_back("Msgs too long !");
+		cmd_quit(fd, tokens);
+	} else {				// TREAT MESSAGE
+		string answer(buffer, bytesRead);
+		size_t pos = 0;
+		size_t start = 0;
+		while ((pos = answer.find("\n", start)) != string::npos){
+			size_t msgLen = pos - start;
+			if (pos > 0 && answer[pos - 1] == '\r')
+				--msgLen;
+			string msg = answer.substr(start, msgLen);
+
+			if (!msg.empty()){
+				userInfos* user = _users->getUserByFd(fd);
+				if (user){
+					user->incMsgs();
+					vector<string> tokens = parseMessage(fd, msg);
+					analyseCommands(fd, tokens);
+				}
+			}
+
+			start = pos + 1;
+			++_msg_nb;
+		}
 	}
 }
 
