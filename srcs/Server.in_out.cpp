@@ -1,4 +1,5 @@
 #include "../includes/server.class.hpp"
+#include <cstring>
 
 int Server::pollFds(int timeout){
 	int ret = poll(_fds, MAX_CON, timeout);

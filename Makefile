@@ -39,7 +39,9 @@ $(OBJ_DIR)/%.o: srcs/%.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(NAME): $(OBJS)
-	$(CC) $(OBJS) -o $(NAME)
+	@echo "Linking..."
+	@$(CC) $(OBJS) -o $(NAME)
+	@echo "Done !"
 
 clean:
 	rm -rf $(OBJ_DIR)
