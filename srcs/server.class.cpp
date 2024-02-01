@@ -353,6 +353,7 @@ void Server::cmd_ping(int fd, vector<string> tokens){
 		sendMessage(fd, string("PONG :" + tokens[1]));
 }
 void Server::cmd_pong(int fd, vector<string> tokens){
+	(void)tokens;
 	_users->getUserByFd(fd)->setPong(false);
 }
 void Server::cmd_msg(int fd, vector<string> tokens){
