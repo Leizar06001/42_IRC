@@ -1,6 +1,13 @@
 #include "../includes/server.class.hpp"
 
+static void toUpperCase(std::string& str) {
+	for (size_t i = 0; i < str.size(); ++i) {
+		str[i] = std::toupper(static_cast<unsigned char>(str[i]));
+	}
+}
+
 void Server::analyseCommands(int fd, vector<string>& tokens){
+	toUpperCase(tokens[0]);
 	void (Server::*functionsPTRS[])(int fd,  vector<string> tokens) = {
 		&Server::cmd_cap,
 		&Server::cmd_nick,

@@ -77,13 +77,14 @@ void Terminal::updateMenu(userList* users){
 }
 
 void Terminal::updateTitle(int port, int clients, int not_reg, int channels, int msgs, int max_con){
-	static int dec = 1;
+	static int dec = 0;
 	// saveCursor();
 	for(int i = 1; i <= TITLE_H + 1; ++i){
 		clearLine(i);
 	}
 	setCursor(4, dec);
-	prtColor(">>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>", Terminal::BLUE);
+	prtColor(">>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>    >>", Terminal::BLUE);
+	clearLine(5);
 	for(int i = 1; i <= TITLE_H; ++i){
 		setCursor(i, 1);
 		prtColor("▞", Terminal::BLUE);
@@ -136,7 +137,7 @@ void Terminal::updateTitle(int port, int clients, int not_reg, int channels, int
 	// restoreCursor();
 	cout << flush;	// update display
 	++dec;
-	if (dec > 6) dec = 1;
+	if (dec > 6) dec = 0;
 }
 
 void Terminal::clearScreen() const {

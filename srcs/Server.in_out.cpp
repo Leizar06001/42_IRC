@@ -9,7 +9,7 @@ int Server::pollFds(int timeout){
 }
 
 void Server::readSockets(void){
-	if (pollFds(500) > 0){
+	if (pollFds(250) > 0){
 		// Check for new clients
 		if (_fds[0].revents & POLLIN){
 			this->getConnection();
@@ -31,7 +31,7 @@ void Server::readSockets(void){
 }
 
 void Server::getMessages(int fd){
-	char buffer[10000] = {0};
+	char buffer[1000] = {0};
 	ssize_t bytesRead = recv(_fds[fd].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
 
 	try {
@@ -46,6 +46,11 @@ void Server::getMessages(int fd){
 			vector<string> tokens;
 			tokens.push_back("QUIT");
 			tokens.push_back("Connection lost");
+			cmd_quit(fd, tokens);
+		} else if (bytesRead >= 999){
+			vector<string> tokens;
+			tokens.push_back("QUIT");
+			tokens.push_back("Msgs too long !");
 			cmd_quit(fd, tokens);
 		} else {				// TREAT MESSAGE
 			string answer(buffer, bytesRead);
