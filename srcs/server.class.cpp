@@ -389,6 +389,7 @@ void Server::cmd_quit(int fd, vector<string> tokens){
 	userInfos* target = _users->getNextUser(1);
 	int i = 0;
 	while (i < nb_users){
+		_term.prtTmColor("QUIT: In while loop, i: " + toString(i), Terminal::BRIGHT_CYAN);
 		if (target){
 			int fd_dest = target->getFd();
 			if (fd != fd_dest)
