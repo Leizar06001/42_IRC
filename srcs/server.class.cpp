@@ -377,6 +377,7 @@ void Server::cmd_names(int fd, vector<string> tokens){
 	}
 }
 void Server::cmd_quit(int fd, vector<string> tokens){
+	_term.prtTmColor("QUIT: " + toString(_users->getNbUsers()) + " to notify", Terminal::CYAN);
 	// Advertise other users
 	userInfos* user = _users->getUserByFd(fd);
 	string nickname = user->getNickname();
