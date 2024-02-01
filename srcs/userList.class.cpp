@@ -34,15 +34,25 @@ void userList::addUser(int fd){
 		throw length_error("USER DB FULL");
 	}
 	userInfos* user = new userInfos(fd, _term, _prt_debug);
-	_userlist.push_back(user);
-	size_t	index = _userlist.size() - 1;
+	// Find if there is an empty line in vector list
+	size_t index = 0;
+	size_t size_list = _userlist.size();
+	userInfos* userInList = getNextUser(1);
+	while (userInList && index < size_list){
+		++index;
+		userInList = getNextUser(0);
+	}
+	if (index == size_list)	// add at the end
+		_userlist.push_back(user);
+	else					// replace NULL in list
+		_userlist[index] = user;
 	user->setIndex(index);
 	_mapID.insert(make_pair(fd, index));
 	_mapInit.insert(make_pair(fd, index));
 
 	++_nbUsers;
 	if (_prt_debug)
-		_term->prtTmColor("FD." + toString(fd) + " User added\n", Terminal::MAGENTA);
+		_term->prtTmColor("FD." + toString(fd) + " User added at index + " + toString(index) + "\n", Terminal::MAGENTA);
 }
 
 int userList::setNickname(int fd, string& nickname){

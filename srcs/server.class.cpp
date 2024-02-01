@@ -203,6 +203,11 @@ void Server::performAction(userInfos* user){
 		// message = ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1";
 		// sendMessage(fd, message);
 		_users->validateRegistration(user);
+		vector<string> tokens;
+		tokens.push_back("*");
+		tokens.push_back("General");
+		cmd_join(fd, tokens);
+		cmd_names(fd, tokens);
 	} else if (action_type == ACT_CHANGED_NICK){
 		string message = ":" + user->getPrevNick() + " NICK " + user->getNickname();
 		sendMessage(fd, message);
@@ -252,9 +257,10 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_msg,
 		&Server::cmd_whois,
 		&Server::cmd_names,
-		&Server::cmd_quit
+		&Server::cmd_quit,
+		&Server::cmd_join
 	};
-	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PRIVMSG", "WHOIS", "NAMES", "QUIT"};
+	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PRIVMSG", "WHOIS", "NAMES", "QUIT", "JOIN"};
 
 	for (size_t i = 0; i < sizeof(cmds) / sizeof(cmds[0]); ++i){
 		if (cmds[i] == tokens[0]){
@@ -335,8 +341,13 @@ void Server::cmd_names(int fd, vector<string> tokens){
 	string	msg;
 	string	nick = _users->getUserByFd(fd)->getNickname();
 
+	// channels   = : public, * : secret, @ : private
+	// users      @ : operator
 	if (tokens.size() > 1){	// list users of a channel
-
+		msg = ":" + _servername + " " + toString(RPL_NAMREPLY) + " " + nick + " = #" + tokens[1] + " :" + _users->getListOfUsers();
+		sendMessage(fd, msg);
+		msg = ":" + _servername + " " + toString(RPL_ENDOFNAMES) + " " + nick + " #" + tokens[1] + " :End of /NAMES list";
+		sendMessage(fd, msg);
 	} else {		// list all users
 		msg = ":" + _servername + " " + toString(RPL_NAMREPLY) + " " + nick + " = * :" + _users->getListOfUsers();
 		sendMessage(fd, msg);
@@ -348,6 +359,29 @@ void Server::cmd_quit(int fd, vector<string> tokens){
 	(void)tokens;
 	rmUser(fd, string("QUIT"));
 }
+void Server::cmd_join(int fd, vector<string> tokens){
+	if (tokens.size() < 2){
+		// NO CHANNEL NAME
+		return;
+	}
+	// JOIN CHANNEL
+	userInfos* user = _users->getUserByFd(fd);
+	string chanType = "#";
+	sendMessage(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " JOIN " + chanType + tokens[1]);
+
+	// NOTIF OTHER USERS IN CHANNEL
+	int nb_users = _users->getNbUsers();
+	user = _users->getNextUser(1);
+	int i = 0;
+	while (i < nb_users){
+		if (user){
+			sendMessage(user->getFd(), ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " JOIN " + chanType + tokens[1]);
+			++i;
+			user = _users->getNextUser(0);
+		}
+	}
+}
+
 
 void Server::rmUser(int fd, const string& reason){
 	_term.prtTmColor("X Client # " + toString(fd) + " disconnected: " + reason + "\n", Terminal::RED);

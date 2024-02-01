@@ -49,6 +49,7 @@ class Server {
 		void	cmd_whois(int fd, vector<string> tokens);
 		void	cmd_names(int fd, vector<string> tokens);
 		void	cmd_quit(int fd, vector<string> tokens);
+		void	cmd_join(int fd, vector<string> tokens);
 
 		void	rmUser(int fd, const string& reason);
 
