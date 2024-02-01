@@ -324,12 +324,14 @@ void Server::cmd_msg(int fd, vector<string> tokens){
 void Server::cmd_whois(int fd, vector<string> tokens){
 	userInfos* user = _users->getUserByFd(fd);
 	if (tokens.size() < 2){		// No nickname to search
-		sendMessage(fd, ":" + _servername + " " + toString(ERR_NONICKNAMEGIVEN) + " " + user->getNickname());
+		_term.prtTmColor("WHOIS: No nickname to search", Terminal::RED);
+		sendMessage(fd, ":" + _servername + " " + toString(ERR_NONICKNAMEGIVEN) + " " + user->getNickname() + " :Nickname missing");
 		return;
 	}
 	userInfos* target = _users->getUserByNick(tokens[1]);
-	if (!user){					// No target found
-		sendMessage(fd, ":" + _servername + " " + toString(ERR_NOSUCHNICK) + " " + user->getNickname() + " " + target->getNickname());
+	if (!target){					// No target found
+		_term.prtTmColor("WHOIS: Nickname not found", Terminal::RED);
+		sendMessage(fd, ":" + _servername + " " + toString(ERR_NOSUCHNICK) + " " + user->getNickname() + " " + tokens[1]);
 		return;
 	}
 	sendMessage(fd, ":" + _servername + " " + toString(RPL_WHOISUSER) + " " + user->getNickname() + " "
@@ -376,7 +378,7 @@ void Server::cmd_join(int fd, vector<string> tokens){
 	while (i < nb_users){
 		if (target){
 			int fd_dest = target->getFd();
-			//if (fd != fd_dest)
+			if (fd != fd_dest)
 				sendMessage(fd_dest, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " JOIN " + chanType + tokens[1]);
 			++i;
 			target = _users->getNextUser(0);
