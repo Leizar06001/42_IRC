@@ -48,6 +48,7 @@ class userList {
 		void		validateRegistration(userInfos* user);
 		void		checkForRegistration(int fd);
 		int			checkRegistrationTimeout(int timeout);
+		vector<userInfos*>	checkConnectionTimeout(int timeout);
 
 		userInfos*	getUserActionRequests(void) const;
 		void		rmFirstAction(void);

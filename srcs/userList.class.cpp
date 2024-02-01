@@ -184,6 +184,20 @@ int userList::checkRegistrationTimeout(int timeout){
 	return -1;
 }
 
+vector<userInfos*> userList::checkConnectionTimeout(int timeout){
+	vector<userInfos*> list;
+	vector<userInfos*>::iterator it = _userlist.begin();
+	while (it != _userlist.end()){
+		if ((*it)){
+			if (time(NULL) - (*it)->getLastMessageTime() > timeout){
+				list.push_back((*it));
+			}
+		}
+		++it;
+	}
+	return list;
+}
+
 userInfos* userList::getUserActionRequests(void) const {
 	if (!_mapAction.size())
 		return NULL;

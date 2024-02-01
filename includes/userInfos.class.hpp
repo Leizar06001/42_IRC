@@ -19,6 +19,8 @@ class userInfos {
 		int			_nickname_registered;
 		int			_username_registered;
 		time_t		_connection_start;
+		time_t		_last_message;
+		bool		_waiting_for_pong;
 		string		_nickname;
 		string		_prev_nick;
 		string		_username;
@@ -28,6 +30,7 @@ class userInfos {
 		int			_actionType;		// tell the server what the client is waiting for
 		Terminal*	_term;
 		int			_prt_debug;	// print debug infos ?
+
 
 	public:
 		userInfos(int fd, Terminal* term, int prt_debug);
@@ -39,6 +42,8 @@ class userInfos {
 		int		setUsername(string& username);
 		int		setRealname(string& realname);
 		void	setIndex(int index);
+		void	resetLastMessageTime(void);
+		void	setPong(bool ping);
 
 		void	incMsgs(void);
 
@@ -51,6 +56,8 @@ class userInfos {
 		int		getIndex(void) const;
 		int		getAction(void) const;
 		time_t	getConnectionStart(void) const;
+		time_t	getLastMessageTime(void) const;
+		bool	getPong(void) const;
 
 		int		checkReg(void);
 

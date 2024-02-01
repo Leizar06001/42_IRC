@@ -11,6 +11,8 @@ userInfos::userInfos(int fd, Terminal* term, int prt_debug):_term(term), _prt_de
 	_nickname_registered = 0;
 	_username_registered = 0;
 	_connection_start = time(NULL);
+	_last_message = _connection_start;
+	_waiting_for_pong = 0;
 	_fd = fd;
 	_nickname = "";
 	_username = "";
@@ -26,11 +28,20 @@ userInfos::userInfos(userInfos & src){*this = src;};
 userInfos& userInfos::operator=(const userInfos & src){
 	if (this != &src){
 		_registered = src._registered;
+		_nickname_registered = src._nickname_registered;
+		_username_registered = src._username_registered;
+		_connection_start = src._connection_start;
+		_last_message = src._last_message;
+		_waiting_for_pong = src._waiting_for_pong;
 		_nickname = src._nickname;
+		_prev_nick = src._prev_nick;
 		_username = src._username;
 		_realname = src._username;
 		_nb_msg = src._nb_msg;
 		_fd = src._fd;
+		_actionType = src._actionType;
+		_term = src._term;
+		_prt_debug = src._prt_debug;
 	}
 	return *this;
 }
@@ -71,6 +82,12 @@ int userInfos::setUsername(string& username){
 		return 1;
 	}
 }
+void	userInfos::resetLastMessageTime(void){
+	_last_message = time(NULL);
+}
+void	userInfos::setPong(bool ping){
+	_waiting_for_pong = ping;
+}
 void userInfos::setIndex(int index){
 	_index = index;
 }
@@ -104,6 +121,12 @@ int userInfos::getAction(void) const {
 }
 time_t	userInfos::getConnectionStart(void) const {
 	return _connection_start;
+}
+time_t	userInfos::getLastMessageTime(void) const {
+	return _last_message;
+}
+bool	userInfos::getPong(void) const {
+	return _waiting_for_pong;
 }
 
 int userInfos::checkReg(void) {

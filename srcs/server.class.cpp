@@ -52,6 +52,7 @@ int Server::init(int port){
 	_msg_nb = 0;
 	_connection_nb = 0;
 	_sockfd = 0;
+	_last_timeout_check = time(NULL);
 	for(int i = 0; i <= MAX_CON; ++i){
 		_fds[i].fd = -1;
 		_fds[i].events = 0;
@@ -181,6 +182,26 @@ void Server::handleEvents(void){
 	if (fdtm >= 0){
 		rmUser(fdtm, string("REGISTRATION TIMEOUT"));
 	}
+	// Check if connection timeout
+	if (time(NULL) - _last_timeout_check > CONNECTION_TIMEOUT){
+		_term.prtTmColor("Checking timeouts..", Terminal::BRIGHT_CYAN);
+
+		vector<userInfos*> list = _users->checkConnectionTimeout(CONNECTION_TIMEOUT);
+		vector<userInfos*>::iterator it = list.begin();
+
+		while (it != list.end()){
+			if (!(*it)->getPong()){	// send PING to check alive
+				(*it)->setPong(true);
+				sendMessage((*it)->getFd(), "PING :test_alive");
+			} else {
+				vector<string> tokens;
+				tokens.push_back("QUIT");
+				tokens.push_back("Connection timeout");
+				cmd_quit((*it)->getFd(), tokens);
+			}
+		}
+		_last_timeout_check = time(NULL);
+	}
 	drawInterface();
 }
 
@@ -245,6 +266,7 @@ vector<string> Server::parseMessage(int fd, string& msg){
 		str = str + Terminal::BRIGHT_BLUE + " [" + Terminal::BRIGHT_WHITE + tokens[ind] + Terminal::BRIGHT_BLUE + "]";
 	_term.prtTmColor(str, Terminal::BRIGHT_YELLOW);
 
+	user->resetLastMessageTime();
 	return tokens;
 }
 
@@ -329,6 +351,9 @@ void Server::cmd_ping(int fd, vector<string> tokens){
 		sendMessage(fd, string("PONG"));
 	else
 		sendMessage(fd, string("PONG :" + tokens[1]));
+}
+void Server::cmd_pong(int fd, vector<string> tokens){
+	_users->getUserByFd(fd)->setPong(false);
 }
 void Server::cmd_msg(int fd, vector<string> tokens){
 	if (!tokens[1].empty() && !tokens[2].empty()){

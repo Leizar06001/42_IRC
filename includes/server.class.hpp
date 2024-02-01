@@ -6,10 +6,12 @@
 #include <poll.h>
 #include "userList.class.hpp"
 #include "terminal.class.hpp"
+#include <ctime>
 
 
-#define MAX_CON	100
+#define MAX_CON					100
 #define REGISTRATION_TIMEOUT	10
+#define CONNECTION_TIMEOUT		60
 #define PRINT_DEBUG_INFOS		0
 
 using namespace std;
@@ -26,6 +28,7 @@ class Server {
 		int				_initialized;
 		userList*		_users;
 		Terminal		_term;
+		time_t			_last_timeout_check;
 
 		void	createSocket(int domain, int type, int protocol);
 		void	bindToPort(int port);
@@ -40,11 +43,11 @@ class Server {
 		void	performAction(userInfos* user);
 		void	drawInterface(void);
 
-
 		void	cmd_cap(int fd, vector<string> tokens);
 		void	cmd_nick(int fd, vector<string> tokens);
 		void	cmd_user(int fd, vector<string> tokens);
 		void	cmd_ping(int fd, vector<string> tokens);
+		void	cmd_pong(int fd, vector<string> tokens);
 		void	cmd_msg(int fd, vector<string> tokens);
 		void	cmd_whois(int fd, vector<string> tokens);
 		void	cmd_names(int fd, vector<string> tokens);
