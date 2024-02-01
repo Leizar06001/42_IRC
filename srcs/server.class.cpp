@@ -473,7 +473,7 @@ void Server::getMessages(int fd){
 		} else {				// TREAT MESSAGE
 			string answer(buffer, bytesRead);
 			size_t pos;
-			_term.prtTmColor(answer, Terminal::GREEN);
+			_term.prtTmColor(answer, Terminal::BRIGHT_RED);
 			while ((pos = answer.find("\n", 0)) != string::npos){
 				int inc = 1;
 				if (answer[pos - 1] == '\r') {--pos; ++inc;}
