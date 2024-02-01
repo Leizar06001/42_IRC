@@ -469,7 +469,10 @@ void Server::getMessages(int fd){
 
 	try {
 		if (bytesRead == 0){	// CLIENT DISCONNECTED
-			rmUser(fd, string("CONNECTION LOST"));
+			vector<string> tokens;
+			tokens[0] = "QUIT";
+			tokens[1] = "Connection lost";
+			cmd_quit(fd, tokens);
 		} else {				// TREAT MESSAGE
 			string answer(buffer, bytesRead);
 			size_t pos;
