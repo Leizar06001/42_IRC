@@ -14,7 +14,7 @@ using namespace std;
 
 Server::Server(void):_initialized(0){
 	_servername = "IRis.Chat";
-	_users = new userList(&_term);
+	_users = new userList(&_term, PRINT_DEBUG_INFOS);
 };
 Server::~Server(void){
 	delete _users;
@@ -31,15 +31,15 @@ void Server::shutdown(void){
 	_term.prtTmColor("------ END SERVER ------\n", Terminal::BRIGHT_CYAN);
 	for(int i = 1; i <= MAX_CON; ++i){
 		if (_fds[i].fd >= 0){
-			_term.prtTmColor("Closing Connection.. " + toString(i) + "\n", Terminal::RESET);
+			_term.prtTmColor("Closing Connection.. " + toString(i) + "\n", Terminal::WHITE);
 			close(_fds[i].fd);
 		}
 	}
 	if (_sockfd){
-		_term.prtTmColor("Closing Socket..\n", Terminal::RESET);
+		_term.prtTmColor("Closing Socket..\n", Terminal::WHITE);
 		close(_sockfd);
 	}
-	_term.prtTmColor("------ GOODBYE ------\n", Terminal::BRIGHT_CYAN);
+	_term.prtTmColor("-------- GOODBYE -------\n", Terminal::BRIGHT_CYAN);
 }
 
 void Server::drawInterface(void){
@@ -52,7 +52,11 @@ int Server::init(int port){
 	_msg_nb = 0;
 	_connection_nb = 0;
 	_sockfd = 0;
-	for(int i = 0; i <= MAX_CON; ++i) _fds[i].fd = -1;
+	for(int i = 0; i <= MAX_CON; ++i){
+		_fds[i].fd = -1;
+		_fds[i].events = 0;
+		_fds[i].revents = 0;
+	}
 
 	_term.clearScreen();
 	drawInterface();
@@ -64,12 +68,12 @@ int Server::init(int port){
 	createSocket(AF_INET, SOCK_STREAM, 0);
 	bindToPort(_port);
 	_initialized = 1;
-	_term.prtTmColor("------ INIT DONE ------\n", Terminal::BRIGHT_CYAN);
+	_term.prtTmColor("--------- INIT DONE ---------\n", Terminal::BRIGHT_CYAN);
 	return 0;
 }
 
 void Server::createSocket(int domain, int type, int protocol){
-	_term.prtTmColor(" >>> Creating Socket..\n", Terminal::RESET);
+	_term.prtTmColor(">>> Creating Socket..\n", Terminal::WHITE);
 
 	_sockfd = socket(domain, type, protocol);
 	if (_sockfd == -1) {
@@ -85,11 +89,11 @@ void Server::createSocket(int domain, int type, int protocol){
 	_fds[0].fd = _sockfd;
 	_fds[0].events = POLLIN;
 
-	_term.prtTmColor(" > ..ok\n", Terminal::RESET);
+	_term.prtTmColor("> ..ok\n", Terminal::WHITE);
 }
 
 void Server::bindToPort(int port){
-	_term.prtTmColor(">>> Binding to port " + toString(port) + "..\n", Terminal::RESET);
+	_term.prtTmColor(">>> Binding to port " + toString(port) + "..\n", Terminal::WHITE);
 
 	_sockaddr.sin_family = AF_INET;
 	_sockaddr.sin_addr.s_addr = INADDR_ANY;
@@ -105,7 +109,7 @@ void Server::bindToPort(int port){
 		exit(EXIT_FAILURE);
 	}
 
-	_term.prtTmColor(" > ..ok\n", Terminal::RESET);
+	_term.prtTmColor("> ..ok\n", Terminal::WHITE);
 }
 
 void Server::getConnection(void){
@@ -182,15 +186,22 @@ void Server::handleEvents(void){
 
 void Server::performAction(userInfos* user){
 	int action_type = user->getAction();
-	_term.prtTmColor("User " + user->getNickname() + " request action #" + toString(action_type) + "\n", Terminal::BRIGHT_CYAN);
+	string msg_act;
+	switch (action_type){
+		case ACT_REGISTRATION:
+			msg_act = "REGISTRATION"; break;
+		case ACT_CHANGED_NICK:
+			msg_act = "CHANGE NICK"; break;
+	}
+	_term.prtTmColor("User " + user->getNickname() + " request action " + msg_act + "\n", Terminal::BRIGHT_CYAN);
 
 	int fd = user->getFd();
 
 	if (action_type == ACT_REGISTRATION){
 		string message = ":" + _servername + " 001 " + user->getNickname() + " :Welcome to the iRisChat network, " + user->getNickname() + "!" + user->getUsername() + "@" + _servername;
 		sendMessage(fd, message);
-		message = ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1";
-		sendMessage(fd, message);
+		// message = ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1";
+		// sendMessage(fd, message);
 		_users->validateRegistration(user);
 	} else if (action_type == ACT_CHANGED_NICK){
 		string message = ":" + user->getPrevNick() + " NICK " + user->getNickname();
@@ -223,11 +234,11 @@ vector<string> Server::parseMessage(int fd, string& msg){
 	userInfos* user = _users->getUserByFd(fd);
 	string name = user->getNickname();
 	if (name.empty()) name = "FD." + toString(fd);
-	_term.prtTmColor("IN: " + name + ": " + msg, Terminal::BRIGHT_YELLOW);
-	string str = "  > " + Terminal::BRIGHT_GREEN + tokens[0] + Terminal::BRIGHT_WHITE;
+	//_term.prtTmColor("IN: " + name + ": " + msg, Terminal::BRIGHT_YELLOW);
+	string str = "IN: " + Terminal::YELLOW + name + ": " + Terminal::BRIGHT_GREEN + tokens[0];
 	for(size_t ind = 1; ind < tokens.size(); ++ind)
-		str = str + " [" + tokens[ind] + "]";
-	_term.prtTmColor(str, Terminal::WHITE);
+		str = str + Terminal::BRIGHT_BLUE + " [" + Terminal::BRIGHT_WHITE + tokens[ind] + Terminal::BRIGHT_BLUE + "]";
+	_term.prtTmColor(str, Terminal::BRIGHT_YELLOW);
 
 	return tokens;
 }
@@ -239,11 +250,11 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_user,
 		&Server::cmd_ping,
 		&Server::cmd_msg,
-		&Server::cmd_who,
+		&Server::cmd_whois,
 		&Server::cmd_names,
 		&Server::cmd_quit
 	};
-	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PRIVMSG", "WHO", "NAMES", "QUIT"};
+	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PRIVMSG", "WHOIS", "NAMES", "QUIT"};
 
 	for (size_t i = 0; i < sizeof(cmds) / sizeof(cmds[0]); ++i){
 		if (cmds[i] == tokens[0]){
@@ -304,15 +315,28 @@ void Server::cmd_msg(int fd, vector<string> tokens){
 		}
 	}
 }
-void Server::cmd_who(int fd, vector<string> tokens){
-	(void)fd; (void)tokens;
+void Server::cmd_whois(int fd, vector<string> tokens){
+	userInfos* user = _users->getUserByFd(fd);
+	if (tokens.size() < 2){		// No nickname to search
+		sendMessage(fd, ":" + _servername + " " + toString(ERR_NONICKNAMEGIVEN) + " " + user->getNickname());
+		return;
+	}
+	userInfos* target = _users->getUserByNick(tokens[1]);
+	if (!user){					// No target found
+		sendMessage(fd, ":" + _servername + " " + toString(ERR_NOSUCHNICK) + " " + user->getNickname() + " " + target->getNickname());
+		return;
+	}
+	sendMessage(fd, ":" + _servername + " " + toString(RPL_WHOISUSER) + " " + user->getNickname() + " "
+		+ target->getNickname() + " " + target->getUsername() + " " + _servername + " * :" + target->getRealname());
+
+	sendMessage(fd, ":" + _servername + " " + toString(RPL_ENDOFWHOIS) + " " + user->getNickname() + " " + target->getNickname());
 }
 void Server::cmd_names(int fd, vector<string> tokens){
 	string	msg;
 	string	nick = _users->getUserByFd(fd)->getNickname();
 
 	if (tokens.size() > 1){	// list users of a channel
-		_term.prtTmColor("'" + tokens[1] + "'", Terminal::RED);
+
 	} else {		// list all users
 		msg = ":" + _servername + " " + toString(RPL_NAMREPLY) + " " + nick + " = * :" + _users->getListOfUsers();
 		sendMessage(fd, msg);

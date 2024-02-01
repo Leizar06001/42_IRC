@@ -27,9 +27,10 @@ class userInfos {
 		int			_nb_msg;
 		int			_actionType;		// tell the server what the client is waiting for
 		Terminal*	_term;
+		int			_prt_debug;	// print debug infos ?
 
 	public:
-		userInfos(int fd, Terminal* term);
+		userInfos(int fd, Terminal* term, int prt_debug);
 		~userInfos(void);
 		userInfos(userInfos & src);
 		userInfos &operator=(const userInfos & src);

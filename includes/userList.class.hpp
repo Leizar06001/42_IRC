@@ -23,9 +23,10 @@ class userList {
 		map<int, size_t>		_mapInit;	// userInfo not registered yet
 		map<int, size_t>		_mapAction;	// userInfo waiting for server action
 		Terminal*				_term;
+		int						_prt_debug;	// print debug infos ?
 
 	public:
-		userList(Terminal* term);
+		userList(Terminal* term, int prt_debug);
 		~userList(void);
 		userList(userList & src);
 		userList &operator=(const userList & src);

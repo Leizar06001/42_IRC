@@ -30,7 +30,7 @@ Terminal::Terminal(){};
 Terminal::~Terminal(void){};
 
 void Terminal::updateMenu(userList* users){
-	saveCursor();
+	// saveCursor();
 	(void)users;
 
 	for(int i = TITLE_H + 1; i < WIN_H; ++i){
@@ -68,13 +68,14 @@ void Terminal::updateMenu(userList* users){
 		user = users->getNextUser(0);
 	}
 
-	restoreCursor();
+	// restoreCursor();
+	setCursor(WIN_H - 1, 3);
 	cout << flush;
 }
 
 void Terminal::updateTitle(int port, int clients, int not_reg, int channels, int msgs, int max_con){
 	static int dec = 1;
-	saveCursor();
+	// saveCursor();
 	for(int i = 1; i <= TITLE_H + 1; ++i){
 		clearLine(i);
 	}
@@ -99,9 +100,9 @@ void Terminal::updateTitle(int port, int clients, int not_reg, int channels, int
 	prtColor("\033[1m (ﾟ◥益◤ﾟ) i̲̭̘̊ͣR͔̅ͨi͉̝͈͓s̝̍ͩ͌̀̉.̹͙͗͐C̦̠h͉̯a̦̝̙͔ͯͭͫͬț̰̓ͦ́ͤ̈  (ʘ言ʘ╬) ", Terminal::CYAN);
 	// LEFT SIDE
 	setCursor(6, 10);
-	prtColor("   Port: " + toString(port), Terminal::CYAN);
+	prtColor("   Port: " + toString(port), Terminal::BRIGHT_CYAN);
 	setCursor(7, 10);
-	prtColor("Clients: " + toString(clients) + "/" + toString(max_con), Terminal::GREEN);
+	prtColor("Clients: " + toString(clients) + "/" + toString(max_con), Terminal::BRIGHT_GREEN);
 	if (not_reg) {
 		setCursor(7, 26);
 		prtColor("! " + toString(not_reg) + " not reg", Terminal::RED);
@@ -129,7 +130,7 @@ void Terminal::updateTitle(int port, int clients, int not_reg, int channels, int
 	// prtColor("███", Terminal::BRIGHT_RED);
 	// prtColor("███", Terminal::BRIGHT_YELLOW);
 
-	restoreCursor();
+	// restoreCursor();
 	cout << flush;	// update display
 	++dec;
 	if (dec > 6) dec = 1;
@@ -162,18 +163,41 @@ void Terminal::prtColor(const std::string& text, const std::string& color) const
 void Terminal::prtTmColor(const std::string& text, const std::string& color) const {
 	clearLine(WIN_H);
 	setCursor(WIN_H - 1, 3);
-	if (text.length() <= 56)
+
+	size_t visibleCount = 0;
+	size_t i = 0;
+	if (text.length() < 56 && text.find("\033") == string::npos)
 		std::cout << color << timestamp() << " " << text << RESET;
 	else {
-		std::cout << color << timestamp() << " " << text.substr(0, 56);
-		std::cout << "\033[S";	// scroll up
-		setCursor(WIN_H - 1, 19);
-		std::cout << text.substr(56, 112);
+
+		while (i < text.length() && visibleCount < 55) {
+			if (text[i] == '\033' && i + 1 < text.length() && text[i + 1] == '[') {
+				i += 2; // Skip '\033['
+				while (i < text.length() && text[i] != 'm')
+					i++;
+				if (i < text.length())
+					i++; // Skip 'm'
+			} else {
+				visibleCount++;
+				i++;
+			}
+		}
+		std::cout << color << timestamp() << " " << text.substr(0, i);
+		if (text.substr(i).length() > 0){
+			std::cout << "\033[S";	// scroll up
+			setCursor(WIN_H - 1, 19);
+			std::cout << text.substr(i);
+		}
 	}
+
+	// std::cout << "\033[S"; 	// scroll up
+	// setCursor(WIN_H - 1, 3);
+	// cout << "i: " << i << " vis: " << visibleCount;
+
 	std::cout << "\033[S"; 	// scroll up
-	setCursor(WIN_H - 1, 3);
 	setCursor(WIN_H, 1);
 	prtColor("■▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰┷▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰■", Terminal::BLUE);
+	setCursor(WIN_H - 1, 3);
 	std::cout << flush;
 }
 

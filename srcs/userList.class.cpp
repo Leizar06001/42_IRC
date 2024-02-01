@@ -5,19 +5,23 @@
 #include "../includes/terminal.class.hpp"
 #include <ctime>
 
-userList::userList(Terminal* term):_nbUsers(0), _term(term){
-	_term->prtTmColor("USER LIST CREATED\n", Terminal::MAGENTA);
+userList::userList(Terminal* term, int prt_debug):_nbUsers(0), _term(term), _prt_debug(prt_debug){
+	if (_prt_debug)
+		_term->prtTmColor("USER LIST CREATED\n", Terminal::MAGENTA);
 };
 userList::~userList(void){
-	_term->prtTmColor("User list size : " + toString(_userlist.size()) + "\n", Terminal::MAGENTA);
+	if (_prt_debug)
+		_term->prtTmColor("User list size : " + toString(_userlist.size()) + "\n", Terminal::MAGENTA);
 	for (size_t i = 0; i < _userlist.size(); ++i) {
 		if (_userlist[i]){
-			_term->prtTmColor("deleting " + toString(i) + " : " + toString(_userlist[i]->getNickname()) + "\n", Terminal::MAGENTA);
+			if (_prt_debug)
+				_term->prtTmColor("deleting " + toString(i) + " : " + toString(_userlist[i]->getNickname()) + "\n", Terminal::MAGENTA);
 			delete _userlist[i];
 		}
 	}
 	_userlist.clear();
-	_term->prtTmColor("USER LIST DELETED\n", Terminal::MAGENTA);
+	if (_prt_debug)
+		_term->prtTmColor("USER LIST DELETED\n", Terminal::MAGENTA);
 };
 userList::userList(userList & src){*this = src;};
 userList& userList::operator=(const userList & src){
@@ -29,7 +33,7 @@ void userList::addUser(int fd){
 	if (_nbUsers >= MAX_USERS){
 		throw length_error("USER DB FULL");
 	}
-	userInfos* user = new userInfos(fd, _term);
+	userInfos* user = new userInfos(fd, _term, _prt_debug);
 	_userlist.push_back(user);
 	size_t	index = _userlist.size() - 1;
 	user->setIndex(index);
@@ -37,7 +41,8 @@ void userList::addUser(int fd){
 	_mapInit.insert(make_pair(fd, index));
 
 	++_nbUsers;
-	_term->prtTmColor("FD." + toString(fd) + " User added\n", Terminal::MAGENTA);
+	if (_prt_debug)
+		_term->prtTmColor("FD." + toString(fd) + " User added\n", Terminal::MAGENTA);
 }
 
 int userList::setNickname(int fd, string& nickname){
@@ -94,7 +99,8 @@ void userList::rmUser(int fd){
 		if (itNick != _mapNick.end()) _mapNick.erase(itNick);
 		delete _userlist[index];
 		_userlist[index] = NULL;
-		_term->prtTmColor("FD.'" + toString(fd) + "' deleted from vector\n", Terminal::MAGENTA);
+		if (_prt_debug)
+			_term->prtTmColor("FD.'" + toString(fd) + "' deleted from vector\n", Terminal::MAGENTA);
 		_mapID.erase(itID);
 		--_nbUsers;
 	// 	_term->prtTmColor("FD.'" + toString(fd) + "' removed from mapID\n", Terminal::MAGENTA);

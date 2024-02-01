@@ -10,6 +10,7 @@
 
 #define MAX_CON	100
 #define REGISTRATION_TIMEOUT	10
+#define PRINT_DEBUG_INFOS		0
 
 using namespace std;
 class Server {
@@ -45,7 +46,7 @@ class Server {
 		void	cmd_user(int fd, vector<string> tokens);
 		void	cmd_ping(int fd, vector<string> tokens);
 		void	cmd_msg(int fd, vector<string> tokens);
-		void	cmd_who(int fd, vector<string> tokens);
+		void	cmd_whois(int fd, vector<string> tokens);
 		void	cmd_names(int fd, vector<string> tokens);
 		void	cmd_quit(int fd, vector<string> tokens);
 

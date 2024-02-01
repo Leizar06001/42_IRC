@@ -3,7 +3,7 @@
 #include "../includes/toString.hpp"
 #include "../includes/terminal.class.hpp"
 
-userInfos::userInfos(int fd, Terminal* term):_term(term){
+userInfos::userInfos(int fd, Terminal* term, int prt_debug):_term(term), _prt_debug(prt_debug){
 	_registered = 0;
 	_index = 0;
 	_nb_msg = 0;
@@ -15,10 +15,12 @@ userInfos::userInfos(int fd, Terminal* term):_term(term){
 	_nickname = "";
 	_username = "";
 	_realname = "";
-	_term->prtTmColor("New user created Fd #" + toString(fd) + "\n", Terminal::BLUE);
+	if (_prt_debug)
+		_term->prtTmColor("New user created Fd #" + toString(fd) + "\n", Terminal::BLUE);
 };
 userInfos::~userInfos(void){
-	_term->prtTmColor("User " + _nickname + " destroyed\n", Terminal::BLUE);
+	if (_prt_debug)
+		_term->prtTmColor("User " + _nickname + " destroyed\n", Terminal::BLUE);
 };
 userInfos::userInfos(userInfos & src){*this = src;};
 userInfos& userInfos::operator=(const userInfos & src){
@@ -36,7 +38,8 @@ userInfos& userInfos::operator=(const userInfos & src){
 int userInfos::setNickname(string& nickname){
 	_prev_nick = _nickname;
 	_nickname = nickname;
-	_term->prtTmColor("FD." + toString(_fd) + " set nickname: " + nickname + "\n", Terminal::BLUE);
+	if (_prt_debug)
+		_term->prtTmColor("FD." + toString(_fd) + " set nickname: " + nickname + "\n", Terminal::BLUE);
 	if (!_registered)
 		_nickname_registered = 1;
 	else
@@ -46,7 +49,8 @@ int userInfos::setNickname(string& nickname){
 int userInfos::setRealname(string& realname){
 	if (!_registered){
 		_realname = realname;
-		_term->prtTmColor("FD." + toString(_fd) + " " + _nickname + " set realname: " + realname + "\n", Terminal::BLUE);
+		if (_prt_debug)
+			_term->prtTmColor("FD." + toString(_fd) + " " + _nickname + " set realname: " + realname + "\n", Terminal::BLUE);
 		return 0;
 	} else {
 		// cout << "ERREUR REG" << endl;
@@ -56,7 +60,8 @@ int userInfos::setRealname(string& realname){
 int userInfos::setUsername(string& username){
 	if (!_registered){
 		_username = username;
-		_term->prtTmColor("FD." + toString(_fd) + " " + _nickname + " set username: " + username + "\n", Terminal::BLUE);
+		if (_prt_debug)
+			_term->prtTmColor("FD." + toString(_fd) + " " + _nickname + " set username: " + username + "\n", Terminal::BLUE);
 		_username_registered = 1;
 		return 0;
 	} else {
