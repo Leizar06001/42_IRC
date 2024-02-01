@@ -43,7 +43,7 @@ int userInfos::setNickname(string& nickname){
 	if (!_registered)
 		_nickname_registered = 1;
 	else {
-		_actionType = ACT_CHANGED_NICK;
+		//_actionType = ACT_CHANGED_NICK;
 		return 1;
 	}
 	return 0;

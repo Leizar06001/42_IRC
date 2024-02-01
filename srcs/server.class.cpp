@@ -190,8 +190,8 @@ void Server::performAction(userInfos* user){
 	switch (action_type){
 		case ACT_REGISTRATION:
 			msg_act = "REGISTRATION"; break;
-		case ACT_CHANGED_NICK:
-			msg_act = "CHANGE NICK"; break;
+		// case ACT_CHANGED_NICK:
+		// 	msg_act = "CHANGE NICK"; break;
 	}
 	_term.prtTmColor("User " + user->getNickname() + " request action " + msg_act + "\n", Terminal::BRIGHT_CYAN);
 
@@ -208,10 +208,10 @@ void Server::performAction(userInfos* user){
 		tokens.push_back("General");
 		cmd_join(fd, tokens);
 		cmd_names(fd, tokens);
-	} else if (action_type == ACT_CHANGED_NICK){
-		string message = ":" + user->getPrevNick() + " NICK " + user->getNickname();
-		sendMessage(fd, message);
-	}
+	} //else if (action_type == ACT_CHANGED_NICK){
+		// string message = ":" + user->getPrevNick() + " NICK " + user->getNickname();
+		// sendMessage(fd, message);
+	// }
 
 	_users->rmFirstAction();
 }
@@ -279,15 +279,34 @@ void Server::cmd_cap(int fd, vector<string> tokens){
 	}
 }
 void Server::cmd_nick(int fd, vector<string> tokens){
+	if (tokens.size() < 2){	// ERR not nickname
+		sendMessage(fd, string(":" + _servername + " " + toString(ERR_NONICKNAMEGIVEN) + " :No nickname given"));
+		return;
+	}
 	int ret = _users->setNickname(fd, tokens[1]);
+	userInfos* user = _users->getUserByFd(fd);
 	if (ret == ERR_NICKNAMEINUSE){
-		string nick = _users->getUserByFd(fd)->getNickname();
+		string nick = user->getNickname();
 		if (nick.empty()) nick = "*";
 		_term.prtTmColor("FD. " + toString(fd) + " nickname already in use\n", Terminal::RED);
 		sendMessage(fd, string(":" + _servername + " " + toString(ERR_NICKNAMEINUSE) + " " + nick + " " + tokens[1] + " :Nickname already in use"));
-	} else {
-		_users->checkForRegistration(fd);
+		return ;
+	} else if (ret == 1) { // Nick changed, must advertise new nick to others
+		int nb_users = _users->getNbUsers();
+		userInfos* target = _users->getNextUser(1);
+		int i = 0;
+		while (i < nb_users){
+			if (target){
+				int fd_dest = target->getFd();
+				if (fd != fd_dest)
+					sendMessage(fd_dest, ":" + user->getPrevNick() + "!" + user->getUsername() + "@" + _servername + " NICK " + user->getNickname());
+				++i;
+				target = _users->getNextUser(0);
+			}
+		}
 	}
+	sendMessage(fd, ":" + user->getPrevNick() + " NICK " + user->getNickname());
+	_users->checkForRegistration(fd);
 }
 void Server::cmd_user(int fd, vector<string> tokens){
 	if (_users->getUserByFd(fd)->isRegistered()) {

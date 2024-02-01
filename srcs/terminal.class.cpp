@@ -62,7 +62,7 @@ void Terminal::updateMenu(userList* users){
 		if (user){
 			setCursor(h, x + 4);
 			if (user->isRegistered())
-				prtColor("◎ " + user->getNickname(), Terminal::WHITE);
+				prtColor("◎ " + user->getNickname() + " :" + toString(user->getFd()), Terminal::WHITE);
 			else
 				prtColor("! Fd" + toString(user->getFd()), Terminal::RED);
 			++h;

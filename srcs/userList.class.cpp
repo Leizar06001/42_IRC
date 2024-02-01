@@ -66,10 +66,10 @@ int userList::setNickname(int fd, string& nickname){
 		}
 		_mapNick.insert(make_pair(nickname, user->getIndex()));
 	}
-	if (user->isRegistered()){
-		_mapAction.insert(make_pair(fd, user->getIndex()));
-	}
-	return 0;
+	// if (user->isRegistered()){
+	// 	_mapAction.insert(make_pair(fd, user->getIndex()));
+	// }
+	return ret;
 }
 
 int userList::setUsername(int fd, string& username){
