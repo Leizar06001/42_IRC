@@ -473,7 +473,8 @@ void Server::getMessages(int fd){
 		string answer(buffer, bytesRead);
 		size_t pos;
 		while ((pos = answer.find("\n", 0)) != string::npos){
-			if (answer[pos - 1] == '\r') --pos;
+			int inc = 1;
+			if (answer[pos - 1] == '\r') {--pos; ++inc;}
 			string msg = answer.substr(0, pos);
 			userInfos* user = _users->getUserByFd(fd);
 			user->incMsgs();
@@ -483,7 +484,7 @@ void Server::getMessages(int fd){
 				analyseCommands(fd, tokens);
 			}
 
-			answer = answer.substr(pos + 2);
+			answer = answer.substr(pos + 1);
 			++_msg_nb;
 			// cout << "---> Reading again " << fd, Terminal::RESET);
 		}
