@@ -377,7 +377,6 @@ void Server::cmd_names(int fd, vector<string> tokens){
 	}
 }
 void Server::cmd_quit(int fd, vector<string> tokens){
-	_term.prtTmColor("QUIT: " + toString(_users->getNbUsers()) + " to notify", Terminal::CYAN);
 	// Advertise other users
 	userInfos* user = _users->getUserByFd(fd);
 	string nickname = user->getNickname();
@@ -390,7 +389,6 @@ void Server::cmd_quit(int fd, vector<string> tokens){
 	int i = 0;
 	if (nb_users > 1){
 		while (i < nb_users){
-			_term.prtTmColor("QUIT: In while loop, i: " + toString(i), Terminal::BRIGHT_CYAN);
 			if (target){
 				int fd_dest = target->getFd();
 				if (fd != fd_dest)
