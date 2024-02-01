@@ -7,6 +7,8 @@
 #include "userList.class.hpp"
 #include "terminal.class.hpp"
 #include <ctime>
+#include "../includes/toString.hpp"
+#include "../includes/numerics.hpp"
 
 
 #define MAX_CON					100

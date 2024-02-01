@@ -3,9 +3,23 @@ NAME = irc_server
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
-SRCS = 	main.cpp \
-		srcs/server.class.cpp	\
-		srcs/userList.class.cpp	\
+SRCS = 	main.cpp					\
+		srcs/server.class.cpp		\
+		srcs/Server.actions.cpp		\
+		srcs/Server.cmd_cap.cpp		\
+		srcs/Server.cmd_join.cpp	\
+		srcs/Server.cmd_names.cpp	\
+		srcs/Server.cmd_nick.cpp	\
+		srcs/Server.cmd_ping.cpp	\
+		srcs/Server.cmd_pong.cpp	\
+		srcs/Server.cmd_privmsg.cpp	\
+		srcs/Server.cmd_quit.cpp	\
+		srcs/Server.cmd_user.cpp	\
+		srcs/Server.cmd_whois.cpp	\
+		srcs/Server.in_out.cpp		\
+		srcs/Server.parse.cpp		\
+		srcs/Server.timeouts.cpp	\
+		srcs/userList.class.cpp		\
 		srcs/userInfos.class.cpp	\
 		srcs/terminal.class.cpp
 

@@ -56,15 +56,22 @@ void userList::addUser(int fd){
 }
 
 int userList::setNickname(int fd, string& nickname){
-	userInfos* check = getUserByNick(nickname);
-	if (check) return ERR_NICKNAMEINUSE;
+	string wrong_first_char = "#: 0123456789";
+	if (wrong_first_char.find(nickname[0]) != string::npos)
+		return ERR_ERRONEUSNICKNAME;
+	string valid_nick = nickname;
+	if (valid_nick.length() > 10)
+		valid_nick = valid_nick.substr(0, 10);
+	userInfos* check = getUserByNick(valid_nick);
+	if (check)
+		return ERR_NICKNAMEINUSE;
 	userInfos* user = getUserByFd(fd);
-	int ret = user->setNickname(nickname);
+	int ret = user->setNickname(valid_nick);
 	if (ret >= 0){	// Worked
 		if (ret == 1) {		// changed nick
 			_mapNick.erase(user->getPrevNick());
 		}
-		_mapNick.insert(make_pair(nickname, user->getIndex()));
+		_mapNick.insert(make_pair(valid_nick, user->getIndex()));
 	}
 	// if (user->isRegistered()){
 	// 	_mapAction.insert(make_pair(fd, user->getIndex()));
