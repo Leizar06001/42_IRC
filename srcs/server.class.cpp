@@ -1,14 +1,4 @@
 #include "../includes/server.class.hpp"
-#include <sys/socket.h> // For socket functions
-#include <netinet/in.h> // For sockaddr_in
-#include <cstdlib> // For exit() and EXIT_FAILURE
-#include <iostream>
-#include <unistd.h> // For read
-#include <poll.h>
-#include <cerrno>
-#include <ctime>
-
-using namespace std;
 
 Server::Server(void):_initialized(0){
 	_servername = "IRis.Chat";

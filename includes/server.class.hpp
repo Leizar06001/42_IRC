@@ -7,8 +7,13 @@
 #include "userList.class.hpp"
 #include "terminal.class.hpp"
 #include <ctime>
-#include "../includes/toString.hpp"
-#include "../includes/numerics.hpp"
+#include "toString.hpp"
+#include "numerics.hpp"
+#include <cerrno>
+#include <sys/socket.h> // For socket functions
+#include <cstdlib> // For exit() and EXIT_FAILURE
+#include <iostream>
+#include <unistd.h>
 
 
 #define MAX_CON					100
