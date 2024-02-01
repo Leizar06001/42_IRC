@@ -467,36 +467,40 @@ void Server::getMessages(int fd){
 	char buffer[10000];
 	ssize_t bytesRead = recv(_fds[fd].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
 
-	if (bytesRead == 0){	// CLIENT DISCONNECTED
-		rmUser(fd, string("CONNECTION LOST"));
-	} else {				// TREAT MESSAGE
-		string answer(buffer, bytesRead);
-		size_t pos;
-		_term.prtTmColor(answer, Terminal::GREEN);
-		while ((pos = answer.find("\n", 0)) != string::npos){
-			int inc = 1;
-			if (answer[pos - 1] == '\r') {--pos; ++inc;}
-			string msg;
-			try{
-				msg = answer.substr(0, pos);
-			} catch (const std::out_of_range& e){
-				_term.prtTmColor("Exception caught on sub 1: " + toString(e.what()), Terminal::RED);
-			}
-			userInfos* user = _users->getUserByFd(fd);
-			user->incMsgs();
+	try {
+		if (bytesRead == 0){	// CLIENT DISCONNECTED
+			rmUser(fd, string("CONNECTION LOST"));
+		} else {				// TREAT MESSAGE
+			string answer(buffer, bytesRead);
+			size_t pos;
+			_term.prtTmColor(answer, Terminal::GREEN);
+			while ((pos = answer.find("\n", 0)) != string::npos){
+				int inc = 1;
+				if (answer[pos - 1] == '\r') {--pos; ++inc;}
+				string msg;
+				// try{
+					msg = answer.substr(0, pos);
+				// } catch (const std::out_of_range& e){
+				// 	_term.prtTmColor("Exception caught on sub 1: " + toString(e.what()), Terminal::RED);
+				// }
+				userInfos* user = _users->getUserByFd(fd);
+				user->incMsgs();
 
-			if (!msg.empty()){
-				vector<string> tokens = parseMessage(fd, msg);
-				analyseCommands(fd, tokens);
+				if (!msg.empty()){
+					vector<string> tokens = parseMessage(fd, msg);
+					analyseCommands(fd, tokens);
+				}
+				// try{
+					answer = answer.substr(pos + inc);
+				// } catch (const std::out_of_range& e){
+				// 	_term.prtTmColor("Exception caught on sub 2: " + toString(e.what()), Terminal::RED);
+				// }
+				++_msg_nb;
+				// cout << "---> Reading again " << fd, Terminal::RESET);
 			}
-			try{
-				answer = answer.substr(pos + inc);
-			} catch (const std::out_of_range& e){
-				_term.prtTmColor("Exception caught on sub 2: " + toString(e.what()), Terminal::RED);
-			}
-			++_msg_nb;
-			// cout << "---> Reading again " << fd, Terminal::RESET);
 		}
+	} catch (const std::out_of_range& e){
+		_term.prtTmColor("Exception caught reading messages: " + toString(e.what()), Terminal::RED);
 	}
 	// cout << "---> Reading END " << fd, Terminal::RESET);
 }
