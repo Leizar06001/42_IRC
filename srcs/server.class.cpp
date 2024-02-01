@@ -371,13 +371,15 @@ void Server::cmd_join(int fd, vector<string> tokens){
 
 	// NOTIF OTHER USERS IN CHANNEL
 	int nb_users = _users->getNbUsers();
-	user = _users->getNextUser(1);
+	userInfos* target = _users->getNextUser(1);
 	int i = 0;
 	while (i < nb_users){
-		if (user){
-			sendMessage(user->getFd(), ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " JOIN " + chanType + tokens[1]);
+		if (target){
+			int fd_dest = target->getFd();
+			//if (fd != fd_dest)
+				sendMessage(fd_dest, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " JOIN " + chanType + tokens[1]);
 			++i;
-			user = _users->getNextUser(0);
+			target = _users->getNextUser(0);
 		}
 	}
 }
