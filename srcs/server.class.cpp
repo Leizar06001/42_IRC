@@ -476,7 +476,12 @@ void Server::getMessages(int fd){
 		while ((pos = answer.find("\n", 0)) != string::npos){
 			int inc = 1;
 			if (answer[pos - 1] == '\r') {--pos; ++inc;}
-			string msg = answer.substr(0, pos);
+			string msg;
+			try{
+				msg = answer.substr(0, pos);
+			} catch (const std::out_of_range& e){
+				_term.prtTmColor("Exception caught on sub 1: " + toString(e.what()), Terminal::RED);
+			}
 			userInfos* user = _users->getUserByFd(fd);
 			user->incMsgs();
 
@@ -484,7 +489,11 @@ void Server::getMessages(int fd){
 				vector<string> tokens = parseMessage(fd, msg);
 				analyseCommands(fd, tokens);
 			}
-			answer = answer.substr(pos + inc);
+			try{
+				answer = answer.substr(pos + inc);
+			} catch (const std::out_of_range& e){
+				_term.prtTmColor("Exception caught on sub 2: " + toString(e.what()), Terminal::RED);
+			}
 			++_msg_nb;
 			// cout << "---> Reading again " << fd, Terminal::RESET);
 		}
