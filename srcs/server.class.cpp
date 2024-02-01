@@ -388,17 +388,17 @@ void Server::cmd_quit(int fd, vector<string> tokens){
 	int nb_users = _users->getNbUsers();
 	userInfos* target = _users->getNextUser(1);
 	int i = 0;
-	int j = 0;
-	while (i < nb_users && j < 20){
-		_term.prtTmColor("QUIT: In while loop, i: " + toString(i), Terminal::BRIGHT_CYAN);
-		if (target){
-			int fd_dest = target->getFd();
-			if (fd != fd_dest)
-				sendMessage(fd_dest, ":" + nickname + "!" + username + "@" + _servername + " QUIT :" + reason);
-			++i;
-			target = _users->getNextUser(0);
+	if (nb_users > 1){
+		while (i < nb_users){
+			_term.prtTmColor("QUIT: In while loop, i: " + toString(i), Terminal::BRIGHT_CYAN);
+			if (target){
+				int fd_dest = target->getFd();
+				if (fd != fd_dest)
+					sendMessage(fd_dest, ":" + nickname + "!" + username + "@" + _servername + " QUIT :" + reason);
+				++i;
+				target = _users->getNextUser(0);
+			}
 		}
-		++j;
 	}
 	rmUser(fd, string("QUIT"));
 }
