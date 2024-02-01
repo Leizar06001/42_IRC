@@ -38,6 +38,10 @@ void Server::getMessages(int fd){
 		if (bytesRead < 0 ){
 			// ERROR
 			_term.prtTmColor("RECV ERROR", Terminal::BRIGHT_RED);
+			vector<string> tokens;
+			tokens.push_back("QUIT");
+			tokens.push_back("???");
+			cmd_quit(fd, tokens);
 		} else if (bytesRead == 0){	// CLIENT DISCONNECTED
 			vector<string> tokens;
 			tokens.push_back("QUIT");
