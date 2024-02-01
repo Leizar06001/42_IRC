@@ -463,15 +463,17 @@ void Server::rmUser(int fd, const string& reason){
 
 
 void Server::getMessages(int fd){
-	// cout << "---> Reading Fd " << fd, Terminal::RESET);
-	char buffer[10000];
+	char buffer[10000] = {0};
 	ssize_t bytesRead = recv(_fds[fd].fd, buffer, sizeof(buffer), MSG_DONTWAIT);
 
 	try {
-		if (bytesRead == 0){	// CLIENT DISCONNECTED
+		if (bytesRead < 0 ){
+			// ERROR
+			_term.prtTmColor("RECV ERROR", Terminal::BRIGHT_RED);
+		} else if (bytesRead == 0){	// CLIENT DISCONNECTED
 			vector<string> tokens;
-			tokens[0] = "QUIT";
-			tokens[1] = "Connection lost";
+			tokens.push_back("QUIT");
+			tokens.push_back("Connection lost");
 			cmd_quit(fd, tokens);
 		} else {				// TREAT MESSAGE
 			string answer(buffer, bytesRead);
@@ -481,11 +483,9 @@ void Server::getMessages(int fd){
 				int inc = 1;
 				if (answer[pos - 1] == '\r') {--pos; ++inc;}
 				string msg;
-				// try{
-					msg = answer.substr(0, pos);
-				// } catch (const std::out_of_range& e){
-				// 	_term.prtTmColor("Exception caught on sub 1: " + toString(e.what()), Terminal::RED);
-				// }
+
+				msg = answer.substr(0, pos);
+
 				userInfos* user = _users->getUserByFd(fd);
 				user->incMsgs();
 
@@ -493,19 +493,15 @@ void Server::getMessages(int fd){
 					vector<string> tokens = parseMessage(fd, msg);
 					analyseCommands(fd, tokens);
 				}
-				// try{
-					answer = answer.substr(pos + inc);
-				// } catch (const std::out_of_range& e){
-				// 	_term.prtTmColor("Exception caught on sub 2: " + toString(e.what()), Terminal::RED);
-				// }
+
+				answer = answer.substr(pos + inc);
+
 				++_msg_nb;
-				// cout << "---> Reading again " << fd, Terminal::RESET);
 			}
 		}
 	} catch (const std::out_of_range& e){
 		_term.prtTmColor("Exception caught reading messages: " + toString(e.what()), Terminal::RED);
 	}
-	// cout << "---> Reading END " << fd, Terminal::RESET);
 }
 
 void Server::sendMessage(int fd, const string& msg){
