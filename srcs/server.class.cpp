@@ -152,7 +152,17 @@ void Server::handleEvents(void){
 		_term.prtTmColor("SERVER NOT INITIALIZED\n", Terminal::RED);
 		return ;
 	}
-	//drawInterface();
+	readSockets();
+	// Check if a user waits for an action from the server
+	checkPendingActions();
+	// Check for user not registered in time
+	checkClientRegistrationTimeout();
+	// Check if connection timeout
+	checkIfClientsAlive();
+	drawInterface();
+}
+
+void Server::readSockets(void){
 	if (pollFds(500) > 0){
 		// Check for new clients
 		if (_fds[0].revents & POLLIN){
@@ -172,24 +182,31 @@ void Server::handleEvents(void){
 			}
 		}
 	}
-	// Check if a user waits for an action from the server
+}
+
+void Server::checkPendingActions(void){
 	userInfos* user;
 	while ((user = _users->getUserActionRequests()) != NULL){
 		performAction(user);
 	}
-	// Check for user not registered in time
+}
+
+void Server::checkClientRegistrationTimeout(void){
 	int fdtm = _users->checkRegistrationTimeout(REGISTRATION_TIMEOUT);
 	if (fdtm >= 0){
 		rmUser(fdtm, string("REGISTRATION TIMEOUT"));
 	}
-	// Check if connection timeout
-	if (time(NULL) - _last_timeout_check > CONNECTION_TIMEOUT){
-		_term.prtTmColor("Checking timeouts..", Terminal::BRIGHT_CYAN);
+}
+
+void Server::checkIfClientsAlive(void){
+	if (time(NULL) - _last_timeout_check > TIMEOUT_CHECK_TIME){
+		// _term.prtTmColor("Checking timeouts..", Terminal::BRIGHT_CYAN);
 
 		vector<userInfos*> list = _users->checkConnectionTimeout(CONNECTION_TIMEOUT);
 		vector<userInfos*>::iterator it = list.begin();
 
 		while (it != list.end()){
+			// _term.prtTmColor((*it)->getNickname() + " Ping? " + toString((*it)->getPong()) + " t: " + toString(time(NULL) - (*it)->getLastMessageTime()), Terminal::BRIGHT_CYAN);
 			if (!(*it)->getPong()){	// send PING to check alive
 				(*it)->setPong(true);
 				sendMessage((*it)->getFd(), "PING :test_alive");
@@ -199,10 +216,10 @@ void Server::handleEvents(void){
 				tokens.push_back("Connection timeout");
 				cmd_quit((*it)->getFd(), tokens);
 			}
+			++it;
 		}
 		_last_timeout_check = time(NULL);
 	}
-	drawInterface();
 }
 
 void Server::performAction(userInfos* user){
@@ -276,13 +293,14 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_nick,
 		&Server::cmd_user,
 		&Server::cmd_ping,
+		&Server::cmd_pong,
 		&Server::cmd_msg,
 		&Server::cmd_whois,
 		&Server::cmd_names,
 		&Server::cmd_quit,
 		&Server::cmd_join
 	};
-	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PRIVMSG", "WHOIS", "NAMES", "QUIT", "JOIN"};
+	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PONG", "PRIVMSG", "WHOIS", "NAMES", "QUIT", "JOIN"};
 
 	for (size_t i = 0; i < sizeof(cmds) / sizeof(cmds[0]); ++i){
 		if (cmds[i] == tokens[0]){
@@ -424,7 +442,7 @@ void Server::cmd_quit(int fd, vector<string> tokens){
 			}
 		}
 	}
-	rmUser(fd, string("QUIT"));
+	rmUser(fd, string("QUIT " + reason));
 }
 void Server::cmd_join(int fd, vector<string> tokens){
 	if (tokens.size() < 2){
@@ -506,7 +524,7 @@ void Server::getMessages(int fd){
 		} else {				// TREAT MESSAGE
 			string answer(buffer, bytesRead);
 			size_t pos = 0;
-			_term.prtTmColor(answer, Terminal::BRIGHT_RED);
+			//_term.prtTmColor(answer, Terminal::BRIGHT_RED);
 			while ((pos = answer.find("\n")) != string::npos){
 				int inc = 1;
 				if (pos > 0 && answer[pos - 1] == '\r') {

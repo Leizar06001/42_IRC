@@ -12,6 +12,7 @@
 #define MAX_CON					100
 #define REGISTRATION_TIMEOUT	10
 #define CONNECTION_TIMEOUT		60
+#define TIMEOUT_CHECK_TIME		30
 #define PRINT_DEBUG_INFOS		0
 
 using namespace std;
@@ -42,6 +43,10 @@ class Server {
 
 		void	performAction(userInfos* user);
 		void	drawInterface(void);
+		void	checkClientRegistrationTimeout(void);
+		void	checkIfClientsAlive(void);
+		void	readSockets(void);
+		void	checkPendingActions(void);
 
 		void	cmd_cap(int fd, vector<string> tokens);
 		void	cmd_nick(int fd, vector<string> tokens);
