@@ -377,7 +377,25 @@ void Server::cmd_names(int fd, vector<string> tokens){
 	}
 }
 void Server::cmd_quit(int fd, vector<string> tokens){
-	(void)tokens;
+	// Advertise other users
+	userInfos* user = _users->getUserByFd(fd);
+	string nickname = user->getNickname();
+	string username = user->getUsername();
+	string reason;
+	(tokens.size() < 2) ? reason = "" : reason = tokens[1];
+
+	int nb_users = _users->getNbUsers();
+	userInfos* target = _users->getNextUser(1);
+	int i = 0;
+	while (i < nb_users){
+		if (target){
+			int fd_dest = target->getFd();
+			if (fd != fd_dest)
+				sendMessage(fd_dest, ":" + nickname + "!" + username + "@" + _servername + " QUIT :" + reason);
+			++i;
+			target = _users->getNextUser(0);
+		}
+	}
 	rmUser(fd, string("QUIT"));
 }
 void Server::cmd_join(int fd, vector<string> tokens){
