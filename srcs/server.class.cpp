@@ -475,6 +475,7 @@ void Server::getMessages(int fd){
 		while ((pos = answer.find("\n", 0)) != string::npos){
 			int inc = 1;
 			if (answer[pos - 1] == '\r') {--pos; ++inc;}
+			_term.prtTmColor("SUB1", Terminal::GREEN);
 			string msg = answer.substr(0, pos);
 			userInfos* user = _users->getUserByFd(fd);
 			user->incMsgs();
@@ -483,8 +484,8 @@ void Server::getMessages(int fd){
 				vector<string> tokens = parseMessage(fd, msg);
 				analyseCommands(fd, tokens);
 			}
-
-			answer = answer.substr(pos + 1);
+			_term.prtTmColor("SUB2", Terminal::GREEN);
+			answer = answer.substr(pos + inc);
 			++_msg_nb;
 			// cout << "---> Reading again " << fd, Terminal::RESET);
 		}
