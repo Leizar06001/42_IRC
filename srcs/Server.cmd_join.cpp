@@ -14,6 +14,9 @@ void Server::cmd_join(int fd, vector<string> tokens){
 	s_Channel* chan = _channels->getChannel(tokens[1]);
 	if (!chan) return;
 	sendMsgToList(fd, "JOIN " + tokens[1], chan->users);
+	// SEND ALL USERS OF THE CHANNEL TO THE NEW
+	// cmd_names(fd, _channels->getChannelUsersNicks());
+
 
 	// int nb_users = _users->getNbUsers();
 	// userInfos* target = _users->getNextUser(1);

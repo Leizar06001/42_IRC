@@ -81,6 +81,11 @@ class Server {
 		void	cmd_quit(int fd, vector<string> tokens);
 		void	cmd_join(int fd, vector<string> tokens);
 		void	cmd_kick(int fd, vector<string> tokens);
+		void	cmd_invite(int fd, vector<string> tokens);
+		void	cmd_topic(int fd, vector<string> tokens);
+		void	cmd_mode(int fd, vector<string> tokens);
+		void	cmd_part(int fd, vector<string> tokens);
+		void	cmd_ban(int fd, vector<string> tokens);
 
 		void	rmUser(int fd, const string& reason);
 
