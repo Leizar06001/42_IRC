@@ -6,8 +6,7 @@ ChannelList::ChannelList(Terminal* term):_term(term)
 	general->channel_name = "General";
 	general->channel_type = "Public";
 	general->deletable = 0;
-	(this->channel_map).insert(std::pair<std::string, size_t>("General", 0));
-	(this->channels).push_back(general);
+	channel.insert(std::pair<std::string, s_Channel *>("General", general));
 	_term->prtTmColor("Channel General created", Terminal::BLUE);
 }
 
@@ -27,18 +26,13 @@ ChannelList::~ChannelList()
 
 void ChannelList::joinChannel(userInfos* user, std::string channel_name)
 {
-	std::vector<s_Channel *>::iterator it = (this->channels).begin();
+	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
 	int	is_channel = 0;
-	while(it != channels.end())
+	if (it != channel.end())
 	{
-		if(((*it)->channel_name == channel_name) && !is_kicked(user, (*it)))
-		{
-			(*it)->users.push_back(user);
-			is_channel++;
-			_term->prtTmColor("Channel " + channel_name + " exist", Terminal::BLUE);
-
-		}
-		it++;
+		it->second->users.push_back(user);
+		is_channel++;
+		_term->prtTmColor("Channel " + channel_name + " exist", Terminal::BLUE);
 	}
 	if(is_channel == 0)
 	{
@@ -46,8 +40,7 @@ void ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		new_channel->channel_name = channel_name;
 		new_channel->channel_type = "Public";
 		new_channel->deletable = 0;
-		(this->channel_map).insert(std::pair<std::string, size_t>(channel_name, 0));
-		(this->channels).push_back(new_channel);
+		channel.insert(std::pair<std::string, s_Channel *>(channel_name, new_channel));
 		_term->prtTmColor("Channel " + channel_name + " created", Terminal::BLUE);
 		new_channel->users.push_back(user);
 	}
@@ -55,14 +48,10 @@ void ChannelList::joinChannel(userInfos* user, std::string channel_name)
 
 void ChannelList::kickChannel(userInfos* user, std::string channel_name)
 {
-	std::vector<s_Channel *>::iterator it = (this->channels).begin();
-	while(it != channels.end())
+	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
+	if (it != channel.end())
 	{
-		if(((*it)->channel_name == channel_name))
-		{
-			(*it)->kicklist.push_back(user);
-		}
-		it++;
+		it->second->kicklist.push_back(user);
 	}
 }
 
@@ -93,4 +82,5 @@ s_Channel	*ChannelList::getChannel(std::string channel_name)
 		}
 		it++;
 	}
+	return NULL;
 }

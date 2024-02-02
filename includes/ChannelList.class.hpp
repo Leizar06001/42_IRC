@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <map>
 
 #include "Channel.hpp"
 #include "terminal.class.hpp"
@@ -11,6 +12,7 @@ class ChannelList
 	private:
 		vector<s_Channel *> channels;
 		map<string, size_t>	channel_map;
+		map<std::string, s_Channel *>	channel;
 		Terminal*	_term;
 
 	public:
