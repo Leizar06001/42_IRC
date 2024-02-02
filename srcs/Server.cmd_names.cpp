@@ -1,9 +1,11 @@
 #include "../includes/server.class.hpp"
 
 void Server::cmd_names(int fd, vector<string> tokens){
-	string	msg;
-	string	nick = _users->getUserByFd(fd)->getNickname();
-
+	string		msg;
+	userInfos* 	user = _users->getUserByFd(fd);
+	if (!user) return ;
+	string		nick = user->getNickname();
+	if (nick.length() == 0) return ;
 	// channels   = : public, * : secret, @ : private
 	// users      @ : operator
 	if (tokens.size() > 1){	// list users of a channel
