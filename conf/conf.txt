@@ -1,0 +1,5 @@
+[CONFIG]
+max_clients 100
+max_channels 30
+
+[BANNED IP]

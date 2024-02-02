@@ -26,6 +26,25 @@ void Server::writeConf(const string& str){
 	(void)str;
 }
 
+void Server::setVarsFromConf(string& str){
+	vector<string> toks;
+	size_t pos = str.find(" ");
+	if (pos == string::npos || pos <= 0) return;
+	string key = str.substr(0, pos - 1);
+	if (str.length() < pos + 1) return;
+	string val = str.substr(pos + 1);
+	int num;
+	if (str == "max_clients"){
+		num = atoi(val.c_str());
+		if (num){
+
+		}
+	} else {
+
+	}
+
+}
+
 void Server::readConf(void){
 	struct stat st;
 	string path = CONF_FOLDER;
@@ -42,8 +61,16 @@ void Server::readConf(void){
 		_term.prtTmColor("Reading conf file..\n", Terminal::CYAN);
 		string line;
 		while(getline(conf, line)){
-			if (line == "[BANNED IP]"){
-				_term.prtTmColor("CONF: Banned:\n", Terminal::MAGENTA);
+			if (line == "[CONFIG]"){
+				_term.prtTmColor("CONF:\n", Terminal::MAGENTA);
+				while(getline(conf, line)){
+					if (line.empty() || line[0] == '[')
+						break;
+					setVarsFromConf(line);
+					_term.prtTmColor(line + "\n", Terminal::MAGENTA);
+				}
+			} else if (line == "[BANNED IP]"){
+				_term.prtTmColor("BANNED:\n", Terminal::MAGENTA);
 				while(getline(conf, line)){
 					if (line.empty() || line[0] == '[')
 						break;

@@ -48,7 +48,9 @@ class Server {
 		fstream			_logStream;
 		Terminal		_term;
 
-		vector<string> _bans_ip;
+		vector<string>	_bans_ip;
+		int				_max_clients;
+		int				_max_channels;
 
 
 		void	createSocket(int domain, int type, int protocol);
@@ -85,11 +87,12 @@ class Server {
 		void	writeToLog(const string& str);
 		void	writeConf(const string& str);
 		void	readConf(void);
+		void	setVarsFromConf(string &str);
 		void	openLog(void);
 
 		int		isIPBanned(string& ip);
 		void	sendMsgToList(int fd_source, const string& msg, const map<int, size_t> &lst);
-		void	sendMsgToList(int fd_source, const string& msg, const vector<userInfos*> &lst);
+		void	sendMsgToList(int fd_source, const string& msg, vector<userInfos*> lst);
 
 	public:
 		Server(void);

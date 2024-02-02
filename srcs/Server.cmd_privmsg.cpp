@@ -8,7 +8,13 @@ void Server::cmd_msg(int fd, vector<string> tokens){
 			if (tokens[1][0] == '#'){
 				if (tokens[1] == "#General"){
 					sendMsgToList(fd, "PRIVMSG " + tokens[1] + " :" + tokens[2], _users->getIDmap());
-				} else err = ERR_NOSUCHCHANNEL;
+				} else {
+					if (1){
+						s_Channel* chan = _channels->getChannel(tokens[1]);
+						sendMsgToList(fd, "PRIVMSG " + tokens[1] + " :" + tokens[2], chan->users);
+					} else
+						err = ERR_NOSUCHCHANNEL;
+				}
 			} else {
 				userInfos* dest = _users->getUserByNick(tokens[1]);
 				if (dest){
@@ -46,9 +52,11 @@ void	Server::sendMsgToList(int fd_source, const string& msg, const map<int, size
 	}
 }
 
-void	Server::sendMsgToList(int fd_source, const string& msg, const vector<userInfos*> &lst){
+void	Server::sendMsgToList(int fd_source, const string& msg, vector<userInfos*> lst){
 	userInfos* source = _users->getUserByFd(fd_source);
-	vector<userInfos*>::const_iterator it = lst.begin();
+	(void)lst;
+	vector<userInfos*>::iterator it = lst.begin();
+	(void)it;
 	if (msg.length() == 0 || !source) return;
 	while (it != lst.end()){
 		if ((*it)->getFd() != fd_source){
