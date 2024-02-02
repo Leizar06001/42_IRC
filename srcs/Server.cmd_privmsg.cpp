@@ -7,7 +7,7 @@ void Server::cmd_msg(int fd, vector<string> tokens){
 			// Check if dest is a channel
 			if (tokens[1][0] == '#'){
 				if (tokens[1] == "#General"){
-					sendMsgToList(fd, tokens[1] + " :" + tokens[2], _users->getIDmap());
+					sendMsgToList(fd, "PRIVMSG " + tokens[1] + " :" + tokens[2], _users->getIDmap());
 				} else err = ERR_NOSUCHCHANNEL;
 			} else {
 				userInfos* dest = _users->getUserByNick(tokens[1]);
