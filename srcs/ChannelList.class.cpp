@@ -46,6 +46,45 @@ void ChannelList::joinChannel(userInfos* user, std::string channel_name)
 	}
 }
 
+void ChannelList::quitChannel(userInfos* user, std::string channel_name)
+{
+	std::map<std::string, s_Channel*>::iterator it = channel.find(channel_name);
+
+	if (it != channel.end())
+	{
+		std::vector<userInfos*>::iterator it_u = it->second->users.begin();
+		while (it_u != it->second->users.end())
+		{
+			if (*it_u == user)
+				it_u = it->second->users.erase(it_u);
+			else
+				++it_u;
+		}
+	}
+}
+
+void ChannelList::leaveServer(userInfos* user)
+{
+    std::map<std::string, s_Channel*>::iterator it = channel.begin();
+
+    while (it != channel.end())
+    {
+        std::vector<userInfos*>::iterator it_u = it->second->users.begin();
+        while (it_u != it->second->users.end())
+        {
+            if (*it_u == user)
+            {
+                it_u = it->second->users.erase(it_u);
+            }
+            else
+            {
+                ++it_u;
+            }
+        }
+		it++;
+    }
+}
+
 void ChannelList::kickChannel(userInfos* user, std::string channel_name)
 {
 	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);

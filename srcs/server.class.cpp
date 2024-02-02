@@ -191,6 +191,7 @@ void Server::handleEvents(void){
 
 void Server::rmUser(int fd, const string& reason){
 	_term.prtTmColor("X Client # " + toString(fd) + " disconnected: " + reason + "\n", Terminal::RED);
+	_channels->leaveServer(_users->getUserByFd(fd));
 	_users->rmUser(fd);
 	close(_fds[fd].fd);
 	_fds[fd].fd = -1;
