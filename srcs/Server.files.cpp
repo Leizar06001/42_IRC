@@ -16,7 +16,7 @@ void Server::openLog(void){
 			_term.prtTmColor("ERROR: CANNOT CREATE LOG FOLDER\n", Terminal::BRIGHT_RED);
 		}
 	}
-	_logStream.open(path + string(LOG_FILE), std::fstream::out ); //| std::fstream::app
+	_logStream.open((path + LOG_FILE).c_str(), std::fstream::out ); //| std::fstream::app
 	if (!_logStream.is_open()) {
 		_term.prtTmColor("ERROR: CANNOT OPEN LOG FILE\n", Terminal::BRIGHT_RED);
 	}
@@ -35,7 +35,7 @@ void Server::readConf(void){
 			_term.prtTmColor("ERROR: CANNOT CREATE CONF FOLDER\n", Terminal::BRIGHT_RED);
 		}
 	}
-	ifstream conf(path + string(CONF_FILE));
+	ifstream conf((path + CONF_FILE).c_str());
 	if (!conf.is_open()) {
 		_term.prtTmColor("ERROR: CANNOT OPEN CONF FILE\n", Terminal::BRIGHT_RED);
 	} else {
