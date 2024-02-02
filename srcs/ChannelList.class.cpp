@@ -55,22 +55,6 @@ void ChannelList::kickChannel(userInfos* user, std::string channel_name)
 	}
 }
 
-int	is_kicked(userInfos* user, s_Channel *channel)
-{
-	std::vector<userInfos *>::iterator it = channel->kicklist.begin();
-	while(it != channel->kicklist.end())
-	{
-		if(((*it) == user))
-		{
-			std::cout << user->getUsername() << " is kicked" << std::endl;
-			return(1);
-		}
-		it++;
-	}
-	std::cout << user->getUsername() << " is not kicked" << std::endl;
-	return(0);
-}
-
 s_Channel	*ChannelList::getChannel(std::string channel_name)
 {
 	std::vector<s_Channel *>::iterator it = (this->channels).begin();

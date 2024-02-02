@@ -22,5 +22,3 @@ class ChannelList
 		void kickChannel(userInfos* user, string channel_name);
 		s_Channel* getChannel(string channel_name);
 };
-
-int is_kicked(userInfos* user, s_Channel *channel);
