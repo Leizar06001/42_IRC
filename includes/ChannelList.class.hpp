@@ -20,5 +20,6 @@ class ChannelList
 		~ChannelList();
 		void joinChannel(userInfos* user, string channel_name);
 		void kickChannel(userInfos* user, string channel_name);
+		bool is_in_Channel(userInfos* user, string channel_name);
 		s_Channel* getChannel(string channel_name);
 };

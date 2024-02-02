@@ -57,14 +57,26 @@ void ChannelList::kickChannel(userInfos* user, std::string channel_name)
 
 s_Channel	*ChannelList::getChannel(std::string channel_name)
 {
-	std::vector<s_Channel *>::iterator it = (this->channels).begin();
-	while(it != channels.end())
+	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
+	if (it != channel.end())
 	{
-		if(((*it)->channel_name == channel_name))
-		{
-			return (*it);
-		}
-		it++;
+		return (it->second);
 	}
 	return NULL;
+}
+
+bool ChannelList::is_in_Channel(userInfos* user, string channel_name)
+{
+	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
+	if(it != channel.end())
+	{
+		std::vector<userInfos *>::iterator it_u = it->second->users.begin();
+		while(it_u != it->second->users.end())
+		{
+			if((*it_u) == user)
+				return(1);
+			it_u++;
+		}
+	}
+	return(0);
 }
