@@ -12,16 +12,16 @@ ChannelList::ChannelList(Terminal* term):_term(term)
 
 ChannelList::~ChannelList()
 {
-	size_t i = 0;
-	while(i < channels.size())
+	std::map<std::string, s_Channel*>::iterator it = channel.begin();
+	while (it != channel.end())
 	{
-		if (channels[i])
+		if (it->second)
 		{
-			delete channels[i];
+			delete it->second;
 		}
-		i++;
+		++it;
 	}
-	channels.clear();
+	channel.clear();
 }
 
 void ChannelList::joinChannel(userInfos* user, std::string channel_name)
