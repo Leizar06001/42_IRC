@@ -14,6 +14,7 @@ class ChannelList
 		map<string, size_t>	channel_map;
 		map<std::string, s_Channel *>	channel;
 		Terminal*	_term;
+		int nb_channel;
 
 	public:
 		ChannelList(Terminal* term);
@@ -25,4 +26,5 @@ class ChannelList
 		string getUsersNames(string& chanel_name);
 		void quitChannel(userInfos* user, std::string channel_name);
 		void leaveServer(userInfos* user);
+		int getNbChannel();
 };

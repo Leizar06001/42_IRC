@@ -46,6 +46,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		channel.insert(std::pair<std::string, s_Channel *>(channel_name, new_channel));
 		_term->prtTmColor("Channel " + channel_name + " created", Terminal::BLUE);
 		new_channel->users.push_back(user);
+		nb_channel++;
 	}
 	return 0;
 }
@@ -140,4 +141,9 @@ std::string ChannelList::getUsersNames(string& channel_name)
 		}
 	}
 	return users;
+}
+
+int ChannelList::getNbChannel()
+{
+	return(this->nb_channel);
 }
