@@ -28,6 +28,11 @@ void ChannelList::joinChannel(userInfos* user, std::string channel_name)
 {
 	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
 	int	is_channel = 0;
+	if (channel_name[0] == '#')
+	{
+		_term->prtTmColor("Channel may begin with #", Terminal::RED);
+		return;
+	}
 	if (it != channel.end())
 	{
 		it->second->users.push_back(user);
