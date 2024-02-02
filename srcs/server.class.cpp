@@ -137,10 +137,19 @@ void Server::getConnection(void){
 	string ip_str = string(client_ip);
 	if (isIPBanned(ip_str)) {
         _term.prtTmColor(">>> Banned IP: " + string(client_ip) + " - Connection refused\n", Terminal::RED);
-		sendMessage(connection, ":" + _servername + " " + toString(ERR_YOUREBANNEDCREEP) + " " + ip_str + " :You're banned motherfucker !");
+		string msg =  ":" + _servername + " " + toString(ERR_YOUREBANNEDCREEP) + " " + ip_str + " :You're banned motherfucker !\r\n";
+		send(connection, msg.c_str(), msg.size(), 0);
 		close(connection); // Close the connection to the banned IP
         return;
     }
+
+	if (_connection_nb >= MAX_CON){
+		_term.prtTmColor(">>> Rejected: " + string(client_ip) + " - Too many connections\n", Terminal::RED);
+		string msg =  ":" + _servername + " :No room left on the server\r\n";
+		send(connection, msg.c_str(), msg.size(), 0);
+		close(connection); // Close the connection to the banned IP
+		return ;
+	}
 
 	++_connection_nb;
 	int i = 1;

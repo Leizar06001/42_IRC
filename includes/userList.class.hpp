@@ -41,8 +41,10 @@ class userList {
 		userInfos*	getUserByFd(int fd);
 		userInfos*	getUserByNick(string& nickname);
 		userInfos*	getNextUser(int reset);
+		userInfos*	getUserByIndex(int index);
 
 		const string	getListOfUsers(void);
+		const map<int, size_t> &getIDmap(void) const;
 
 		int			getNbNotRegistered(void) const;
 		void		validateRegistration(userInfos* user);

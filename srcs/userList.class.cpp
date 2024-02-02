@@ -160,6 +160,16 @@ userInfos* userList::getNextUser(int reset){
 	return user;
 }
 
+userInfos* userList::getUserByIndex(int index){
+	userInfos* user;
+	try {
+		user = _userlist.at(index);
+	} catch (std::out_of_range& e){
+		user = NULL;
+	}
+	return user;
+}
+
 const string userList::getListOfUsers(void){
 	map<string, size_t>::iterator it = _mapNick.begin();
 	string	list;
@@ -168,6 +178,10 @@ const string userList::getListOfUsers(void){
 		++it;
 	}
 	return list;
+}
+
+const map<int, size_t> &userList::getIDmap(void) const{
+	return _mapID;
 }
 
 int userList::getNbNotRegistered(void) const {

@@ -84,6 +84,7 @@ class Server {
 		void	openLog(void);
 
 		int		isIPBanned(string& ip);
+		void	sendMsgToList(int fd_source, const string& msg, const map<int, size_t> &lst);
 
 	public:
 		Server(void);

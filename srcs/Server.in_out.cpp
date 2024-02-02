@@ -83,6 +83,6 @@ void Server::getMessages(int fd){
 
 void Server::sendMessage(int fd, const string& msg){
 	string final_msg = msg + "\r\n";
-	send(fd, final_msg.c_str(), final_msg.size(), 0);
+	send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
 	_term.prtTmColor("OUT: '" + msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
