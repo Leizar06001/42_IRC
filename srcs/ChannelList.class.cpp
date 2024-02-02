@@ -8,6 +8,7 @@ ChannelList::ChannelList(Terminal* term):_term(term)
 	general->deletable = 0;
 	channel.insert(std::pair<std::string, s_Channel *>("General", general));
 	_term->prtTmColor("Channel General created", Terminal::BLUE);
+	nb_channel = 1;
 }
 
 ChannelList::~ChannelList()
