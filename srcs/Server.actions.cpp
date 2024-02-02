@@ -25,10 +25,9 @@ void Server::performAction(userInfos* user){
 		// sendMessage(fd, message);
 		_users->validateRegistration(user);
 		vector<string> tokens;
-		tokens.push_back("*");
-		tokens.push_back("General");
+		tokens.push_back("JOIN");
+		tokens.push_back("#General");
 		cmd_join(fd, tokens);
-		cmd_names(fd, tokens);
 	}
 
 	_users->rmFirstAction();
