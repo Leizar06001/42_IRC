@@ -186,7 +186,7 @@ void Server::handleEvents(void){
 	checkClientRegistrationTimeout();
 	// Check if connection timeout
 	checkIfClientsAlive();
-	// drawInterface();
+	drawInterface();
 }
 
 void Server::rmUser(int fd, const string& reason){

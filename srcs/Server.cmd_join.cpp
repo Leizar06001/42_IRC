@@ -8,6 +8,7 @@ void Server::cmd_join(int fd, vector<string> tokens){
 	// JOIN CHANNEL
 	userInfos* user = _users->getUserByFd(fd);
 	_channels->joinChannel(user, tokens[1]);
+
 	sendMessage(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " JOIN " + tokens[1]);
 
 	// NOTIF OTHER USERS IN CHANNEL

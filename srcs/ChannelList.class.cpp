@@ -24,22 +24,20 @@ ChannelList::~ChannelList()
 	channel.clear();
 }
 
-void ChannelList::joinChannel(userInfos* user, std::string channel_name)
+int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 {
-	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
-	int	is_channel = 0;
-	if (channel_name[0] == '#')
+	if (channel_name[0] != '#')
 	{
 		_term->prtTmColor("Channel may begin with #", Terminal::RED);
-		return;
+		return 1;
 	}
+	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
 	if (it != channel.end())
 	{
 		it->second->users.push_back(user);
-		is_channel++;
 		_term->prtTmColor("Channel " + channel_name + " exist", Terminal::BLUE);
 	}
-	if(is_channel == 0)
+	else
 	{
 		s_Channel *new_channel = new s_Channel;
 		new_channel->channel_name = channel_name;
@@ -49,6 +47,7 @@ void ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		_term->prtTmColor("Channel " + channel_name + " created", Terminal::BLUE);
 		new_channel->users.push_back(user);
 	}
+	return 0;
 }
 
 void ChannelList::quitChannel(userInfos* user, std::string channel_name)
