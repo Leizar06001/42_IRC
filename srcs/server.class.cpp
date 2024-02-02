@@ -140,7 +140,7 @@ void Server::getConnection(void){
 		sendMessage(connection, ":" + _servername + " " + toString(ERR_YOUREBANNEDCREEP) + " " + ip_str + " :You're banned motherfucker !");
         //sleep(1);
 		//close(connection); // Close the connection to the banned IP
-        return;
+        //return;
     }
 
 	++_connection_nb;
