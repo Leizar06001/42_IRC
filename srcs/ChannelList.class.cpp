@@ -3,11 +3,10 @@
 ChannelList::ChannelList(Terminal* term):_term(term)
 {
 	s_Channel *general = new s_Channel;
-	general->channel_name = "General";
+	general->channel_name = "#General";
 	general->channel_type = "Public";
 	general->deletable = 0;
-	channel.insert(std::pair<std::string, s_Channel *>("General", general));
-	_term->prtTmColor("Channel General created", Terminal::BLUE);
+	channel.insert(std::pair<std::string, s_Channel *>("#General", general));
 	nb_channel = 1;
 }
 
