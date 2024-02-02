@@ -15,19 +15,10 @@ void Server::cmd_join(int fd, vector<string> tokens){
 	if (!chan) return;
 	sendMsgToList(fd, "JOIN " + tokens[1], chan->users);
 	// SEND ALL USERS OF THE CHANNEL TO THE NEW
-	// cmd_names(fd, _channels->getChannelUsersNicks());
+	vector<string> toks;
+	toks.push_back("NAMES");
+	toks.push_back(tokens[1]);
+	toks.push_back(_channels->getUsersNames(tokens[1]));
+	cmd_names(fd, toks);
 
-
-	// int nb_users = _users->getNbUsers();
-	// userInfos* target = _users->getNextUser(1);
-	// int i = 0;
-	// while (i < nb_users){
-	// 	if (target){
-	// 		int fd_dest = target->getFd();
-	// 		if (fd != fd_dest)
-	// 			sendMessage(fd_dest, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " JOIN " + tokens[1]);
-	// 		++i;
-	// 		target = _users->getNextUser(0);
-	// 	}
-	// }
 }
