@@ -45,3 +45,15 @@ void	Server::sendMsgToList(int fd_source, const string& msg, const map<int, size
 		++it;
 	}
 }
+
+void	Server::sendMsgToList(int fd_source, const string& msg, const vector<userInfos*> &lst){
+	userInfos* source = _users->getUserByFd(fd_source);
+	vector<userInfos*>::const_iterator it = lst.begin();
+	if (msg.length() == 0 || !source) return;
+	while (it != lst.end()){
+		if ((*it)->getFd() != fd_source){
+			sendMessage((*it)->getFd(), ":" + source->getNickname() + "!" + source->getUsername() + "@" + _servername + " " + msg);
+		}
+		++it;
+	}
+}

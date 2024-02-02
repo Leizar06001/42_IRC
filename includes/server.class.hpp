@@ -5,6 +5,7 @@
 #include <netinet/in.h> // For sockaddr_in
 #include <poll.h>
 #include "userList.class.hpp"
+#include "ChannelList.class.hpp"
 #include "terminal.class.hpp"
 #include <ctime>
 #include "toString.hpp"
@@ -41,6 +42,8 @@ class Server {
 		int				_connection_nb;
 		int				_initialized;
 		userList*		_users;
+		ChannelList*	_channels;
+
 		time_t			_last_timeout_check;
 		fstream			_logStream;
 		Terminal		_term;
@@ -75,6 +78,7 @@ class Server {
 		void	cmd_names(int fd, vector<string> tokens);
 		void	cmd_quit(int fd, vector<string> tokens);
 		void	cmd_join(int fd, vector<string> tokens);
+		void	cmd_kick(int fd, vector<string> tokens);
 
 		void	rmUser(int fd, const string& reason);
 
@@ -85,6 +89,7 @@ class Server {
 
 		int		isIPBanned(string& ip);
 		void	sendMsgToList(int fd_source, const string& msg, const map<int, size_t> &lst);
+		void	sendMsgToList(int fd_source, const string& msg, const vector<userInfos*> &lst);
 
 	public:
 		Server(void);

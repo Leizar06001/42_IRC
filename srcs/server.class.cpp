@@ -5,9 +5,11 @@
 Server::Server(void):_initialized(0), _term(&_logStream){
 	_servername = "IRis.Chat";
 	_users = new userList(&_term, PRINT_DEBUG_INFOS);
+	_channels = new ChannelList(&_term);
 };
 Server::~Server(void){
 	delete _users;
+	delete _channels;
 	this->shutdown();
 };
 Server::Server(Server &rhs):_term(&_logStream){(void)rhs;};
