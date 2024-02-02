@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include "userList.class.hpp"
+#include <fstream>
 
 using namespace std;
 
@@ -12,7 +13,7 @@ class userList;
 class Terminal {
 
 private:
-
+	fstream* _logStream;
 
 public:
 	static const std::string BLACK;
@@ -33,7 +34,7 @@ public:
 	static const std::string BRIGHT_WHITE;
 	static const std::string RESET;
 
-	Terminal();
+	Terminal(fstream* logStream);
 	~Terminal(void);
 
 	void updateTitle(int port, int clients, int not_reg, int channels, int msgs, int max_con);
@@ -47,6 +48,7 @@ public:
 	void prtTmColor(const std::string& text, const std::string& color) const;
 	void saveCursor(void) const;
 	void restoreCursor(void) const;
+
 };
 
 #endif

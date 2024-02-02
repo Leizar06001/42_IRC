@@ -14,6 +14,7 @@
 #include <cstdlib> // For exit() and EXIT_FAILURE
 #include <iostream>
 #include <unistd.h>
+#include <fstream>
 
 
 #define MAX_CON					100
@@ -21,6 +22,11 @@
 #define CONNECTION_TIMEOUT		120
 #define TIMEOUT_CHECK_TIME		30
 #define PRINT_DEBUG_INFOS		0
+
+#define CONF_FILE				"conf.txt"
+#define CONF_FOLDER				"./conf/"
+#define LOG_FILE				"last_log.txt"
+#define LOG_FOLDER				"./log/"
 
 using namespace std;
 class Server {
@@ -35,8 +41,12 @@ class Server {
 		int				_connection_nb;
 		int				_initialized;
 		userList*		_users;
-		Terminal		_term;
 		time_t			_last_timeout_check;
+		fstream			_logStream;
+		Terminal		_term;
+
+		vector<string> _bans_ip;
+
 
 		void	createSocket(int domain, int type, int protocol);
 		void	bindToPort(int port);
@@ -67,6 +77,13 @@ class Server {
 		void	cmd_join(int fd, vector<string> tokens);
 
 		void	rmUser(int fd, const string& reason);
+
+		void	writeToLog(const string& str);
+		void	writeConf(const string& str);
+		void	readConf(void);
+		void	openLog(void);
+
+		int		isIPBanned(string& ip);
 
 	public:
 		Server(void);

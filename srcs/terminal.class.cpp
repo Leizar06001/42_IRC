@@ -25,7 +25,7 @@ const std::string Terminal::BRIGHT_CYAN = "\033[96m";
 const std::string Terminal::BRIGHT_WHITE = "\033[97m";
 const std::string Terminal::RESET = "\033[0m";
 
-Terminal::Terminal(){};
+Terminal::Terminal(fstream* logStream):_logStream(logStream){};
 
 Terminal::~Terminal(void){};
 
@@ -167,11 +167,12 @@ void Terminal::prtColor(const std::string& text, const std::string& color) const
 void Terminal::prtTmColor(const std::string& text, const std::string& color) const {
 	clearLine(WIN_H);
 	setCursor(WIN_H - 1, 3);
+	string tm = timestamp();
 
 	size_t visibleCount = 0;
 	size_t i = 0;
 	if (text.length() < 56 && text.find("\033") == string::npos)
-		std::cout << color << timestamp() << " " << text << RESET;
+		std::cout << color << tm << " " << text << RESET;
 	else {
 
 		while (i < text.length() && visibleCount < 55) {
@@ -186,13 +187,19 @@ void Terminal::prtTmColor(const std::string& text, const std::string& color) con
 				i++;
 			}
 		}
-		std::cout << color << timestamp() << " " << text.substr(0, i);
+		std::cout << color << tm << " " << text.substr(0, i);
 		if (text.substr(i).length() > 0){
 			std::cout << "\033[S";	// scroll up
 			setCursor(WIN_H - 1, 19);
 			std::cout << text.substr(i);
 		}
 	}
+
+	// Write to log
+	*_logStream << tm << " " << text;
+	if (text[text.length() - 1] != '\n')
+		*_logStream << "\n";
+	_logStream->flush();
 
 	// std::cout << "\033[S"; 	// scroll up
 	// setCursor(WIN_H - 1, 3);

@@ -2,7 +2,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-Server::Server(void):_initialized(0){
+Server::Server(void):_initialized(0), _term(&_logStream){
 	_servername = "IRis.Chat";
 	_users = new userList(&_term, PRINT_DEBUG_INFOS);
 };
@@ -10,7 +10,7 @@ Server::~Server(void){
 	delete _users;
 	this->shutdown();
 };
-Server::Server(Server &rhs){(void)rhs;};
+Server::Server(Server &rhs):_term(&_logStream){(void)rhs;};
 Server &Server::operator=(Server &rhs){
 	(void)rhs;
 	return *this;
@@ -29,6 +29,12 @@ void Server::shutdown(void){
 		_term.prtTmColor("Closing Socket..\n", Terminal::WHITE);
 		close(_sockfd);
 	}
+	if (_logStream.is_open()) {
+		_term.prtTmColor("Closing Log file..\n", Terminal::WHITE);
+		_logStream.close();
+		return ;
+	}
+
 	_term.prtTmColor("-------- GOODBYE -------\n", Terminal::BRIGHT_CYAN);
 }
 
@@ -51,10 +57,16 @@ int Server::init(int port){
 
 	_term.clearScreen();
 	drawInterface();
+
+	// Create LOG folder and open log file
+	openLog();
+	// Create CONF folder and read conf file if exists
+	readConf();
+
+	// INIT SOCKET
 	_term.prtTmColor("------ STARTING SERVER ------\n", Terminal::BRIGHT_CYAN);
 	if (port <= 0 || port > 65535){
 		_term.prtTmColor("Error: PORT " + toString(port) + " not valid\n", Terminal::RED);
-		return -1;
 	}
 	createSocket(AF_INET, SOCK_STREAM, 0);
 	bindToPort(_port);
@@ -122,6 +134,14 @@ void Server::getConnection(void){
 	char client_ip[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
 
+	string ip_str = string(client_ip);
+	if (isIPBanned(ip_str)) {
+        _term.prtTmColor(">>> Banned IP: " + string(client_ip) + " - Connection refused\n", Terminal::RED);
+		sendMessage(connection, "You're banned motherfucker !");
+        close(connection); // Close the connection to the banned IP
+        return;
+    }
+
 	++_connection_nb;
 	int i = 1;
 	while (_fds[i].fd > 0) ++i;
@@ -131,6 +151,16 @@ void Server::getConnection(void){
 	_users->addUser(i);
 
 	_term.prtTmColor(">>> " + string(client_ip) + " FD." + toString(i) + Terminal::BRIGHT_CYAN + " | " + toString(_connection_nb) + " / " + toString(MAX_CON) + " clients\n", Terminal::GREEN);
+}
+
+int	Server::isIPBanned(string& ip){
+	size_t i = 0;
+	while (i < _bans_ip.size()){
+		if (ip == _bans_ip[i])
+			return 1;
+		++i;
+	}
+	return 0;
 }
 
 void Server::handleEvents(void){
