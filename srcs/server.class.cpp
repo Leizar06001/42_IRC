@@ -138,8 +138,8 @@ void Server::getConnection(void){
 	if (isIPBanned(ip_str)) {
         _term.prtTmColor(">>> Banned IP: " + string(client_ip) + " - Connection refused\n", Terminal::RED);
 		sendMessage(connection, ":" + _servername + " " + toString(ERR_YOUREBANNEDCREEP) + " " + ip_str + " :You're banned motherfucker !");
-        sleep(1);
-		close(connection); // Close the connection to the banned IP
+        //sleep(1);
+		//close(connection); // Close the connection to the banned IP
         return;
     }
 
