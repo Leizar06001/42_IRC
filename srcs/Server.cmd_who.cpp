@@ -18,7 +18,7 @@ void Server::cmd_who(int fd, vector<string> tokens){
 		} else {	// send list
 			vector<userInfos*> list = chan->users;
 			for(vector<userInfos*>::iterator it = list.begin(); it != list.end(); ++it){
-				sendServerMessage(fd, RPL_WHOREPLY, tokens[1] + " " + (*it)->getUsername() + " " + (*it)->getIpAdress() + " " + _servername + " "
+				sendServerMessage(fd, RPL_WHOREPLY, tokens[1] + " " + (*it)->getUsername() + " " + _servername + " " + _servername + " "
 					+ (*it)->getNickname() + " " + (*it)->getStatus() + " :0 " + (*it)->getRealname());
 			}
 			sendServerMessage(fd, RPL_ENDOFWHO, tokens[1] + " :End of /WHO list");
@@ -30,7 +30,7 @@ void Server::cmd_who(int fd, vector<string> tokens){
 		if (!target){
 			sendServerMessage(fd, ERR_NOSUCHNICK, tokens[1] + " :No such nickname");
 		} else {
-			sendServerMessage(fd, RPL_WHOREPLY, tokens[1] + " " + target->getUsername() + " " + target->getIpAdress() + " " + _servername + " "
+			sendServerMessage(fd, RPL_WHOREPLY, target->getUsername() + " " + _servername + " " + _servername + " "
 					+ target->getNickname() + " " + target->getStatus() + " :0 " + target->getRealname());
 			sendServerMessage(fd, RPL_ENDOFWHO, tokens[1] + " :End of /WHO list");
 		}
