@@ -97,6 +97,7 @@ void Server::getMessages(int fd){
 void Server::sendMessage(int fd, const string& msg){
 	string final_msg = msg + "\r\n";
 	int ret = send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
+	(void)ret;
 	// if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE\n", Terminal::RED);
 	// else _term.prtTmColor("OUT: '" + msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
@@ -108,6 +109,7 @@ void Server::sendClientMessage(int fd, const string& msg){
 	const string msg_to_send = final_msg + "\r\n";
 
 	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
+	(void)ret;
 	// if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
 	// else _term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
@@ -118,6 +120,7 @@ void Server::sendClientMessageShowIp(int fd, const string& msg){
 	const string msg_to_send = final_msg + "\r\n";
 
 	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
+	(void)ret;
 	// if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
 	// else _term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
@@ -129,6 +132,7 @@ void Server::sendServerMessage(int fd, int rpl_err_code, const string& msg){
 	const string msg_to_send = final_msg + "\r\n";
 
 	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
+	(void)ret;
 	// if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
 	// else _term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
