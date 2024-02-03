@@ -1,6 +1,8 @@
 #include "../includes/terminal.class.hpp"
 #include "../includes/timestamp.hpp"
+#include "../includes/userList.class.hpp"
 #include "../includes/userInfos.class.hpp"
+#include "../includes/ChannelList.class.hpp"
 
 #define MENU_W	25
 #define TITLE_H	10
