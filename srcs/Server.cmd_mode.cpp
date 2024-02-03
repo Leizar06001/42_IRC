@@ -7,9 +7,9 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 	if (tokens[1][0] == '#'){		// target is a channel
 		s_Channel* chan = _channels->getChannel(tokens[1]);
 		if (chan == NULL){ // channel not exists
-			sendMessage(fd, ":" + _servername + " " + toString(ERR_NOSUCHCHANNEL) + " " + user->getUsername() + " :" + tokens[1]);
+			sendMessage(fd, ":" + _servername + " " + toString(ERR_NOSUCHCHANNEL) + " " + user->getNickname() + " :" + tokens[1]);
 		} else {
-			sendMessage(fd, ":" + _servername + " " + toString(RPL_CHANNELMODEIS) + " " + user->getUsername() + " " + tokens[1] + " " + chan->mode);
+			sendMessage(fd, ":" + _servername + " " + toString(RPL_CHANNELMODEIS) + " " + user->getNickname() + " " + tokens[1] + " " + chan->mode);
 		}
 	} else {						// target is a user
 
