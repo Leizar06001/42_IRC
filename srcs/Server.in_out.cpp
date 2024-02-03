@@ -68,10 +68,6 @@ void Server::getMessages(int fd){
 					user->incMsgs();
 					vector<string> tokens = parseMessage(fd, msg);	// PARSE
 					analyseCommands(fd, tokens);					// LAUNCH CMDS
-					if (user->getWrongCmdsNb() > 2){
-						_channels->leaveServer(user);
-						rmUser(fd, string("QUIT Too many wrong messages"));
-					}
 				}
 			}
 
