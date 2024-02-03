@@ -42,10 +42,13 @@ userInfos* userList::addUser(int fd){
 		++index;
 		userInList = getNextUser(0);
 	}
-	if (index == size_list)	// add at the end
+	if (index == size_list){	// add at the end
 		_userlist.push_back(user);
-	else					// replace NULL in list
+		_term->prtTmColor("Added end of vector "  + toString(index), Terminal::YELLOW);
+	} else {					// replace NULL in list
 		_userlist[index] = user;
+		_term->prtTmColor("Inserted in vector: " + toString(index), Terminal::YELLOW);
+	}
 	user->setIndex(index);
 	_mapID.insert(make_pair(fd, index));
 	_mapInit.insert(make_pair(fd, index));
