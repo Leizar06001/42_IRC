@@ -30,7 +30,7 @@ void Server::cmd_who(int fd, vector<string> tokens){
 		if (!target){
 			sendServerMessage(fd, ERR_NOSUCHNICK, tokens[1] + " :No such nickname");
 		} else {
-			sendServerMessage(fd, RPL_WHOREPLY, target->getUsername() + " " + _servername + " " + _servername + " "
+			sendServerMessage(fd, RPL_WHOREPLY, "#" + target->getUsername() + " " + _servername + " " + _servername + " "
 					+ target->getNickname() + " " + target->getStatus() + " :0 " + target->getRealname());
 			sendServerMessage(fd, RPL_ENDOFWHO, tokens[1] + " :End of /WHO list");
 		}
