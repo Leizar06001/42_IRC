@@ -7,14 +7,20 @@ SRCS = 	main.cpp					\
 		srcs/ChannelList.class.cpp	\
 		srcs/server.class.cpp		\
 		srcs/Server.actions.cpp		\
+		srcs/Server.cmd_ban.cpp		\
 		srcs/Server.cmd_cap.cpp		\
+		srcs/Server.cmd_invite.cpp	\
 		srcs/Server.cmd_join.cpp	\
+		srcs/Server.cmd_kick.cpp	\
+		srcs/Server.cmd_mode.cpp	\
 		srcs/Server.cmd_names.cpp	\
 		srcs/Server.cmd_nick.cpp	\
+		srcs/Server.cmd_part.cpp	\
 		srcs/Server.cmd_ping.cpp	\
 		srcs/Server.cmd_pong.cpp	\
 		srcs/Server.cmd_privmsg.cpp	\
 		srcs/Server.cmd_quit.cpp	\
+		srcs/Server.cmd_topic.cpp	\
 		srcs/Server.cmd_user.cpp	\
 		srcs/Server.cmd_whois.cpp	\
 		srcs/Server.files.cpp		\

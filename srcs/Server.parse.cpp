@@ -18,9 +18,16 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_whois,
 		&Server::cmd_names,
 		&Server::cmd_quit,
-		&Server::cmd_join
+		&Server::cmd_join,
+		&Server::cmd_kick,
+		&Server::cmd_invite,
+		&Server::cmd_topic,
+		&Server::cmd_mode,
+		&Server::cmd_part,
+		&Server::cmd_ban
 	};
-	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PONG", "PRIVMSG", "WHOIS", "NAMES", "QUIT", "JOIN"};
+	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PONG", "PRIVMSG", "WHOIS",
+		"NAMES", "QUIT", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "PART", "BAN"};
 
 	for (size_t i = 0; i < sizeof(cmds) / sizeof(cmds[0]); ++i){
 		if (cmds[i] == tokens[0]){

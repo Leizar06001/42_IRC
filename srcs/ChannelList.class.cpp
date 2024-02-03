@@ -5,6 +5,7 @@ ChannelList::ChannelList(Terminal* term):_term(term)
 	s_Channel *general = new s_Channel;
 	general->channel_name = "#General";
 	general->channel_type = "Public";
+	general->mode = "+nt";
 	general->deletable = 0;
 	channel.insert(std::pair<std::string, s_Channel *>("#General", general));
 	nb_channel = 1;
@@ -42,7 +43,8 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		s_Channel *new_channel = new s_Channel;
 		new_channel->channel_name = channel_name;
 		new_channel->channel_type = "Public";
-		new_channel->deletable = 0;
+		new_channel->mode = "+nt";
+		new_channel->deletable = 1;
 		channel.insert(std::pair<std::string, s_Channel *>(channel_name, new_channel));
 		_term->prtTmColor("Channel " + channel_name + " created", Terminal::BLUE);
 		new_channel->users.push_back(user);
