@@ -122,13 +122,14 @@ void userList::rmUser(int fd){
 		if (itNick != _mapNick.end()) _mapNick.erase(itNick);
 		delete _userlist[index];
 		_userlist[index] = NULL;
-		if (_prt_debug)
-			_term->prtTmColor("FD.'" + toString(fd) + "' deleted from vector\n", Terminal::MAGENTA);
+		if (_prt_debug){
+			_term->prtTmColor("FD.'" + toString(fd) + "' deleted from vector\n", Terminal::BRIGHT_BLUE);
+			_term->prtTmColor("Removing FD " + toString(itID->first) + " index " + toString(itID->second) + " from mapID\n", Terminal::BRIGHT_BLUE);
+		}
 		_mapID.erase(itID);
 		--_nbUsers;
-	// 	_term->prtTmColor("FD.'" + toString(fd) + "' removed from mapID\n", Terminal::MAGENTA);
-	// } else {
-	// 	_term->prtTmColor("FD.'" + toString(fd) + "' not found, cannot remove from mapID\n", Terminal::MAGENTA);
+	} else {
+		_term->prtTmColor("FD.'" + toString(fd) + "' not found, cannot remove from mapID\n", Terminal::BRIGHT_BLUE);
 	}
 }
 
