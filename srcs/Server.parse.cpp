@@ -35,9 +35,34 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 	if (!user) return;
 	size_t max_cmd_rights = user->isRegistered() ? sizeof(cmds) / sizeof(cmds[0]) : 3; // IF NOT REGISTERED, ALLOW ONLY FIRST 3 COMMANDS
 
+	int found = 0;
 	for (size_t i = 0; i < max_cmd_rights; ++i){
 		if (cmds[i] == tokens[0]){
 			(this->*functionsPTRS[i])(fd, tokens);
+			found = 1;
+			break;
+		}
+	}
+
+	if (!found){		// CHECK IF THE COMMAND IS A IRC
+		string all_cmds[] = {"CAP", "AUTHENTICATE", "PASS", "NICK", "USER", "PING", "PONG", "JOIN", "PART",
+							"MODE", "TOPIC", "NAMES", "LIST", "INVITE", "KICK", "PRIVMSG", "NOTICE", "MOTD", "HELP",
+							"LUSERS", "VERSION", "STATS", "LINKS", "TIME", "CONNECT", "TRACE", "ADMIN", "INFO",
+							"SERVLIST", "SQUERY", "WHO", "WHOIS", "WHOWAS", "KILL", "PING", "PONG", "ERROR",
+							"AWAY", "REHASH", "DIE", "RESTART", "SUMMON", "USERS", "WALLOPS", "USERHOST", "ISON"};
+		for(size_t i = 0; i < sizeof(all_cmds) / sizeof(all_cmds[0]); ++i){
+			if (all_cmds[i] == tokens[0]){
+				found = 1;
+				break;
+			}
+		}
+	}
+	if (!found){
+		_term.prtTmColor("Command not found: " + tokens[0], Terminal::BRIGHT_RED);
+		userInfos* user = _users->getUserByFd(fd);
+		if (user){
+			user->incWrongCmds();
+			_term.prtTmColor(user->getNickname() + " has " + toString(user->getWrongCmdsNb()) + " wrong commands", Terminal::RED);
 		}
 	}
 }

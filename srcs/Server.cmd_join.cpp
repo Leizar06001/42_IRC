@@ -10,7 +10,7 @@ void Server::cmd_join(int fd, vector<string> tokens){
 			int ret = 0;
 			_channels->joinChannel(user, tokens[i]);
 			if (ret == 0){								// CHANNEL JOINED
-				sendClientMessage(fd, "JOIN " + tokens[i]);
+				sendClientMessageShowIp(fd, "JOIN " + tokens[i]);
 				s_Channel* chan = _channels->getChannel(tokens[i]);
 				if (chan){
 					sendMsgToList(fd, "JOIN " + tokens[i], chan->users);

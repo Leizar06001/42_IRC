@@ -33,6 +33,7 @@ class userInfos {
 		int			_actionType;		// tell the server what the client is waiting for
 		Terminal*	_term;
 		int			_prt_debug;	// print debug infos ?
+		int			_nb_wrong_cmds;
 
 
 	public:
@@ -52,6 +53,7 @@ class userInfos {
 		void	setStatus(const string& status);
 
 		void	incMsgs(void);
+		void	incWrongCmds(void);
 
 		string	const &getNickname(void) const;
 		string	const &getPrevNick(void) const;
@@ -67,6 +69,7 @@ class userInfos {
 		string	const &getUserMode(void) const;
 		string	const &getIpAdress(void) const;
 		string	const &getStatus(void) const;
+		int		getWrongCmdsNb(void) const;
 
 		int		checkReg(void);
 

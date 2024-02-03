@@ -216,3 +216,10 @@ void Server::rmUser(int fd, const string& reason){
 	_fds[fd].fd = -1;
 	--_connection_nb;
 }
+
+void Server::forceDisconnect(int fd, const string& reason){
+	vector<string> tokens;
+	tokens.push_back("QUIT");
+	tokens.push_back(reason);
+	cmd_quit(fd, tokens);
+}

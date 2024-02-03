@@ -20,6 +20,7 @@ userInfos::userInfos(int fd, Terminal* term, int prt_debug):_term(term), _prt_de
 	_status = "H";
 	_mode = "";
 	_ip_addr = "";
+	_nb_wrong_cmds = 0;
 	if (_prt_debug)
 		_term->prtTmColor("New user created Fd #" + toString(fd) + "\n", Terminal::BLUE);
 };
@@ -48,6 +49,7 @@ userInfos& userInfos::operator=(const userInfos & src){
 		_actionType = src._actionType;
 		_term = src._term;
 		_prt_debug = src._prt_debug;
+		_nb_wrong_cmds = src._nb_wrong_cmds;
 	}
 	return *this;
 }
@@ -100,6 +102,9 @@ void userInfos::setIndex(int index){
 void	userInfos::incMsgs(void){
 	++_nb_msg;
 }
+void	userInfos::incWrongCmds(void){
+	++_nb_wrong_cmds;
+}
 void	userInfos::setUserMode(const string& mode){
 	_mode = mode;
 }
@@ -151,6 +156,9 @@ string const &userInfos::getIpAdress(void) const {
 }
 const string &userInfos::getStatus(void) const{
 	return _status;
+}
+int userInfos::getWrongCmdsNb(void) const{
+	return _nb_wrong_cmds;
 }
 
 int userInfos::checkReg(void) {

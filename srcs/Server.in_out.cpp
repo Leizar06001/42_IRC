@@ -40,31 +40,22 @@ void Server::getMessages(int fd){
 		// ERROR
 		if (errno != EAGAIN && errno != EWOULDBLOCK) {
 			_term.prtTmColor("RECV ERROR: " + toString(strerror(errno)), Terminal::BRIGHT_RED);
-			vector<string> tokens;
-			tokens.push_back("QUIT");
-			tokens.push_back("???");
-			cmd_quit(fd, tokens);
+			forceDisconnect(fd, "??");
 		}
         // If EAGAIN or EWOULDBLOCK, simply no data available now, not an error
 	} else if (bytesRead == 0){	// CLIENT DISCONNECTED
-		vector<string> tokens;
-		tokens.push_back("QUIT");
-		tokens.push_back("Connection lost");
-		cmd_quit(fd, tokens);
+		forceDisconnect(fd, "Connection lost");
 	} else {				// TREAT MESSAGE
 		string answer(buffer, bytesRead);
-		if (isBotTraffic(answer)){
+		if (isBotTraffic(answer)){					// BOT DETECTION
 			userInfos* bot = _users->getUserByFd(fd);
 			if (bot) addToBannedList(bot->getIpAdress());
-			vector<string> tokens;
-			tokens.push_back("QUIT");
-			tokens.push_back("BANNED !");
-			cmd_quit(fd, tokens);
+			forceDisconnect(fd, "BANNED");
 			return;
 		}
 		size_t pos = 0;
 		size_t start = 0;
-		while ((pos = answer.find("\n", start)) != string::npos){
+		while ((pos = answer.find("\n", start)) != string::npos){	// FIND MESSAGES IN DATAS RECEIVED
 			size_t msgLen = pos - start;
 			if (pos > 0 && answer[pos - 1] == '\r')
 				--msgLen;
@@ -74,8 +65,11 @@ void Server::getMessages(int fd){
 				userInfos* user = _users->getUserByFd(fd);
 				if (user){
 					user->incMsgs();
-					vector<string> tokens = parseMessage(fd, msg);
-					analyseCommands(fd, tokens);
+					vector<string> tokens = parseMessage(fd, msg);	// PARSE
+					analyseCommands(fd, tokens);					// LAUNCH CMDS
+					if (user->getWrongCmdsNb() > 2){
+						forceDisconnect(fd, "Too many wrong messages");
+					}
 				}
 			}
 
@@ -103,6 +97,15 @@ void Server::sendClientMessage(int fd, const string& msg){
 	else _term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
 
+void Server::sendClientMessageShowIp(int fd, const string& msg){
+	userInfos* dest = _users->getUserByFd(fd);
+	const string final_msg = ":" + dest->getNickname() + "!" + dest->getUsername() + "@" + dest->getIpAdress() + " " + msg;
+	const string msg_to_send = final_msg + "\r\n";
+
+	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
+	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
+	else _term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+}
 
 void Server::sendServerMessage(int fd, int rpl_err_code, const string& msg){
 	userInfos* dest = _users->getUserByFd(fd);

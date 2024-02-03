@@ -68,6 +68,7 @@ class Server {
 		void			analyseCommands(int fd, vector<string>& tokens);
 		void			sendMessage(int fd, const string& msg);
 		void			sendClientMessage(int fd, const string& msg);
+		void			sendClientMessageShowIp(int fd, const string& msg);
 		void			sendServerMessage(int fd, int rpl_err_code, const string& msg);
 
 		void	performAction(userInfos* user);
@@ -97,6 +98,7 @@ class Server {
 		void	cmd_userhost(int fd, vector<string> tokens);
 
 		void	rmUser(int fd, const string& reason);
+		void	forceDisconnect(int fd, const string& reason);
 
 		void	writeToLog(const string& str);
 		void	writeConf(const string& str);
