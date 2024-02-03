@@ -58,6 +58,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 
 void ChannelList::quitChannel(userInfos* user, std::string channel_name)
 {
+	if (!user) return;
 	std::map<std::string, s_Channel*>::iterator it = channel.find(channel_name);
 
 	if (it != channel.end())
@@ -77,6 +78,7 @@ void ChannelList::quitChannel(userInfos* user, std::string channel_name)
 
 void ChannelList::leaveServer(userInfos* user)
 {
+	if (!user) return;
     std::map<std::string, s_Channel*>::iterator it = channel.begin();
 
     while (it != channel.end())
