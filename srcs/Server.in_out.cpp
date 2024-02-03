@@ -86,3 +86,12 @@ void Server::sendMessage(int fd, const string& msg){
 	send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
 	_term.prtTmColor("OUT: '" + msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
+
+void Server::sendServerMessage(int fd, int rpl_err_code, const string& msg){
+	userInfos* dest = _users->getUserByFd(fd);
+	string nick = (dest == NULL) ? "" : dest->getNickname();
+	string final_msg = ":" + _servername + " " + toString(rpl_err_code) + nick + " " + msg + "\r\n";
+
+	send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
+	_term.prtTmColor("OUT: '" + msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+}

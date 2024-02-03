@@ -29,7 +29,7 @@ userList& userList::operator=(const userList & src){
 	return *this;
 }
 
-void userList::addUser(int fd){
+userInfos* userList::addUser(int fd){
 	if (_nbUsers >= MAX_USERS){
 		throw length_error("USER DB FULL");
 	}
@@ -53,6 +53,7 @@ void userList::addUser(int fd){
 	++_nbUsers;
 	if (_prt_debug)
 		_term->prtTmColor("FD." + toString(fd) + " User added at index + " + toString(index) + "\n", Terminal::MAGENTA);
+	return user;
 }
 
 int userList::setNickname(int fd, string& nickname){

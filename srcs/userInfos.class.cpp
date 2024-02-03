@@ -17,7 +17,9 @@ userInfos::userInfos(int fd, Terminal* term, int prt_debug):_term(term), _prt_de
 	_nickname = "";
 	_username = "";
 	_realname = "";
+	_status = "H";
 	_mode = "";
+	_ip_addr = "";
 	if (_prt_debug)
 		_term->prtTmColor("New user created Fd #" + toString(fd) + "\n", Terminal::BLUE);
 };
@@ -38,6 +40,8 @@ userInfos& userInfos::operator=(const userInfos & src){
 		_prev_nick = src._prev_nick;
 		_username = src._username;
 		_realname = src._username;
+		_ip_addr = src._ip_addr;
+		_status = src._status;
 		_mode = src._mode;
 		_nb_msg = src._nb_msg;
 		_fd = src._fd;
@@ -99,6 +103,12 @@ void	userInfos::incMsgs(void){
 void	userInfos::setUserMode(const string& mode){
 	_mode = mode;
 }
+void	userInfos::setIpAddr(string& add){
+	_ip_addr = add;
+}
+void	userInfos::setStatus(const string& status){
+	_status = status;
+}
 
 string const &userInfos::getNickname(void) const{
 	return _nickname;
@@ -136,6 +146,12 @@ bool	userInfos::getPong(void) const {
 string const &userInfos::getUserMode(void) const {
 	return _mode;
 }
+string const &userInfos::getIpAdress(void) const {
+	return _ip_addr;
+}
+const string &userInfos::getStatus(void) const{
+	return _status;
+}
 
 int userInfos::checkReg(void) {
 	if (!_registered && _username_registered && _nickname_registered){
@@ -145,7 +161,7 @@ int userInfos::checkReg(void) {
 	return 0;
 }
 
-int userInfos::isRegistered(void) {
+int userInfos::isRegistered(void) const {
 	return _registered;
 }
 void userInfos::setRegistered(void) {

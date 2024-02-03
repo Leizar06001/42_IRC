@@ -62,6 +62,7 @@ class Server {
 		vector<string>	parseMessage(int fd, string& msg);
 		void			analyseCommands(int fd, vector<string>& tokens);
 		void			sendMessage(int fd, const string& msg);
+		void			sendServerMessage(int fd, int rpl_err_code, const string& msg);
 
 		void	performAction(userInfos* user);
 		void	drawInterface(void);
@@ -76,6 +77,7 @@ class Server {
 		void	cmd_ping(int fd, vector<string> tokens);
 		void	cmd_pong(int fd, vector<string> tokens);
 		void	cmd_msg(int fd, vector<string> tokens);
+		void	cmd_who(int fd, vector<string> tokens);
 		void	cmd_whois(int fd, vector<string> tokens);
 		void	cmd_names(int fd, vector<string> tokens);
 		void	cmd_quit(int fd, vector<string> tokens);

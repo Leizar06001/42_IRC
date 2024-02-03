@@ -159,7 +159,8 @@ void Server::getConnection(void){
 	_fds[i].fd = connection;
 	_fds[i].events = POLLIN;// | POLLHUP;
 
-	_users->addUser(i);
+	userInfos* new_user = _users->addUser(i);
+	new_user->setIpAddr(ip_str);
 
 	_term.prtTmColor(">>> " + string(client_ip) + " FD." + toString(i) + Terminal::BRIGHT_CYAN + " | " + toString(_connection_nb) + " / " + toString(MAX_CON) + " clients\n", Terminal::GREEN);
 }

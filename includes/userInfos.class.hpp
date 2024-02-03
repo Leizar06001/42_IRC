@@ -26,6 +26,8 @@ class userInfos {
 		string		_username;
 		string		_realname;
 		string		_mode;
+		string		_ip_addr;
+		string		_status;
 		int			_fd;
 		int			_nb_msg;
 		int			_actionType;		// tell the server what the client is waiting for
@@ -46,6 +48,8 @@ class userInfos {
 		void	resetLastMessageTime(void);
 		void	setPong(bool ping);
 		void	setUserMode(const string& mode);
+		void	setIpAddr(string& add);
+		void	setStatus(const string& status);
 
 		void	incMsgs(void);
 
@@ -61,10 +65,12 @@ class userInfos {
 		time_t	getLastMessageTime(void) const;
 		bool	getPong(void) const;
 		string	const &getUserMode(void) const;
+		string	const &getIpAdress(void) const;
+		string	const &getStatus(void) const;
 
 		int		checkReg(void);
 
-		int		isRegistered(void);
+		int		isRegistered(void) const;
 		void	setRegistered(void);
 
 };

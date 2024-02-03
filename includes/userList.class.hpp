@@ -31,10 +31,11 @@ class userList {
 		userList(userList & src);
 		userList &operator=(const userList & src);
 
-		void	addUser(int fd);
+		userInfos*	addUser(int fd);
 		int		setNickname(int fd, string& nickname);
 		int		setRealname(int fd, string& realname);
 		int		setUsername(int fd, string& username);
+
 		void		rmUser(int fd);
 
 		int			getNbUsers(void) const;
@@ -42,6 +43,7 @@ class userList {
 		userInfos*	getUserByNick(string& nickname);
 		userInfos*	getNextUser(int reset);
 		userInfos*	getUserByIndex(int index);
+
 
 		const string	getListOfUsers(void);
 		const map<int, size_t> &getIDmap(void) const;
