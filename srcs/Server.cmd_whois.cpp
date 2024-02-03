@@ -14,8 +14,9 @@ void Server::cmd_whois(int fd, vector<string> tokens){
 		sendServerMessage(fd, ERR_NOSUCHNICK, user->getNickname() + " " + tokens[1]);
 		return;
 	}
-	sendServerMessage(fd, RPL_WHOISUSER, user->getNickname() + " " + target->getNickname() + " "
-			+ target->getUsername() + " " + _servername + " * :" + target->getRealname());
-
-	sendServerMessage(fd, RPL_ENDOFWHOIS, user->getNickname() + " " + target->getNickname());
+	if (target == user)
+		sendServerMessage(fd, RPL_WHOISUSER, target->getNickname() + " " + target->getUsername() + " " + target->getIpAdress() + " * :" + target->getRealname());
+	else
+		sendServerMessage(fd, RPL_WHOISUSER, target->getNickname() + " " + target->getUsername() + " " + _servername + " * :" + target->getRealname());
+	sendServerMessage(fd, RPL_ENDOFWHOIS, target->getNickname() + ":END of WHOIS list");
 }
