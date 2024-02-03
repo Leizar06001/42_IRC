@@ -52,7 +52,7 @@ userInfos* userList::addUser(int fd){
 
 	++_nbUsers;
 	if (_prt_debug)
-		_term->prtTmColor("FD." + toString(fd) + " User added at index " + toString(index) + "\n", Terminal::BRIGHT_GREEN);
+		_term->prtTmColor("FD." + toString(fd) + " User added at index " + toString(index) + "\n", Terminal::BRIGHT_CYAN);
 	return user;
 }
 
@@ -123,7 +123,7 @@ void userList::rmUser(int fd){
 		delete _userlist[index];
 		_userlist[index] = NULL;
 		if (_prt_debug){
-			_term->prtTmColor("FD.'" + toString(fd) + "' deleted from vector\n", Terminal::BRIGHT_BLUE);
+			_term->prtTmColor("FD.'" + toString(fd) + "' deleted from vector index : " + toString(index) + "\n", Terminal::BRIGHT_BLUE);
 			_term->prtTmColor("Removing FD " + toString(itID->first) + " index " + toString(itID->second) + " from mapID\n", Terminal::BRIGHT_BLUE);
 		}
 		_mapID.erase(itID);
