@@ -59,8 +59,8 @@ userInfos& userInfos::operator=(const userInfos & src){
 int userInfos::setNickname(string& nickname){
 	_prev_nick = _nickname;
 	_nickname = nickname;
-	if (_prt_debug)
-		_term->prtTmColor("FD." + toString(_fd) + " set nickname: " + nickname + "\n", Terminal::BLUE);
+	// if (_prt_debug)
+	// 	_term->prtTmColor("FD." + toString(_fd) + " set nickname: " + nickname + "\n", Terminal::BLUE);
 	if (!_registered)
 		_nickname_registered = 1;
 	else {
@@ -72,8 +72,8 @@ int userInfos::setNickname(string& nickname){
 int userInfos::setRealname(string& realname){
 	if (!_registered){
 		_realname = realname;
-		if (_prt_debug)
-			_term->prtTmColor("FD." + toString(_fd) + " " + _nickname + " set realname: " + realname + "\n", Terminal::BLUE);
+		// if (_prt_debug)
+		// 	_term->prtTmColor("FD." + toString(_fd) + " " + _nickname + " set realname: " + realname + "\n", Terminal::BLUE);
 		return 0;
 	} else {
 		// cout << "ERREUR REG" << endl;
@@ -83,8 +83,8 @@ int userInfos::setRealname(string& realname){
 int userInfos::setUsername(string& username){
 	if (!_registered){
 		_username = username;
-		if (_prt_debug)
-			_term->prtTmColor("FD." + toString(_fd) + " " + _nickname + " set username: " + username + "\n", Terminal::BLUE);
+		// if (_prt_debug)
+		// 	_term->prtTmColor("FD." + toString(_fd) + " " + _nickname + " set username: " + username + "\n", Terminal::BLUE);
 		_username_registered = 1;
 		return 0;
 	} else {
