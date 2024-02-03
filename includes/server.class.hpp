@@ -62,6 +62,7 @@ class Server {
 		vector<string>	parseMessage(int fd, string& msg);
 		void			analyseCommands(int fd, vector<string>& tokens);
 		void			sendMessage(int fd, const string& msg);
+		void			sendClientMessage(int fd, const string& msg);
 		void			sendServerMessage(int fd, int rpl_err_code, const string& msg);
 
 		void	performAction(userInfos* user);

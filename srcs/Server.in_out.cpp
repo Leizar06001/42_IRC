@@ -83,9 +83,22 @@ void Server::getMessages(int fd){
 
 void Server::sendMessage(int fd, const string& msg){
 	string final_msg = msg + "\r\n";
-	send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
-	_term.prtTmColor("OUT: '" + msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+	int ret = send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
+	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE\n", Terminal::RED);
+	else _term.prtTmColor("OUT: '" + msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
+// sendMessage(fd, ":" + nick + "!" + user->getUsername() + "@" + _servername + " MODE " + nick + " " + target->getUserMode());
+
+void Server::sendClientMessage(int fd, const string& msg){
+	userInfos* dest = _users->getUserByFd(fd);
+	const string final_msg = ":" + dest->getNickname() + "!" + dest->getUsername() + "@" + _servername + " " + msg;
+	const string msg_to_send = final_msg + "\r\n";
+
+	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
+	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
+	else _term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+}
+
 
 void Server::sendServerMessage(int fd, int rpl_err_code, const string& msg){
 	userInfos* dest = _users->getUserByFd(fd);
@@ -93,6 +106,7 @@ void Server::sendServerMessage(int fd, int rpl_err_code, const string& msg){
 	const string final_msg = ":" + _servername + " " + toString(rpl_err_code) + " " + nick + " " + msg;
 	const string msg_to_send = final_msg + "\r\n";
 
-	send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
-	_term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
+	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
+	else _term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
