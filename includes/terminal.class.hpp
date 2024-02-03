@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include "userList.class.hpp"
+#include "ChannelList.class.hpp"
 #include <fstream>
 
 using namespace std;
