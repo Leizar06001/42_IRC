@@ -53,14 +53,20 @@ void Terminal::updateMenu(userList* users, ChannelList* channels){
 	prtColor("_.~\"( CHANNELS )\"~._", Terminal::BRIGHT_MAGENTA);
 	++h;
 	s_Channel*	chan = channels->getNextChannel(1);
+	if (!chan) prtTmColor("NO CHAN", Terminal::RED);
 	while ((h < WIN_H - 1) && chan){
 		setCursor(h, x + 4);
-		prtColor("◎ " + chan->channel_name + " : " + toString(chan->nb_users), Terminal::WHITE);
+		string color;
+		const string mode = chan->mode;
+		if (mode == "=") color = Terminal::WHITE;			// Public
+		else if (mode == "*") color = Terminal::BRIGHT_RED;	// Secret
+		else if (mode == "@") color = Terminal::YELLOW;		// Private
+		prtColor("◎ " + chan->channel_name + " : " + toString(chan->nb_users), color);
 		++h;
 		chan = channels->getNextChannel(0);
 	}
 
-	h += 2;
+	++h;
 	setCursor(h, x + 3);
 	prtColor("_.~\"( USERS  )\"~._", Terminal::BRIGHT_GREEN);
 	++h;

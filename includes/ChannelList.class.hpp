@@ -29,3 +29,6 @@ class ChannelList
 		int getNbChannel();
 		s_Channel* getNextChannel(int reset);
 };
+
+// channels   = : public, * : secret, @ : private
+	// users      @ : operator

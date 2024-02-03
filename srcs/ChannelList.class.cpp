@@ -4,7 +4,7 @@ ChannelList::ChannelList(Terminal* term):_term(term)
 {
 	s_Channel *general = new s_Channel;
 	general->channel_name = "#General";
-	general->channel_type = "Public";
+	general->channel_type = "=";
 	general->mode = "+nbt";
 	general->deletable = 0;
 	general->nb_users = 0;
@@ -44,7 +44,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 	{
 		s_Channel *new_channel = new s_Channel;
 		new_channel->channel_name = channel_name;
-		new_channel->channel_type = "Public";
+		new_channel->channel_type = "=";
 		new_channel->mode = "+nbt";
 		new_channel->deletable = 1;
 		new_channel->nb_users = 1;
@@ -157,13 +157,13 @@ int ChannelList::getNbChannel()
 }
 
 s_Channel* ChannelList::getNextChannel(int reset){
-	static vector<s_Channel*>::iterator it;
-	if (reset) it = channels.begin();
-	if (it == channels.end()) return NULL;
-	while (it != channels.end() && *it == NULL)
+	static map<string, s_Channel*>::iterator it;
+	if (reset) it = channel.begin();
+	if (it == channel.end()) return NULL;
+	while (it != channel.end() && it->second == NULL)
 		++it;
-	if (it == channels.end()) return NULL;
-	s_Channel*	channel = *it;
+	if (it == channel.end()) return NULL;
+	s_Channel*	chan = it->second;
 	++it;
-	return channel;
+	return chan;
 }
