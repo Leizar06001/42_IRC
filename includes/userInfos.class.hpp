@@ -25,6 +25,7 @@ class userInfos {
 		string		_prev_nick;
 		string		_username;
 		string		_realname;
+		string		_mode;
 		int			_fd;
 		int			_nb_msg;
 		int			_actionType;		// tell the server what the client is waiting for
@@ -44,6 +45,7 @@ class userInfos {
 		void	setIndex(int index);
 		void	resetLastMessageTime(void);
 		void	setPong(bool ping);
+		void	setUserMode(const string& mode);
 
 		void	incMsgs(void);
 
@@ -58,6 +60,7 @@ class userInfos {
 		time_t	getConnectionStart(void) const;
 		time_t	getLastMessageTime(void) const;
 		bool	getPong(void) const;
+		string	const &getUserMode(void) const;
 
 		int		checkReg(void);
 

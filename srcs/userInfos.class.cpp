@@ -17,6 +17,7 @@ userInfos::userInfos(int fd, Terminal* term, int prt_debug):_term(term), _prt_de
 	_nickname = "";
 	_username = "";
 	_realname = "";
+	_mode = "";
 	if (_prt_debug)
 		_term->prtTmColor("New user created Fd #" + toString(fd) + "\n", Terminal::BLUE);
 };
@@ -37,6 +38,7 @@ userInfos& userInfos::operator=(const userInfos & src){
 		_prev_nick = src._prev_nick;
 		_username = src._username;
 		_realname = src._username;
+		_mode = src._mode;
 		_nb_msg = src._nb_msg;
 		_fd = src._fd;
 		_actionType = src._actionType;
@@ -94,6 +96,9 @@ void userInfos::setIndex(int index){
 void	userInfos::incMsgs(void){
 	++_nb_msg;
 }
+void	userInfos::setUserMode(const string& mode){
+	_mode = mode;
+}
 
 string const &userInfos::getNickname(void) const{
 	return _nickname;
@@ -127,6 +132,9 @@ time_t	userInfos::getLastMessageTime(void) const {
 }
 bool	userInfos::getPong(void) const {
 	return _waiting_for_pong;
+}
+string const &userInfos::getUserMode(void) const {
+	return _mode;
 }
 
 int userInfos::checkReg(void) {
