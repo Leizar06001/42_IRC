@@ -178,7 +178,7 @@ void Server::getConnection(void){
 	_term.prtTmColor(">>> " + string(client_ip) + " FD." + toString(i) + Terminal::BRIGHT_CYAN + " | " + toString(_connection_nb) + " / " + toString(_max_clients) + " clients\n", Terminal::GREEN);
 }
 
-int	Server::isIPBanned(string& ip){
+int	Server::isIPBanned(const string& ip){
 	size_t i = 0;
 	while (i < _bans_ip.size()){
 		if (ip == _bans_ip[i])
@@ -186,6 +186,11 @@ int	Server::isIPBanned(string& ip){
 		++i;
 	}
 	return 0;
+}
+
+void Server::addToBannedList(const string& ip){
+	_bans_ip.push_back(ip);
+	writeConf(ip);
 }
 
 void Server::handleEvents(void){

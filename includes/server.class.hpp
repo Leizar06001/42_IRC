@@ -104,7 +104,9 @@ class Server {
 		void	setVarsFromConf(string &str);
 		void	openLog(void);
 
-		int		isIPBanned(string& ip);
+		int		isIPBanned(const string& ip);
+		void	addToBannedList(const string& ip);
+		bool	isBotTraffic(const string &str);
 		void	sendMsgToList(int fd_source, const string& msg, const map<int, size_t> &lst);
 		void	sendMsgToList(int fd_source, const string& msg, vector<userInfos*> lst);
 

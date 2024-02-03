@@ -1,3 +1,5 @@
+! NEED A EMPTY LINE AT THE END OF THE FILE
+
 [GENERAL]
 timeout_check_time 30
 

@@ -23,7 +23,15 @@ void Server::openLog(void){
 }
 
 void Server::writeConf(const string& str){
-	(void)str;
+	string path = CONF_FOLDER ;
+	ofstream conf((path + CONF_FILE).c_str(), std::ios::out | std::ios::app);
+	if (!conf.is_open()) {
+		_term.prtTmColor("ERROR: CANNOT OPEN CONF FILE\n", Terminal::BRIGHT_RED);
+	} else {
+		conf << str << std::endl;
+		conf.close();
+		_term.prtTmColor("Configuration updated successfully.\n", Terminal::BRIGHT_GREEN);
+	}
 }
 
 void Server::setVarsFromConf(string& str){

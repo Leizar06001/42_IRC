@@ -39,7 +39,7 @@ void Server::getMessages(int fd){
 	if (bytesRead < 0 ){
 		// ERROR
 		if (errno != EAGAIN && errno != EWOULDBLOCK) {
-			_term.prtTmColor("RECV ERROR " + toString(strerror(errno)), Terminal::BRIGHT_RED);
+			_term.prtTmColor("RECV ERROR: " + toString(strerror(errno)), Terminal::BRIGHT_RED);
 			vector<string> tokens;
 			tokens.push_back("QUIT");
 			tokens.push_back("???");
@@ -51,13 +51,17 @@ void Server::getMessages(int fd){
 		tokens.push_back("QUIT");
 		tokens.push_back("Connection lost");
 		cmd_quit(fd, tokens);
-	} else if (bytesRead >= 999){
-		vector<string> tokens;
-		tokens.push_back("QUIT");
-		tokens.push_back("Msgs too long !");
-		cmd_quit(fd, tokens);
 	} else {				// TREAT MESSAGE
 		string answer(buffer, bytesRead);
+		if (isBotTraffic(answer)){
+			userInfos* bot = _users->getUserByFd(fd);
+			if (bot) addToBannedList(bot->getIpAdress());
+			vector<string> tokens;
+			tokens.push_back("QUIT");
+			tokens.push_back("BANNED !");
+			cmd_quit(fd, tokens);
+			return;
+		}
 		size_t pos = 0;
 		size_t start = 0;
 		while ((pos = answer.find("\n", start)) != string::npos){

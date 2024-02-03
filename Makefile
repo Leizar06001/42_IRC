@@ -7,6 +7,7 @@ SRCS = 	main.cpp					\
 		srcs/ChannelList.class.cpp	\
 		srcs/server.class.cpp		\
 		srcs/Server.actions.cpp		\
+		srcs/Server.bot_detection.cpp	\
 		srcs/Server.cmd_ban.cpp		\
 		srcs/Server.cmd_cap.cpp		\
 		srcs/Server.cmd_invite.cpp	\
