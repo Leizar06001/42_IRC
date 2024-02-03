@@ -52,7 +52,7 @@ userInfos* userList::addUser(int fd){
 
 	++_nbUsers;
 	if (_prt_debug)
-		_term->prtTmColor("FD." + toString(fd) + " User added at index + " + toString(index) + "\n", Terminal::MAGENTA);
+		_term->prtTmColor("FD." + toString(fd) + " User added at index " + toString(index) + "\n", Terminal::BRIGHT_GREEN);
 	return user;
 }
 
