@@ -39,14 +39,16 @@ userInfos* userList::addUser(int fd){
 	for (; index < _userlist.size(); ++index) {
 		if (_userlist[index] == NULL) { // Found an empty slot
 			_userlist[index] = user;
-			_term->prtTmColor("Inserted in vector: " + toString(index), Terminal::YELLOW);
+			if (_prt_debug)
+				_term->prtTmColor("Inserted in vector: " + toString(index), Terminal::YELLOW);
 			break;
 		}
 	}
 
 	if (index == _userlist.size()) { // No empty slot found, add to the end
 		_userlist.push_back(user);
-		_term->prtTmColor("Added end of vector " + toString(index), Terminal::YELLOW);
+		if (_prt_debug)
+			_term->prtTmColor("Added end of vector " + toString(index), Terminal::YELLOW);
 	}
 
 	user->setIndex(index);

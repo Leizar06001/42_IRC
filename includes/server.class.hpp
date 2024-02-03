@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include <fstream>
 
-#define PRINT_DEBUG_INFOS		1
+#define PRINT_DEBUG_INFOS		0
 
 #define MAX_CLIENTS				10000
 #define REGISTRATION_TIMEOUT	20

@@ -99,7 +99,7 @@ vector<string> Server::parseMessage(int fd, string& msg){
 	string str = "IN: " + Terminal::YELLOW + name + ": " + Terminal::BRIGHT_GREEN + tokens[0];
 	for(size_t ind = 1; ind < tokens.size(); ++ind)
 		str = str + Terminal::BRIGHT_BLUE + " [" + Terminal::BRIGHT_WHITE + tokens[ind] + Terminal::BRIGHT_BLUE + "]";
-	// _term.prtTmColor(str, Terminal::BRIGHT_YELLOW);
+	_term.prtTmColor(str, Terminal::BRIGHT_YELLOW);
 
 	user->resetLastMessageTime();
 	return tokens;
