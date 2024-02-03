@@ -15,6 +15,7 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_ping,
 		&Server::cmd_pong,
 		&Server::cmd_msg,
+		&Server::cmd_who,
 		&Server::cmd_whois,
 		&Server::cmd_names,
 		&Server::cmd_quit,
@@ -26,7 +27,7 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_part,
 		&Server::cmd_ban
 	};
-	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PONG", "PRIVMSG", "WHOIS",
+	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PONG", "PRIVMSG", "WHO", "WHOIS",
 		"NAMES", "QUIT", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "PART", "BAN"};
 
 	for (size_t i = 0; i < sizeof(cmds) / sizeof(cmds[0]); ++i){
