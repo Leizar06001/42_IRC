@@ -33,22 +33,22 @@ userInfos* userList::addUser(int fd){
 	if (_nbUsers >= MAX_USERS){
 		throw length_error("USER DB FULL");
 	}
+
 	userInfos* user = new userInfos(fd, _term, _prt_debug);
-	// Find if there is an empty line in vector list
 	size_t index = 0;
-	size_t size_list = _userlist.size();
-	userInfos* userInList = getNextUser(1);
-	while (userInList && index < size_list){
-		++index;
-		userInList = getNextUser(0);
+	for (; index < _userlist.size(); ++index) {
+		if (_userlist[index] == NULL) { // Found an empty slot
+			_userlist[index] = user;
+			_term->prtTmColor("Inserted in vector: " + toString(index), Terminal::YELLOW);
+			break;
+		}
 	}
-	if (index == size_list){	// add at the end
+
+	if (index == _userlist.size()) { // No empty slot found, add to the end
 		_userlist.push_back(user);
-		_term->prtTmColor("Added end of vector "  + toString(index), Terminal::YELLOW);
-	} else {					// replace NULL in list
-		_userlist[index] = user;
-		_term->prtTmColor("Inserted in vector: " + toString(index), Terminal::YELLOW);
+		_term->prtTmColor("Added end of vector " + toString(index), Terminal::YELLOW);
 	}
+
 	user->setIndex(index);
 	_mapID.insert(make_pair(fd, index));
 	_mapInit.insert(make_pair(fd, index));
@@ -57,6 +57,32 @@ userInfos* userList::addUser(int fd){
 	if (_prt_debug)
 		_term->prtTmColor("FD." + toString(fd) + " User added at index " + toString(index) + "\n", Terminal::BRIGHT_CYAN);
 	return user;
+}
+
+void userList::rmUser(int fd){
+	// Remove user from maps
+	map<int, size_t>::iterator itInit = _mapInit.find(fd);
+	if (itInit != _mapInit.end()) _mapInit.erase(itInit);
+
+	map<int, size_t>::iterator itAct = _mapAction.find(fd);
+	if (itAct != _mapAction.end()) _mapAction.erase(itAct);
+
+	map<int, size_t>::iterator itID = _mapID.find(fd);
+	if (itID != _mapID.end()){
+		size_t	index = itID->second;
+		map<string, size_t>::iterator itNick = _mapNick.find(_userlist[index]->getNickname());
+		if (itNick != _mapNick.end()) _mapNick.erase(itNick);
+		delete _userlist[index];
+		_userlist[index] = NULL;
+		if (_prt_debug){
+			_term->prtTmColor("FD.'" + toString(fd) + "' deleted from vector index : " + toString(index) + "\n", Terminal::BRIGHT_BLUE);
+			_term->prtTmColor("Removing FD " + toString(itID->first) + " index " + toString(itID->second) + " from mapID\n", Terminal::BRIGHT_BLUE);
+		}
+		_mapID.erase(itID);
+		--_nbUsers;
+	} else {
+		_term->prtTmColor("FD.'" + toString(fd) + "' not found, cannot remove from mapID\n", Terminal::BRIGHT_BLUE);
+	}
 }
 
 int userList::setNickname(int fd, string& nickname){
@@ -107,32 +133,6 @@ void userList::checkForRegistration(int fd){
 			validateRegistration(user);
 			_mapAction.insert(make_pair(fd, user->getIndex()));
 		}
-	}
-}
-
-void userList::rmUser(int fd){
-	// Remove user from maps
-	map<int, size_t>::iterator itInit = _mapInit.find(fd);
-	if (itInit != _mapInit.end()) _mapInit.erase(itInit);
-
-	map<int, size_t>::iterator itAct = _mapAction.find(fd);
-	if (itAct != _mapAction.end()) _mapAction.erase(itAct);
-
-	map<int, size_t>::iterator itID = _mapID.find(fd);
-	if (itID != _mapID.end()){
-		size_t	index = itID->second;
-		map<string, size_t>::iterator itNick = _mapNick.find(_userlist[index]->getNickname());
-		if (itNick != _mapNick.end()) _mapNick.erase(itNick);
-		delete _userlist[index];
-		_userlist[index] = NULL;
-		if (_prt_debug){
-			_term->prtTmColor("FD.'" + toString(fd) + "' deleted from vector index : " + toString(index) + "\n", Terminal::BRIGHT_BLUE);
-			_term->prtTmColor("Removing FD " + toString(itID->first) + " index " + toString(itID->second) + " from mapID\n", Terminal::BRIGHT_BLUE);
-		}
-		_mapID.erase(itID);
-		--_nbUsers;
-	} else {
-		_term->prtTmColor("FD.'" + toString(fd) + "' not found, cannot remove from mapID\n", Terminal::BRIGHT_BLUE);
 	}
 }
 
