@@ -16,11 +16,11 @@ void Server::cmd_join(int fd, vector<string> tokens){
 					sendMsgToList(fd, "JOIN " + tokens[i], chan->users);
 				}
 				// SEND ALL USERS OF THE CHANNEL TO THE NEW
-				// vector<string> toks;
-				// toks.push_back("NAMES");
-				// toks.push_back(tokens[1]);
-				// toks.push_back(_channels->getUsersNicksInChan(tokens[1]));
-				// cmd_names(fd, toks);
+				vector<string> toks;
+				toks.push_back("NAMES");
+				toks.push_back(tokens[1]);
+				toks.push_back(_channels->getUsersNicksInChan(tokens[i]));
+				cmd_names(fd, toks);
 
 
 			} else if (ret == ERR_NOSUCHCHANNEL){
