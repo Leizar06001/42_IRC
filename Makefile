@@ -16,6 +16,7 @@ SRCS = 	main.cpp					\
 		srcs/Server.cmd_mode.cpp	\
 		srcs/Server.cmd_names.cpp	\
 		srcs/Server.cmd_nick.cpp	\
+		srcs/Server.cmd_notice.cpp	\
 		srcs/Server.cmd_part.cpp	\
 		srcs/Server.cmd_ping.cpp	\
 		srcs/Server.cmd_pong.cpp	\
