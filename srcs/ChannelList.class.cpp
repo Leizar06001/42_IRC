@@ -125,7 +125,7 @@ bool ChannelList::is_in_Channel(userInfos* user, string channel_name)
 	return(0);
 }
 
-std::string ChannelList::getUsersNames(string& channel_name)
+std::string ChannelList::getUsersNicksInChan(string& channel_name)
 {
 	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
 	std::string users;

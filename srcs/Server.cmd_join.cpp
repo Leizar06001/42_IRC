@@ -7,8 +7,9 @@ void Server::cmd_join(int fd, vector<string> tokens){
 	}
 	// JOIN CHANNEL
 	userInfos* user = _users->getUserByFd(fd);
-	_channels->joinChannel(user, tokens[1]);
+	int ret = _channels->joinChannel(user, tokens[1]);
 
+	if (ret != 0) return ;
 	sendMessage(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " JOIN " + tokens[1]);
 
 	// NOTIF OTHER USERS IN CHANNEL
@@ -19,7 +20,7 @@ void Server::cmd_join(int fd, vector<string> tokens){
 	vector<string> toks;
 	toks.push_back("NAMES");
 	toks.push_back(tokens[1]);
-	toks.push_back(_channels->getUsersNames(tokens[1]));
+	toks.push_back(_channels->getUsersNicksInChan(tokens[1]));
 	cmd_names(fd, toks);
 
 }

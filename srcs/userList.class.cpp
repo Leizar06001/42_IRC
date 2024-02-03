@@ -152,6 +152,7 @@ userInfos* userList::getUserByNick(string& nickname){
 userInfos* userList::getNextUser(int reset){
 	static vector<userInfos*>::iterator it;
 	if (reset) it = _userlist.begin();
+	if (it == _userlist.end()) return NULL;
 	while (it != _userlist.end() && *it == NULL)
 		++it;
 	if (it == _userlist.end()) return NULL;

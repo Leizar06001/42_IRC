@@ -55,19 +55,14 @@ void Terminal::updateMenu(userList* users){
 	setCursor(h, x + 3);
 	prtColor("_.~\"( USERS  )\"~._", Terminal::BRIGHT_GREEN);
 	++h;
-	int ind = 0;
-	const int nb_users = users->getNbUsers();
 	userInfos*	user = users->getNextUser(1);
-	while ((h < WIN_H - 1) && (ind < nb_users)){
-		if (user){
-			setCursor(h, x + 4);
-			if (user->isRegistered())
-				prtColor("◎ " + user->getNickname() + " :" + toString(user->getFd()), Terminal::WHITE);
-			else
-				prtColor("! Fd" + toString(user->getFd()), Terminal::RED);
-			++h;
-			++ind;
-		}
+	while ((h < WIN_H - 1) && user){
+		setCursor(h, x + 4);
+		if (user->isRegistered())
+			prtColor("◎ " + user->getNickname() + " :" + toString(user->getFd()), Terminal::WHITE);
+		else
+			prtColor("! Fd" + toString(user->getFd()), Terminal::RED);
+		++h;
 		user = users->getNextUser(0);
 	}
 
