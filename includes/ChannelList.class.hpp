@@ -27,4 +27,5 @@ class ChannelList
 		void quitChannel(userInfos* user, std::string channel_name);
 		void leaveServer(userInfos* user);
 		int getNbChannel();
+		s_Channel* getNextChannel(int reset);
 };

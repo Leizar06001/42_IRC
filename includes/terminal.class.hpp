@@ -38,7 +38,7 @@ public:
 	~Terminal(void);
 
 	void updateTitle(int port, int clients, int not_reg, int channels, int msgs, int max_con);
-	void updateMenu(userList* users);
+	void updateMenu(userList* users, ChannelList* channels);
 
 	void clearScreen() const;
 	void clearLine(int row) const;

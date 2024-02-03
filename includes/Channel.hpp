@@ -13,4 +13,5 @@ typedef struct	t_Channel
 	std::vector<userInfos *>		kicklist;
 	bool							deletable;
 	std::string						topic;
+	int								nb_users;
 }				s_Channel;
