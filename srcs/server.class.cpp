@@ -41,7 +41,7 @@ void Server::shutdown(void){
 }
 
 void Server::drawInterface(void){
-	_term.updateTitle(_port, _connection_nb, _users->getNbNotRegistered(), _channels->getNbChannel(), _msg_nb, MAX_CON);
+	_term.updateTitle(_port, _connection_nb, _users->getNbNotRegistered(), _channels->getNbChannel(), _msg_nb, MAX_CON, _bans_ip);
 	_term.updateMenu(_users, _channels);
 }
 
