@@ -56,7 +56,8 @@ void Server::getMessages(int fd){
 		}
 
 		userInfos* user = _users->getUserByFd(fd);
-		if (user) answer = user->getIncommingMsg() + answer;	// RETRIEVE PREVIOUS FRAGMENTED DATAS
+		if (!user) return;
+		answer = user->getIncommingMsg() + answer;	// RETRIEVE PREVIOUS FRAGMENTED DATAS
 		size_t pos = 0;
 		size_t start = 0;
 		while ((pos = answer.find("\n", start)) != string::npos){	// FIND MESSAGES IN DATAS RECEIVED
@@ -77,6 +78,8 @@ void Server::getMessages(int fd){
 			start = pos + 1;
 			++_msg_nb;
 		}
+		user = _users->getUserByFd(fd);
+		if (!user) return;
 		if (start < answer.length()){		// ADD FRAGMENTED DATA
 			if (answer.substr(start).length() > 1000){
 				user->incWrongCmds();
