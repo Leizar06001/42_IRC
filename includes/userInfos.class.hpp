@@ -34,6 +34,7 @@ class userInfos {
 		Terminal*	_term;
 		int			_prt_debug;	// print debug infos ?
 		int			_nb_wrong_cmds;
+		string		_incomming_msg;
 
 
 	public:
@@ -51,6 +52,7 @@ class userInfos {
 		void	setUserMode(const string& mode);
 		void	setIpAddr(string& add);
 		void	setStatus(const string& status);
+		void	setIncommingMsg(const string& msg);
 
 		void	incMsgs(void);
 		void	incWrongCmds(void);
@@ -70,6 +72,7 @@ class userInfos {
 		string	const &getIpAdress(void) const;
 		string	const &getStatus(void) const;
 		int		getWrongCmdsNb(void) const;
+		string	const &getIncommingMsg(void) const;
 
 		int		checkReg(void);
 

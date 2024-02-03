@@ -54,6 +54,9 @@ void Server::getMessages(int fd){
 			forceDisconnect(fd, "BANNED");
 			return;
 		}
+
+		userInfos* user = _users->getUserByFd(fd);
+		if (user) answer = user->getIncommingMsg() + answer;	// RETRIEVE PREVIOUS FRAGMENTED DATAS
 		size_t pos = 0;
 		size_t start = 0;
 		while ((pos = answer.find("\n", start)) != string::npos){	// FIND MESSAGES IN DATAS RECEIVED
@@ -63,7 +66,7 @@ void Server::getMessages(int fd){
 			string msg = answer.substr(start, msgLen);
 
 			if (!msg.empty()){
-				userInfos* user = _users->getUserByFd(fd);
+				user = _users->getUserByFd(fd);
 				if (user){
 					user->incMsgs();
 					vector<string> tokens = parseMessage(fd, msg);	// PARSE
@@ -73,6 +76,17 @@ void Server::getMessages(int fd){
 
 			start = pos + 1;
 			++_msg_nb;
+		}
+		if (start < answer.length()){		// ADD FRAGMENTED DATA
+			if (answer.substr(start).length() > 1000){
+				user->incWrongCmds();
+				_term.prtTmColor(user->getNickname() + " has " + toString(user->getWrongCmdsNb()) + " wrong commands", Terminal::RED);
+			} else {
+				if (user) user->setIncommingMsg(answer.substr(start));
+				_term.prtTmColor("FD." + toString(fd) + " Fragmented message: " + answer.substr(start), Terminal::BRIGHT_YELLOW);
+			}
+		} else {
+			if (user) user->setIncommingMsg("");
 		}
 	}
 }
@@ -114,4 +128,30 @@ void Server::sendServerMessage(int fd, int rpl_err_code, const string& msg){
 	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
 	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
 	else _term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+}
+
+void	Server::sendMsgToList(int fd_source, const string& msg, const map<int, size_t> &lst){
+	userInfos* source = _users->getUserByFd(fd_source);
+	map<int, size_t>::const_iterator it = lst.begin();
+	if (msg.length() == 0 || !source) return;
+	while (it != lst.end()){
+		if (it->first != fd_source){
+			sendMessage(it->first, ":" + source->getNickname() + "!" + source->getUsername() + "@" + _servername + " " + msg);
+		}
+		++it;
+	}
+}
+
+void	Server::sendMsgToList(int fd_source, const string& msg, vector<userInfos*> lst){
+	userInfos* source = _users->getUserByFd(fd_source);
+	(void)lst;
+	vector<userInfos*>::iterator it = lst.begin();
+	(void)it;
+	if (msg.length() == 0 || !source) return;
+	while (it != lst.end()){
+		if ((*it)->getFd() != fd_source){
+			sendMessage((*it)->getFd(), ":" + source->getNickname() + "!" + source->getUsername() + "@" + _servername + " " + msg);
+		}
+		++it;
+	}
 }

@@ -17,12 +17,12 @@
 #include <unistd.h>
 #include <fstream>
 
+#define PRINT_DEBUG_INFOS		1
 
 #define MAX_CLIENTS				10000
 #define REGISTRATION_TIMEOUT	20
 #define CONNECTION_TIMEOUT		120
 #define TIMEOUT_CHECK_TIME		30
-#define PRINT_DEBUG_INFOS		0
 #define MAX_CHANNELS			100
 
 #define CONF_FILE				"conf.txt"

@@ -21,6 +21,7 @@ userInfos::userInfos(int fd, Terminal* term, int prt_debug):_term(term), _prt_de
 	_mode = "";
 	_ip_addr = "";
 	_nb_wrong_cmds = 0;
+	_incomming_msg = "";
 	if (_prt_debug)
 		_term->prtTmColor("New user created Fd #" + toString(fd) + "\n", Terminal::BLUE);
 };
@@ -50,6 +51,7 @@ userInfos& userInfos::operator=(const userInfos & src){
 		_term = src._term;
 		_prt_debug = src._prt_debug;
 		_nb_wrong_cmds = src._nb_wrong_cmds;
+		_incomming_msg = src._incomming_msg;
 	}
 	return *this;
 }
@@ -114,6 +116,9 @@ void	userInfos::setIpAddr(string& add){
 void	userInfos::setStatus(const string& status){
 	_status = status;
 }
+void	userInfos::setIncommingMsg(const string& msg){
+	_incomming_msg = msg;
+}
 
 string const &userInfos::getNickname(void) const{
 	return _nickname;
@@ -159,6 +164,9 @@ const string &userInfos::getStatus(void) const{
 }
 int userInfos::getWrongCmdsNb(void) const{
 	return _nb_wrong_cmds;
+}
+string const &userInfos::getIncommingMsg(void) const {
+	return _incomming_msg;
 }
 
 int userInfos::checkReg(void) {
