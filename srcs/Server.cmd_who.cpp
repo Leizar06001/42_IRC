@@ -10,6 +10,7 @@ void Server::cmd_who(int fd, vector<string> tokens){
 	}
 	string		msg;
 	if (nick.length() == 0) return ;
+
 	if (tokens[1][0] == '#'){	// list users of a channel
 		s_Channel* chan = _channels->getChannel(tokens[1]);
 		if (!chan){	// channel not found
@@ -20,6 +21,17 @@ void Server::cmd_who(int fd, vector<string> tokens){
 				sendServerMessage(fd, RPL_WHOREPLY, tokens[1] + " " + (*it)->getUsername() + " " + (*it)->getIpAdress() + " " + _servername + " "
 					+ (*it)->getNickname() + " " + (*it)->getStatus() + " :0 " + (*it)->getRealname());
 			}
+			sendServerMessage(fd, RPL_ENDOFWHO, tokens[1] + " :End of /WHO list");
+		}
+
+
+	} else {					// Get one user details
+		userInfos* target = _users->getUserByNick(tokens[1]);
+		if (!target){
+			sendServerMessage(fd, ERR_NOSUCHNICK, tokens[1] + " :No such nickname");
+		} else {
+			sendServerMessage(fd, RPL_WHOREPLY, tokens[1] + " " + target->getUsername() + " " + target->getIpAdress() + " " + _servername + " "
+					+ target->getNickname() + " " + target->getStatus() + " :0 " + target->getRealname());
 			sendServerMessage(fd, RPL_ENDOFWHO, tokens[1] + " :End of /WHO list");
 		}
 	}

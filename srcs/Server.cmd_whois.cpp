@@ -2,6 +2,7 @@
 
 void Server::cmd_whois(int fd, vector<string> tokens){
 	userInfos* user = _users->getUserByFd(fd);
+	if (!user) return;
 	if (tokens.size() < 2){		// No nickname to search
 		_term.prtTmColor("WHOIS: No nickname to search", Terminal::RED);
 		sendServerMessage(fd, ERR_NONICKNAMEGIVEN, user->getNickname() + " :Nickname missing");
@@ -14,6 +15,7 @@ void Server::cmd_whois(int fd, vector<string> tokens){
 		return;
 	}
 	sendServerMessage(fd, RPL_WHOISUSER, user->getNickname() + " " + target->getNickname() + " "
-			+ target->getUsername() + " " + target->getIpAdress() + " * :" + target->getRealname());
+			+ target->getUsername() + " " + _servername + " * :" + target->getRealname());
+
 	sendServerMessage(fd, RPL_ENDOFWHOIS, user->getNickname() + " " + target->getNickname());
 }

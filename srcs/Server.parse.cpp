@@ -25,12 +25,17 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_topic,
 		&Server::cmd_mode,
 		&Server::cmd_part,
-		&Server::cmd_ban
+		&Server::cmd_ban,
+		&Server::cmd_userhost
 	};
 	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PONG", "PRIVMSG", "WHO", "WHOIS",
-		"NAMES", "QUIT", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "PART", "BAN"};
+		"NAMES", "QUIT", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "PART", "BAN", "USERHOST"};
 
-	for (size_t i = 0; i < sizeof(cmds) / sizeof(cmds[0]); ++i){
+	userInfos* user = _users->getUserByFd(fd);
+	if (!user) return;
+	int max_cmd_rights = user->isRegistered() ? sizeof(cmds) / sizeof(cmds[0]) : 3; // IF NOT REGISTERED, ALLOW ONLY FIRST 3 COMMANDS
+
+	for (size_t i = 0; i < max_cmd_rights; ++i){
 		if (cmds[i] == tokens[0]){
 			(this->*functionsPTRS[i])(fd, tokens);
 		}
