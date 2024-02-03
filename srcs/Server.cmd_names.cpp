@@ -13,7 +13,7 @@ void Server::cmd_names(int fd, vector<string> tokens){
 		if (!chan){	// channel not found
 			sendServerMessage(fd, ERR_NOSUCHCHANNEL, tokens[1] + " :No such channel");
 		} else {	// send list
-			sendServerMessage(fd, RPL_NAMREPLY, tokens[1] + " :" + _channels->getUsersNicksInChan(tokens[1]));
+			sendServerMessage(fd, RPL_NAMREPLY, "= " + tokens[1] + " :" + _channels->getUsersNicksInChan(tokens[1]));
 			sendServerMessage(fd, RPL_ENDOFNAMES, tokens[1] + " :End of /NAMES list");
 		}
 	} else {		// list all users
