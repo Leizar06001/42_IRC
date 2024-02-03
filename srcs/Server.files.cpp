@@ -30,19 +30,40 @@ void Server::setVarsFromConf(string& str){
 	vector<string> toks;
 	size_t pos = str.find(" ");
 	if (pos == string::npos || pos <= 0) return;
-	string key = str.substr(0, pos - 1);
+	string key = str.substr(0, pos);
 	if (str.length() < pos + 1) return;
 	string val = str.substr(pos + 1);
+	// _term.prtTmColor("key: " + key + "  val: " + val, Terminal::YELLOW);
 	int num;
-	if (str == "max_clients"){
-		num = atoi(val.c_str());
-		if (num){
-
+	num = atoi(val.c_str());
+	if (num){
+		if (key == "max_clients"){
+			if (num > 0 && num < _max_fd_allowed){
+				_max_clients = num;
+				_term.prtTmColor("sets to: " + toString(num), Terminal::GREEN);
+			} else _term.prtTmColor("default: " + toString(_max_clients), Terminal::YELLOW);
+		} else if(key == "max_channels") {
+			if (num > 0 && num < 10000){
+				_max_channels = num;
+				_term.prtTmColor("sets to: " + toString(num), Terminal::GREEN);
+			} else _term.prtTmColor("default: " + toString(_max_channels), Terminal::YELLOW);
+		} else if(key == "timeout_check_time") {
+			if (num > 0 &&num < 120){
+				_timeout_check_time = num;
+				_term.prtTmColor("sets to: " + toString(num), Terminal::GREEN);
+			} else _term.prtTmColor("default: " + toString(_timeout_check_time), Terminal::YELLOW);
+		} else if(key == "connection_timeout") {
+			if (num > 0 && num < 600){
+				_connection_timeout = num;
+				_term.prtTmColor("sets to: " + toString(num), Terminal::GREEN);
+			} else _term.prtTmColor("default: " + toString(_connection_timeout), Terminal::YELLOW);
+		} else if(key == "registration_timeout") {
+			if (num > 0 && num < 120){
+				_registration_timeout = num;
+				_term.prtTmColor("sets to: " + toString(num), Terminal::GREEN);
+			} else _term.prtTmColor("default: " + toString(_registration_timeout), Terminal::YELLOW);
 		}
-	} else {
-
 	}
-
 }
 
 void Server::readConf(void){
@@ -61,23 +82,23 @@ void Server::readConf(void){
 		_term.prtTmColor("Reading conf file..\n", Terminal::CYAN);
 		string line;
 		while(getline(conf, line)){
-			if (line == "[CONFIG]"){
-				_term.prtTmColor("CONF:\n", Terminal::MAGENTA);
-				while(getline(conf, line)){
-					if (line.empty() || line[0] == '[')
-						break;
-					setVarsFromConf(line);
-					_term.prtTmColor(line + "\n", Terminal::MAGENTA);
-				}
-			} else if (line == "[BANNED IP]"){
-				_term.prtTmColor("BANNED:\n", Terminal::MAGENTA);
+			if (line == "[BANNED IP]"){
+				_term.prtTmColor("BANNED\n", Terminal::MAGENTA);
 				while(getline(conf, line)){
 					if (line.empty() || line[0] == '[')
 						break;
 					if (line.length() < 20){
+						_term.prtTmColor(line + "\n", Terminal::BRIGHT_RED);
 						_bans_ip.push_back(line);
-						_term.prtTmColor(line + "\n", Terminal::MAGENTA);
 					}
+				}
+			} else {
+				_term.prtTmColor(line + "\n", Terminal::MAGENTA);
+				while(getline(conf, line)){
+					if (line.empty() || line[0] == '[')
+						break;
+					_term.prtTmColor(line + "\n", Terminal::BLUE);
+					setVarsFromConf(line);
 				}
 			}
 		}

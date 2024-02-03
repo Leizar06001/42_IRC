@@ -5,7 +5,7 @@ ChannelList::ChannelList(Terminal* term):_term(term)
 	s_Channel *general = new s_Channel;
 	general->channel_name = "#General";
 	general->channel_type = "=";
-	general->mode = "+nbt";
+	general->mode = "+nt";
 	general->deletable = 0;
 	general->nb_users = 0;
 	channel.insert(std::pair<std::string, s_Channel *>("#General", general));
@@ -45,7 +45,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		s_Channel *new_channel = new s_Channel;
 		new_channel->channel_name = channel_name;
 		new_channel->channel_type = "=";
-		new_channel->mode = "+nbt";
+		new_channel->mode = "+nt";
 		new_channel->deletable = 1;
 		new_channel->nb_users = 1;
 		channel.insert(std::pair<std::string, s_Channel *>(channel_name, new_channel));

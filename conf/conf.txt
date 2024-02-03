@@ -1,5 +1,13 @@
-[CONFIG]
-max_clients 100
+[GENERAL]
+timeout_check_time 30
+
+[CHANNELS]
 max_channels 30
 
+[CLIENTS]
+max_clients 1000
+registration_timeout 20
+connection_timeout 120
+
 [BANNED IP]
+666.666.666.666

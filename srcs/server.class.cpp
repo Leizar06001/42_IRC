@@ -1,12 +1,25 @@
 #include "../includes/server.class.hpp"
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/resource.h> // for getrlimit (nb fd allowed)
 
 Server::Server(void):_initialized(0), _term(&_logStream){
 	_servername = "IRis.Chat";
 	_users = new userList(&_term, PRINT_DEBUG_INFOS);
 	_channels = new ChannelList(&_term);
+	_timeout_check_time = TIMEOUT_CHECK_TIME;
+	_registration_timeout = REGISTRATION_TIMEOUT;
+	_connection_timeout = CONNECTION_TIMEOUT;
+	_max_channels = MAX_CHANNELS;
+	struct rlimit limit;
+	if (getrlimit(RLIMIT_NOFILE, &limit) != 0){
+		_max_fd_allowed = 256;
+	} else {
+		_max_fd_allowed = limit.rlim_cur;
+	}
+	_max_clients = (MAX_CLIENTS <= _max_fd_allowed) ? MAX_CLIENTS : _max_fd_allowed;
 };
+
 Server::~Server(void){
 	delete _users;
 	delete _channels;
@@ -21,7 +34,7 @@ Server &Server::operator=(Server &rhs){
 void Server::shutdown(void){
 	cout << endl;
 	_term.prtTmColor("------ END SERVER ------\n", Terminal::BRIGHT_CYAN);
-	for(int i = 1; i <= MAX_CON; ++i){
+	for(int i = 1; i <= _max_clients; ++i){
 		if (_fds[i].fd >= 0){
 			_term.prtTmColor("Closing Connection.. " + toString(i) + "\n", Terminal::WHITE);
 			close(_fds[i].fd);
@@ -41,7 +54,7 @@ void Server::shutdown(void){
 }
 
 void Server::drawInterface(void){
-	_term.updateTitle(_port, _connection_nb, _users->getNbNotRegistered(), _channels->getNbChannel(), _msg_nb, MAX_CON, _bans_ip);
+	_term.updateTitle(_port, _connection_nb, _users->getNbNotRegistered(), _channels->getNbChannel(), _msg_nb, _max_clients, _max_channels, _bans_ip);
 	_term.updateMenu(_users, _channels);
 }
 
@@ -51,7 +64,7 @@ int Server::init(int port){
 	_connection_nb = 0;
 	_sockfd = 0;
 	_last_timeout_check = time(NULL);
-	for(int i = 0; i <= MAX_CON; ++i){
+	for(int i = 0; i <= MAX_CLIENTS; ++i){
 		_fds[i].fd = -1;
 		_fds[i].events = 0;
 		_fds[i].revents = 0;
@@ -120,7 +133,7 @@ void Server::bindToPort(int port){
 void Server::getConnection(void){
 	_term.prtTmColor(">>> New Connection..\n", Terminal::GREEN);
 
-	if (_connection_nb >= MAX_CON){
+	if (_connection_nb >= _max_clients){
 		_term.prtTmColor("ERROR: TOO MANY CONNEXIONS\n", Terminal::RED);
 		return ;
 	}
@@ -145,7 +158,7 @@ void Server::getConnection(void){
         return;
     }
 
-	if (_connection_nb >= MAX_CON){
+	if (_connection_nb >= _max_clients){
 		_term.prtTmColor(">>> Rejected: " + string(client_ip) + " - Too many connections\n", Terminal::RED);
 		string msg =  ":" + _servername + " :No room left on the server\r\n";
 		send(connection, msg.c_str(), msg.size(), 0);
@@ -162,7 +175,7 @@ void Server::getConnection(void){
 	userInfos* new_user = _users->addUser(i);
 	new_user->setIpAddr(ip_str);
 
-	_term.prtTmColor(">>> " + string(client_ip) + " FD." + toString(i) + Terminal::BRIGHT_CYAN + " | " + toString(_connection_nb) + " / " + toString(MAX_CON) + " clients\n", Terminal::GREEN);
+	_term.prtTmColor(">>> " + string(client_ip) + " FD." + toString(i) + Terminal::BRIGHT_CYAN + " | " + toString(_connection_nb) + " / " + toString(_max_clients) + " clients\n", Terminal::GREEN);
 }
 
 int	Server::isIPBanned(string& ip){

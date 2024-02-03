@@ -31,9 +31,11 @@ class ChannelList
 
 		void quitChannel(userInfos* user, std::string channel_name);
 		// doit retourner un code (int) si erreur (voir doc)
+		// supprimer channel si no user left
 
 		void leaveServer(userInfos* user);
 		// doit retourner un code (int) si erreur (voir doc)
+		// supprimer channel si no user left
 
 		int getNbChannel();
 		s_Channel* getNextChannel(int reset);

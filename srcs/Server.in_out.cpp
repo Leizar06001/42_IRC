@@ -2,9 +2,9 @@
 #include <cstring>
 
 int Server::pollFds(int timeout){
-	int ret = poll(_fds, MAX_CON, timeout);
+	int ret = poll(_fds, _max_clients, timeout);
 	if (ret == -1){
-		_term.prtTmColor("Poll error. errno: " + toString(errno) + "\n", Terminal::RED);
+		_term.prtTmColor("Poll error: " + toString(strerror(errno)) + "\n", Terminal::RED);
 	}
 	return ret;
 }

@@ -18,11 +18,12 @@
 #include <fstream>
 
 
-#define MAX_CON					100
+#define MAX_CLIENTS				10000
 #define REGISTRATION_TIMEOUT	20
 #define CONNECTION_TIMEOUT		120
 #define TIMEOUT_CHECK_TIME		30
 #define PRINT_DEBUG_INFOS		0
+#define MAX_CHANNELS			100
 
 #define CONF_FILE				"conf.txt"
 #define CONF_FOLDER				"./conf/"
@@ -34,10 +35,11 @@ class Server {
 
 	private:
 		string			_servername;
+		int				_max_fd_allowed;
 		int				_port;
 		int 			_sockfd;
 		sockaddr_in		_sockaddr;
-		struct pollfd 	_fds[MAX_CON + 1];
+		struct pollfd 	_fds[MAX_CLIENTS + 1];
 		int				_msg_nb;
 		int				_connection_nb;
 		int				_initialized;
@@ -51,6 +53,9 @@ class Server {
 		vector<string>	_bans_ip;
 		int				_max_clients;
 		int				_max_channels;
+		int				_timeout_check_time;
+		int				_connection_timeout;
+		int				_registration_timeout;
 
 
 		void	createSocket(int domain, int type, int protocol);
