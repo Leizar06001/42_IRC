@@ -40,7 +40,8 @@ void Server::getMessages(int fd){
 		// ERROR
 		if (errno != EAGAIN && errno != EWOULDBLOCK) {
 			_term.prtTmColor("RECV ERROR: " + toString(strerror(errno)), Terminal::BRIGHT_RED);
-			forceDisconnect(fd, "??");
+			_channels->leaveServer(_users->getUserByFd(fd));
+			rmUser(fd, string("QUIT Weird messages"));
 		}
         // If EAGAIN or EWOULDBLOCK, simply no data available now, not an error
 	} else if (bytesRead == 0){	// CLIENT DISCONNECTED
@@ -68,7 +69,8 @@ void Server::getMessages(int fd){
 					vector<string> tokens = parseMessage(fd, msg);	// PARSE
 					analyseCommands(fd, tokens);					// LAUNCH CMDS
 					if (user->getWrongCmdsNb() > 2){
-						forceDisconnect(fd, "Too many wrong messages");
+						_channels->leaveServer(user);
+						rmUser(fd, string("QUIT Too many wrong messages"));
 					}
 				}
 			}

@@ -96,6 +96,7 @@ class Server {
 		void	cmd_part(int fd, vector<string> tokens);
 		void	cmd_ban(int fd, vector<string> tokens);
 		void	cmd_userhost(int fd, vector<string> tokens);
+		void	cmd_notice(int fd, vector<string> tokens);
 
 		void	rmUser(int fd, const string& reason);
 		void	forceDisconnect(int fd, const string& reason);

@@ -26,10 +26,11 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_mode,
 		&Server::cmd_part,
 		&Server::cmd_ban,
-		&Server::cmd_userhost
+		&Server::cmd_userhost,
+		&Server::cmd_notice
 	};
 	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PONG", "PRIVMSG", "WHO", "WHOIS",
-		"NAMES", "QUIT", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "PART", "BAN", "USERHOST"};
+		"NAMES", "QUIT", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "PART", "BAN", "USERHOST", "NOTICE"};
 
 	userInfos* user = _users->getUserByFd(fd);
 	if (!user) return;
