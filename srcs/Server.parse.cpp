@@ -33,7 +33,7 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 
 	userInfos* user = _users->getUserByFd(fd);
 	if (!user) return;
-	int max_cmd_rights = user->isRegistered() ? sizeof(cmds) / sizeof(cmds[0]) : 3; // IF NOT REGISTERED, ALLOW ONLY FIRST 3 COMMANDS
+	size_t max_cmd_rights = user->isRegistered() ? sizeof(cmds) / sizeof(cmds[0]) : 3; // IF NOT REGISTERED, ALLOW ONLY FIRST 3 COMMANDS
 
 	for (size_t i = 0; i < max_cmd_rights; ++i){
 		if (cmds[i] == tokens[0]){
