@@ -18,6 +18,9 @@ void Server::cmd_userhost(int fd, vector<string> tokens){
 	string status = target->getStatus() == "H" ? "+" : "-";
 	//string ope = target->isOpe() ? "*" : "";
 	string ope = "";
-	sendServerMessage(fd, RPL_USERHOST, ":" + target->getNickname() + "=" + ope + status + target->getUsername() + "@" + _servername);
+	if (user == target)	// SELF TARGETTING GIVE IP
+		sendServerMessage(fd, RPL_USERHOST, ":" + target->getNickname() + "=" + ope + status + target->getUsername() + "@" + user->getIpAdress());
+	else
+		sendServerMessage(fd, RPL_USERHOST, ":" + target->getNickname() + "=" + ope + status + target->getUsername() + "@" + _servername);
 	sendServerMessage(fd, RPL_ENDOFWHO, target->getNickname() + " :End of userhost list");
 }
