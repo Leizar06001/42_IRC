@@ -19,7 +19,9 @@ userInfos::userInfos(int fd, Terminal* term, int prt_debug):_term(term), _prt_de
 	_username = "";
 	_realname = "";
 	_status = "H";
-	_mode = "";
+	_is_invisible = 0;
+	_is_admin = 0;
+	_hide_host = 1;
 	_ip_addr = "";
 	_nb_wrong_cmds = 0;
 	_incomming_msg = "";
@@ -46,7 +48,9 @@ userInfos& userInfos::operator=(const userInfos & src){
 		_realname = src._username;
 		_ip_addr = src._ip_addr;
 		_status = src._status;
-		_mode = src._mode;
+		_is_invisible = src._is_invisible;
+		_is_admin = src._is_admin;
+		_hide_host = src._hide_host;
 		_nb_msg = src._nb_msg;
 		_fd = src._fd;
 		_actionType = src._actionType;
@@ -109,9 +113,6 @@ void	userInfos::incMsgs(void){
 void	userInfos::incWrongCmds(void){
 	++_nb_wrong_cmds;
 }
-void	userInfos::setUserMode(const string& mode){
-	_mode = mode;
-}
 void	userInfos::setIpAddr(string& add){
 	_ip_addr = add;
 }
@@ -124,6 +125,14 @@ void	userInfos::setIncommingMsg(const string& msg){
 void	userInfos::setPasswordOk(void){
 	_password = 1;
 }
+void	userInfos::setInvisible(bool invisible){
+	_is_invisible = invisible;
+}
+void	userInfos::setAdmin(void){
+	_is_admin = true;
+}
+
+
 
 string const &userInfos::getNickname(void) const{
 	return _nickname;
@@ -136,6 +145,15 @@ string const &userInfos::getUsername(void) const{
 }
 string const &userInfos::getRealname(void) const{
 	return _realname;
+}
+string const userInfos::getUserMode(void) const{
+	string mode = "+";
+	if (_is_admin) mode += "Aa";
+	if (_hide_host) mode += "x";
+	if (_is_invisible) mode += "i";
+
+	if (mode.length() <= 1) mode = "*";
+	return mode;
 }
 int	userInfos::getFd(void) const {
 	return _fd;
@@ -158,9 +176,6 @@ time_t	userInfos::getLastMessageTime(void) const {
 bool	userInfos::getPong(void) const {
 	return _waiting_for_pong;
 }
-string const &userInfos::getUserMode(void) const {
-	return _mode;
-}
 string const &userInfos::getIpAdress(void) const {
 	return _ip_addr;
 }
@@ -176,6 +191,13 @@ string const &userInfos::getIncommingMsg(void) const {
 bool	userInfos::hasPassword(void) const {
 	return _password;
 }
+bool	userInfos::isInvisible(void){
+	return _is_invisible;
+}
+bool	userInfos::isAdmin(void){
+	return _is_admin;
+}
+
 
 int userInfos::checkReg(void) {
 	if (!_registered && _username_registered && _nickname_registered && _password){

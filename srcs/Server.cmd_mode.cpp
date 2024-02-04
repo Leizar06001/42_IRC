@@ -24,11 +24,31 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 			sendServerMessage(fd, ERR_NOSUCHNICK, nick + " :" + tokens[1]);
 			return;
 		}
-		if (tokens.size() < 3){		// Getting mode infos
+		if (tokens.size() < 3){		// NO MODE SPECIFIED : ONLY Getting mode infos
 			sendClientMessage(fd, "MODE " + nick + " " + target->getUserMode());
+
+
 		} else {					// Try to set mode
 			if (nick == tokens[1]) {		// SELF TARGETTING
-				user->setUserMode(tokens[2]);
+				bool add = 0;
+				bool rm = 0;
+				for(size_t i = 0; i < tokens[2].length(); ++i){
+					switch (tokens[2][i]){
+						case '+': add = 1; rm = 0; break;
+						case '-': add = 0; rm = 1; break;
+					}
+					if (add && !rm){			// ADD mode
+						switch (tokens[2][i]){
+							case 'i': target->setInvisible(true); break;
+							case 'x': break;	// hide host
+						}
+					} else if (!add && rm){		// RM mode
+						switch (tokens[2][i]){
+							case 'i': target->setInvisible(false); break;
+							case 'x': break;	// hide host
+						}
+					}
+				}
 				sendClientMessage(fd, "MODE " + nick + " " + user->getUserMode());
 			} else {	// ERR cant change mode for other users
 				sendServerMessage(fd, ERR_USERSDONTMATCH, nick + ":Cannot change mode for other users");

@@ -38,6 +38,7 @@ class Server {
 		int				_max_fd_allowed;
 		int				_port;
 		string			_password;
+		string			_admin_password;
 		int 			_sockfd;
 		sockaddr_in		_sockaddr;
 		struct pollfd 	_fds[MAX_CLIENTS + 1];

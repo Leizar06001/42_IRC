@@ -34,7 +34,8 @@ SRCS = 	srcs/main.cpp				\
 		srcs/Server.timeouts.cpp	\
 		srcs/userList.class.cpp		\
 		srcs/userInfos.class.cpp	\
-		srcs/terminal.class.cpp
+		srcs/terminal.class.cpp		\
+		srcs/sha256.cpp
 
 OBJ_DIR = objs
 OBJS := $(SRCS:srcs/%=%)

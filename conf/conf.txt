@@ -2,6 +2,7 @@
 
 [GENERAL]
 timeout_check_time 30
+admin_pass 4bb5e8c31c5c802497e0e6028eefe257d9f0ddfbdfe8c89273f22219a6487868
 
 [CHANNELS]
 max_channels 30

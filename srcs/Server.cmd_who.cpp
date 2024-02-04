@@ -20,10 +20,10 @@ void Server::cmd_who(int fd, vector<string> tokens){
 			for(vector<userInfos*>::iterator it = list.begin(); it != list.end(); ++it){
 				if ((*it) == user){		// SELF TARGETTING GIVE IP
 					sendServerMessage(fd, RPL_WHOREPLY, tokens[1] + " " + (*it)->getUsername() + " " + (*it)->getIpAdress() + " " + _servername + " "
-						+ (*it)->getNickname() + " " + (*it)->getStatus() + " :0 " + (*it)->getRealname());
+						+ (*it)->getNickname() + " " + (*it)->getUserMode() + " :0 " + (*it)->getRealname());
 				} else {
 					sendServerMessage(fd, RPL_WHOREPLY, tokens[1] + " " + (*it)->getUsername() + " " + _servername + " " + _servername + " "
-						+ (*it)->getNickname() + " " + (*it)->getStatus() + " :0 " + (*it)->getRealname());
+						+ (*it)->getNickname() + " " + (*it)->getUserMode() + " :0 " + (*it)->getRealname());
 				}
 			}
 			sendServerMessage(fd, RPL_ENDOFWHO, tokens[1] + " :End of /WHO list");
@@ -37,10 +37,10 @@ void Server::cmd_who(int fd, vector<string> tokens){
 		} else {
 			if (target == user){		// SELF TARGETTING GIVE IP
 				sendServerMessage(fd, RPL_WHOREPLY, "# " + target->getUsername() + " " + target->getIpAdress() + " " + _servername + " "
-						+ target->getNickname() + " " + target->getStatus() + " :0 " + target->getRealname());
+						+ target->getNickname() + " " + target->getUserMode() + " :0 " + target->getRealname());
 			} else {
 				sendServerMessage(fd, RPL_WHOREPLY, "# " + target->getUsername() + " " + _servername + " " + _servername + " "
-						+ target->getNickname() + " " + target->getStatus() + " :0 " + target->getRealname());
+						+ target->getNickname() + " " + target->getUserMode() + " :0 " + target->getRealname());
 			}
 			sendServerMessage(fd, RPL_ENDOFWHO, tokens[1] + " :End of /WHO list");
 		}

@@ -26,9 +26,11 @@ class userInfos {
 		string		_prev_nick;
 		string		_username;
 		string		_realname;
-		string		_mode;
 		string		_ip_addr;
 		string		_status;
+		bool		_is_admin;		// * mode
+		bool		_is_invisible;	// i
+		bool		_hide_host;		// x
 		int			_fd;
 		int			_nb_msg;
 		int			_actionType;		// tell the server what the client is waiting for
@@ -50,11 +52,12 @@ class userInfos {
 		void	setIndex(int index);
 		void	resetLastMessageTime(void);
 		void	setPong(bool ping);
-		void	setUserMode(const string& mode);
 		void	setIpAddr(string& add);
 		void	setStatus(const string& status);
 		void	setIncommingMsg(const string& msg);
 		void	setPasswordOk(void);
+		void	setInvisible(bool invisible);
+		void	setAdmin(void);
 
 		void	incMsgs(void);
 		void	incWrongCmds(void);
@@ -63,6 +66,7 @@ class userInfos {
 		string	const &getPrevNick(void) const;
 		string	const &getUsername(void) const;
 		string	const &getRealname(void) const;
+		string	const getUserMode(void) const;
 		int		getFd(void) const;
 		int		getNbMsg(void) const;
 		int		getIndex(void) const;
@@ -70,12 +74,13 @@ class userInfos {
 		time_t	getConnectionStart(void) const;
 		time_t	getLastMessageTime(void) const;
 		bool	getPong(void) const;
-		string	const &getUserMode(void) const;
 		string	const &getIpAdress(void) const;
 		string	const &getStatus(void) const;
 		int		getWrongCmdsNb(void) const;
 		string	const &getIncommingMsg(void) const;
 		bool	hasPassword(void) const;
+		bool	isInvisible(void);
+		bool	isAdmin(void);
 
 		int		checkReg(void);
 

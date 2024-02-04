@@ -41,6 +41,15 @@ void Server::setVarsFromConf(string& str){
 	string key = str.substr(0, pos);
 	if (str.length() < pos + 1) return;
 	string val = str.substr(pos + 1);
+
+	if(key == "admin_pass") {
+		if (val.length() == 64){
+			_admin_password = val;
+			_term.prtTmColor("sets to: " + val, Terminal::GREEN);
+		}
+		return ;
+	}
+
 	// _term.prtTmColor("key: " + key + "  val: " + val, Terminal::YELLOW);
 	int num;
 	num = atoi(val.c_str());
