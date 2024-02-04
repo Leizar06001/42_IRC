@@ -8,7 +8,7 @@
 #include <poll.h>
 #include <sys/time.h>
 
-#include "includes/server.class.hpp"
+#include "../includes/server.class.hpp"
 
 namespace {
 	volatile sig_atomic_t quitok = false;

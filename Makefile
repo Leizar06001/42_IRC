@@ -3,7 +3,7 @@ NAME = irc_server
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
-SRCS = 	main.cpp					\
+SRCS = 	srcs/main.cpp				\
 		srcs/ChannelList.class.cpp	\
 		srcs/server.class.cpp		\
 		srcs/Server.actions.cpp		\
@@ -55,11 +55,6 @@ post-build-message:
 	@echo "\033[34m╔═══════════════════════════════════════════╗"
 	@echo "\033[34m║               \033[96m\033[1m  ALL GOOD  \033[0m\033[34m                ║"
 	@echo "\033[34m╚═══════════════════════════════════════════╝"
-
-$(OBJ_DIR)/%.o: %.cpp
-	@mkdir -p $(OBJ_DIR)
-	@echo "Compiling $<..."
-	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: srcs/%.cpp
 	@mkdir -p $(OBJ_DIR)
