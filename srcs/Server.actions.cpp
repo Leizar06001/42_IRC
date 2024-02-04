@@ -19,8 +19,8 @@ void Server::performAction(userInfos* user){
 	int fd = user->getFd();
 
 	if (action_type == ACT_REGISTRATION){
-		string message = ":" + _servername + " 001 " + user->getNickname() + " :Welcome to the iRisChat network, " + user->getNickname() + "!" + user->getUsername() + "@" + user->getIpAdress();
-		sendMessage(fd, message);
+		string message = ":Welcome to the iRisChat network, " + user->getNickname() + "!" + user->getUsername() + "@" + user->getIpAdress();
+		sendServerMessage(fd, RPL_WELCOME ,message);
 		// message = ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1";
 		// sendMessage(fd, message);
 		_users->validateRegistration(user);

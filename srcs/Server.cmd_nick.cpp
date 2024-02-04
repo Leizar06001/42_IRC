@@ -12,11 +12,11 @@ void Server::cmd_nick(int fd, vector<string> tokens){
 	string nick = user->getNickname();
 	if (nick.empty()) nick = tokens[1];
 	if (ret == ERR_NICKNAMEINUSE){
-		_term.prtTmColor("FD. " + toString(fd) + " nickname already in use\n", Terminal::RED);
+		_term.prtTmColor("FD. " + toString(fd) + " nickname already in use\n", Terminal::BRIGHT_RED);
 		sendMessage(fd, string(":" + _servername + " " + toString(ERR_NICKNAMEINUSE) + " " + nick + " " + tokens[1] + " :Nickname already in use"));
 		return ;
 	} else if (ret == ERR_ERRONEUSNICKNAME){
-		_term.prtTmColor("FD. " + toString(fd) + " wrong characters in nickname\n", Terminal::RED);
+		_term.prtTmColor("FD. " + toString(fd) + " wrong characters in nickname\n", Terminal::BRIGHT_RED);
 		sendMessage(fd, string(":" + _servername + " " + toString(ERR_ERRONEUSNICKNAME) + " " + nick + " " + tokens[1] + " :Erroneus nickname"));
 		return ;
 	} else if (ret == 1) { // Nick changed, must advertise new nick to others

@@ -99,7 +99,7 @@ void Server::sendMessage(int fd, const string& msg){
 	int ret = send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
 	(void)ret;
 	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE\n", Terminal::RED);
-	else _term.prtTmColor("OUT: '" + msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+	else _term.prtTmColor("OUT: '" + Terminal::MAGENTA + msg + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
 
 void Server::sendClientMessage(int fd, const string& msg){
@@ -110,30 +110,30 @@ void Server::sendClientMessage(int fd, const string& msg){
 	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
 	(void)ret;
 	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
-	else _term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+	else _term.prtTmColor("OUT: '" + Terminal::MAGENTA + final_msg + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
 
 void Server::sendClientMessageShowIp(int fd, const string& msg){
 	userInfos* dest = _users->getUserByFd(fd);
-	const string final_msg = ":" + dest->getNickname() + "!" + dest->getUsername() + "@" + dest->getIpAdress() + " " + msg;
-	const string msg_to_send = final_msg + "\r\n";
+	const string msg_to_print = ":" + Terminal::YELLOW + dest->getNickname() + Terminal::BRIGHT_MAGENTA + "!" + dest->getUsername() + "@" + dest->getIpAdress() + " " + msg;
+	const string msg_to_send = ":" + dest->getNickname() + "!" + dest->getUsername() + "@" + dest->getIpAdress() + " " + msg + "\r\n";
 
 	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
 	(void)ret;
-	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
-	else _term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + msg_to_print, Terminal::RED);
+	else _term.prtTmColor("OUT: '" + Terminal::BRIGHT_MAGENTA + msg_to_print + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
 
 void Server::sendServerMessage(int fd, int rpl_err_code, const string& msg){
 	userInfos* dest = _users->getUserByFd(fd);
 	const string nick = (dest == NULL) ? "" : dest->getNickname();
-	const string final_msg = ":" + _servername + " " + toString(rpl_err_code) + " " + nick + " " + msg;
-	const string msg_to_send = final_msg + "\r\n";
+	const string msg_to_print = ":" + _servername + " " + toString(rpl_err_code) + " " + Terminal::YELLOW + nick + Terminal::MAGENTA + " " + msg;
+	const string msg_to_send = ":" + _servername + " " + toString(rpl_err_code) + " " + nick + " " + msg + "\r\n";
 
 	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
 	(void)ret;
-	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
-	else _term.prtTmColor("OUT: '" + final_msg + "' to fd " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + msg_to_print, Terminal::RED);
+	else _term.prtTmColor("OUT: '" + Terminal::MAGENTA + msg_to_print + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
 
 void	Server::sendMsgToList(int fd_source, const string& msg, const map<int, size_t> &lst){
