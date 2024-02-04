@@ -18,6 +18,7 @@ class userInfos {
 		int			_registered;		// correctly registered
 		int			_nickname_registered;
 		int			_username_registered;
+		int			_password;
 		time_t		_connection_start;
 		time_t		_last_message;
 		bool		_waiting_for_pong;
@@ -53,6 +54,7 @@ class userInfos {
 		void	setIpAddr(string& add);
 		void	setStatus(const string& status);
 		void	setIncommingMsg(const string& msg);
+		void	setPasswordOk(void);
 
 		void	incMsgs(void);
 		void	incWrongCmds(void);
@@ -73,6 +75,7 @@ class userInfos {
 		string	const &getStatus(void) const;
 		int		getWrongCmdsNb(void) const;
 		string	const &getIncommingMsg(void) const;
+		bool	hasPassword(void) const;
 
 		int		checkReg(void);
 

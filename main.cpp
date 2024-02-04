@@ -26,12 +26,17 @@ void	init_sigaction(){
 		std::cerr << "Error: sigaction\n";
 }
 
-int main() {
+int main(int argc, char **argv) {
+	if (argc < 3){
+		cout << "Error: Missing args { port, password }" << endl;
+		return 1;
+	}
+
 	init_sigaction();
 
 	Server serv;
 
-	if (serv.init(6667) == -1)
+	if (serv.init(atoi(argv[1]), string(argv[2])) == -1)
 		return 1;
 	while (!quitok)
 		serv.handleEvents();

@@ -37,6 +37,7 @@ class Server {
 		string			_servername;
 		int				_max_fd_allowed;
 		int				_port;
+		string			_password;
 		int 			_sockfd;
 		sockaddr_in		_sockaddr;
 		struct pollfd 	_fds[MAX_CLIENTS + 1];
@@ -97,6 +98,7 @@ class Server {
 		void	cmd_ban(int fd, vector<string> tokens);
 		void	cmd_userhost(int fd, vector<string> tokens);
 		void	cmd_notice(int fd, vector<string> tokens);
+		void	cmd_pass(int fd, vector<string> tokens);
 
 		void	rmUser(int fd, const string& reason);
 		void	forceDisconnect(int fd, const string& reason);
@@ -119,7 +121,7 @@ class Server {
 		Server(Server &rhs);
 		Server &operator=(Server &rhs);
 
-		int		init(int port);
+		int		init(int port, const string& password);
 		void	shutdown(void);
 		void	handleEvents(void);
 };

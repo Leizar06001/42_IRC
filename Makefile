@@ -7,7 +7,7 @@ SRCS = 	main.cpp					\
 		srcs/ChannelList.class.cpp	\
 		srcs/server.class.cpp		\
 		srcs/Server.actions.cpp		\
-		srcs/Server.bot_detection.cpp	\
+		srcs/Server.bot_detection.cpp \
 		srcs/Server.cmd_ban.cpp		\
 		srcs/Server.cmd_cap.cpp		\
 		srcs/Server.cmd_invite.cpp	\
@@ -18,6 +18,7 @@ SRCS = 	main.cpp					\
 		srcs/Server.cmd_nick.cpp	\
 		srcs/Server.cmd_notice.cpp	\
 		srcs/Server.cmd_part.cpp	\
+		srcs/Server.cmd_pass.cpp 	\
 		srcs/Server.cmd_ping.cpp	\
 		srcs/Server.cmd_pong.cpp	\
 		srcs/Server.cmd_privmsg.cpp	\

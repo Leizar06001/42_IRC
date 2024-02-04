@@ -43,7 +43,7 @@ void Server::getMessages(int fd){
 			_channels->leaveServer(_users->getUserByFd(fd));
 			rmUser(fd, string("QUIT Weird messages"));
 		}
-        // If EAGAIN or EWOULDBLOCK, simply no data available now, not an error
+		// If EAGAIN or EWOULDBLOCK, simply no data available now, not an error
 	} else if (bytesRead == 0){	// CLIENT DISCONNECTED
 		forceDisconnect(fd, "Connection lost");
 	} else {				// TREAT MESSAGE

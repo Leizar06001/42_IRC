@@ -10,6 +10,7 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 	toUpperCase(tokens[0]);
 	void (Server::*functionsPTRS[])(int fd,  vector<string> tokens) = {
 		&Server::cmd_cap,
+		&Server::cmd_pass,
 		&Server::cmd_nick,
 		&Server::cmd_user,
 		&Server::cmd_ping,
@@ -29,12 +30,12 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_userhost,
 		&Server::cmd_notice
 	};
-	std::string cmds[] = {"CAP", "NICK", "USER", "PING", "PONG", "PRIVMSG", "WHO", "WHOIS",
+	std::string cmds[] = {"CAP", "PASS", "NICK", "USER", "PING", "PONG", "PRIVMSG", "WHO", "WHOIS",
 		"NAMES", "QUIT", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "PART", "BAN", "USERHOST", "NOTICE"};
 
 	userInfos* user = _users->getUserByFd(fd);
 	if (!user) return;
-	size_t max_cmd_rights = user->isRegistered() ? sizeof(cmds) / sizeof(cmds[0]) : 3; // IF NOT REGISTERED, ALLOW ONLY FIRST 3 COMMANDS
+	size_t max_cmd_rights = user->isRegistered() ? sizeof(cmds) / sizeof(cmds[0]) : 4; // IF NOT REGISTERED, ALLOW ONLY FIRST 3 COMMANDS
 
 	int found = 0;
 	for (size_t i = 0; i < max_cmd_rights; ++i){

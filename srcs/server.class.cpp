@@ -11,6 +11,14 @@ Server::Server(void):_initialized(0), _term(&_logStream){
 	_registration_timeout = REGISTRATION_TIMEOUT;
 	_connection_timeout = CONNECTION_TIMEOUT;
 	_max_channels = MAX_CHANNELS;
+	_msg_nb = 0;
+	_connection_nb = 0;
+	_sockfd = 0;
+	for(int i = 0; i <= MAX_CLIENTS; ++i){
+		_fds[i].fd = -1;
+		_fds[i].events = 0;
+		_fds[i].revents = 0;
+	}
 	struct rlimit limit;
 	if (getrlimit(RLIMIT_NOFILE, &limit) != 0){
 		_max_fd_allowed = 256;
@@ -33,7 +41,8 @@ Server &Server::operator=(Server &rhs){
 
 void Server::shutdown(void){
 	cout << endl;
-	_term.prtTmColor("------ END SERVER ------\n", Terminal::BRIGHT_CYAN);
+	if (_initialized)
+		_term.prtTmColor("------ END SERVER ------\n", Terminal::BRIGHT_CYAN);
 	for(int i = 1; i <= _max_clients; ++i){
 		if (_fds[i].fd >= 0){
 			_term.prtTmColor("Closing Connection.. " + toString(i) + "\n", Terminal::WHITE);
@@ -49,8 +58,8 @@ void Server::shutdown(void){
 		_logStream.close();
 		return ;
 	}
-
-	_term.prtTmColor("-------- GOODBYE -------\n", Terminal::BRIGHT_CYAN);
+	if (_initialized)
+		_term.prtTmColor("-------- GOODBYE -------\n", Terminal::BRIGHT_CYAN);
 }
 
 void Server::drawInterface(void){
@@ -58,17 +67,20 @@ void Server::drawInterface(void){
 	_term.updateMenu(_users, _channels);
 }
 
-int Server::init(int port){
-	_port = port;
-	_msg_nb = 0;
-	_connection_nb = 0;
-	_sockfd = 0;
-	_last_timeout_check = time(NULL);
-	for(int i = 0; i <= MAX_CLIENTS; ++i){
-		_fds[i].fd = -1;
-		_fds[i].events = 0;
-		_fds[i].revents = 0;
+int Server::init(int port, const string& password){
+	if (port < 0 || port > 65535){
+		cout << "Server init error: wrong port number" << endl;
+		return -1;
 	}
+	if (password.length() < 4 || password.length() > 30){
+		cout << "Server init error: password must be between 4 and 30 characters" << endl;
+		return -1;
+	}
+
+	_port = port;
+	_password = password;
+
+	_last_timeout_check = time(NULL);
 
 	_term.clearScreen();
 	drawInterface();

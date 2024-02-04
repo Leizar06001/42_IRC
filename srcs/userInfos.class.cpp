@@ -10,6 +10,7 @@ userInfos::userInfos(int fd, Terminal* term, int prt_debug):_term(term), _prt_de
 	_actionType = 0;
 	_nickname_registered = 0;
 	_username_registered = 0;
+	_password = 0;
 	_connection_start = time(NULL);
 	_last_message = _connection_start;
 	_waiting_for_pong = 0;
@@ -35,6 +36,7 @@ userInfos& userInfos::operator=(const userInfos & src){
 		_registered = src._registered;
 		_nickname_registered = src._nickname_registered;
 		_username_registered = src._username_registered;
+		_password = src._password;
 		_connection_start = src._connection_start;
 		_last_message = src._last_message;
 		_waiting_for_pong = src._waiting_for_pong;
@@ -119,6 +121,9 @@ void	userInfos::setStatus(const string& status){
 void	userInfos::setIncommingMsg(const string& msg){
 	_incomming_msg = msg;
 }
+void	userInfos::setPasswordOk(void){
+	_password = 1;
+}
 
 string const &userInfos::getNickname(void) const{
 	return _nickname;
@@ -168,9 +173,12 @@ int userInfos::getWrongCmdsNb(void) const{
 string const &userInfos::getIncommingMsg(void) const {
 	return _incomming_msg;
 }
+bool	userInfos::hasPassword(void) const {
+	return _password;
+}
 
 int userInfos::checkReg(void) {
-	if (!_registered && _username_registered && _nickname_registered){
+	if (!_registered && _username_registered && _nickname_registered && _password){
 		_actionType = ACT_REGISTRATION;
 		return 1;
 	}
