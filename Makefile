@@ -41,15 +41,30 @@ OBJS := $(SRCS:srcs/%=%)
 OBJS := $(OBJS:%.cpp=$(OBJ_DIR)/%.o)
   # Strip 'srcs/' from the object file paths
 
-all: $(NAME)
+all: pre-build-message $(NAME) post-build-message
+
+pre-build-message:
+	@echo "\033[2J\033[H"
+	@echo "\033[34m╔═══════════════════════════════════════════╗"
+	@echo "\033[34m║                                           ║"
+	@echo "\033[34m║       \033[1m\033[96m (ﾟ◥益◤ﾟ) i̲̭̘̊ͣR͔̅ͨi͉̝͈͓s̝̍ͩ͌̀̉.̹͙͗͐C̦̠h͉̯a̦̝̙͔ͯͭͫͬț̰̓ͦ́ͤ̈  (ʘ言ʘ╬) \033[0m\033[34m       ║"
+	@echo "\033[34m║                                           ║"
+	@echo "\033[34m╚═══════════════════════════════════════════╝"
+
+post-build-message:
+	@echo "\033[34m╔═══════════════════════════════════════════╗"
+	@echo "\033[34m║               \033[96m\033[1m  ALL GOOD  \033[0m\033[34m                ║"
+	@echo "\033[34m╚═══════════════════════════════════════════╝"
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Compiling $<..."
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: srcs/%.cpp
 	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Compiling $<..."
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(NAME): $(OBJS)
 	@echo "Linking..."
@@ -63,3 +78,5 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
+.PHONY:
