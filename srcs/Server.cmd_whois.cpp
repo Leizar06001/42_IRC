@@ -14,9 +14,21 @@ void Server::cmd_whois(int fd, vector<string> tokens){
 		sendServerMessage(fd, ERR_NOSUCHNICK, user->getNickname() + " " + tokens[1]);
 		return;
 	}
-	if (target == user)
+	if (target == user || !target->isHideHost())
 		sendServerMessage(fd, RPL_WHOISUSER, target->getNickname() + " " + target->getUsername() + " " + target->getIpAdress() + " * :" + target->getRealname());
 	else
 		sendServerMessage(fd, RPL_WHOISUSER, target->getNickname() + " " + target->getUsername() + " " + _servername + " * :" + target->getRealname());
+
+	// Send channels list
+	const map<string, s_Channel*> *chans = target->getChannels();
+	map<string, s_Channel*>::const_iterator it = chans->begin();
+	string chans_str = "";
+	for(; it != chans->end(); ++it){
+		chans_str += it->first + " ";
+	}
+	if (chans_str.length() > 0)
+		sendServerMessage(fd, RPL_WHOISCHANNELS, target->getNickname() + " :" + chans_str);
+
+	// END OF WHOIS
 	sendServerMessage(fd, RPL_ENDOFWHOIS, target->getNickname() + ":END of WHOIS list");
 }

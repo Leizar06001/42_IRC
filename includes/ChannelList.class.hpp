@@ -21,6 +21,8 @@ class ChannelList
 		~ChannelList();
 		int joinChannel(userInfos* user, string channel_name);
 		// doit retourner un code (int) si erreur (voir doc)
+		// doit mettre a jour la map listant dans quelles channels le user est
+		// verifier que le user n'est pas deja dans la channel
 
 		void kickChannel(userInfos* user, string channel_name);
 		// doit retourner un code (int) si erreur (voir doc)
@@ -32,10 +34,12 @@ class ChannelList
 		void quitChannel(userInfos* user, std::string channel_name);
 		// doit retourner un code (int) si erreur (voir doc)
 		// supprimer channel si no user left
+		// doit mettre a jour la map listant dans quelles channels le user est
 
 		void leaveServer(userInfos* user);
 		// doit retourner un code (int) si erreur (voir doc)
 		// supprimer channel si no user left
+		// doit mettre a jour la map listant dans quelles channels le user est
 
 		int getNbChannel();
 		s_Channel* getNextChannel(int reset);

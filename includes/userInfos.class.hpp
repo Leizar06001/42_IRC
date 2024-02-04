@@ -3,12 +3,14 @@
 
 #include <string>
 #include <ctime>
+#include <map>
 
 #define ACT_REGISTRATION	1
 #define ACT_CHANGED_NICK	2
 
 using namespace std;
 
+typedef struct	t_Channel s_Channel;
 class Terminal;
 
 class userInfos {
@@ -38,6 +40,7 @@ class userInfos {
 		int			_prt_debug;	// print debug infos ?
 		int			_nb_wrong_cmds;
 		string		_incomming_msg;
+		map<string, s_Channel*> _channels;
 
 
 	public:
@@ -58,6 +61,9 @@ class userInfos {
 		void	setPasswordOk(void);
 		void	setInvisible(bool invisible);
 		void	setAdmin(void);
+		void	setHideHost(bool hide);
+		void	addChannelToList(s_Channel* chan);
+		void	rmChannelFromList(s_Channel* chan);
 
 		void	incMsgs(void);
 		void	incWrongCmds(void);
@@ -81,6 +87,9 @@ class userInfos {
 		bool	hasPassword(void) const;
 		bool	isInvisible(void);
 		bool	isAdmin(void);
+		bool	isHideHost(void);
+
+		const map<string, s_Channel*>	*getChannels(void) const;
 
 		int		checkReg(void);
 

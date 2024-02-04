@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../includes/toString.hpp"
 #include "../includes/terminal.class.hpp"
+#include "../includes/ChannelList.class.hpp"
 
 userInfos::userInfos(int fd, Terminal* term, int prt_debug):_term(term), _prt_debug(prt_debug){
 	_registered = 0;
@@ -131,7 +132,19 @@ void	userInfos::setInvisible(bool invisible){
 void	userInfos::setAdmin(void){
 	_is_admin = true;
 }
-
+void	userInfos::setHideHost(bool hide){
+	_hide_host = hide;
+}
+void	userInfos::addChannelToList(s_Channel* chan){
+	if (_channels.find(chan->channel_name) == _channels.end()){
+		_channels.insert(pair<string, s_Channel*>(chan->channel_name, chan));
+	}
+}
+void	userInfos::rmChannelFromList(s_Channel* chan){
+	if (_channels.find(chan->channel_name) != _channels.end()){
+		_channels.erase(chan->channel_name);
+	}
+}
 
 
 string const &userInfos::getNickname(void) const{
@@ -197,7 +210,13 @@ bool	userInfos::isInvisible(void){
 bool	userInfos::isAdmin(void){
 	return _is_admin;
 }
+bool	userInfos::isHideHost(void){
+	return _hide_host;
+}
 
+const map<string, s_Channel*>	*userInfos::getChannels(void) const {
+	return &_channels;
+}
 
 int userInfos::checkReg(void) {
 	if (!_registered && _username_registered && _nickname_registered && _password){

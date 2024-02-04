@@ -39,6 +39,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		it->second->users.push_back(user);
 		_term->prtTmColor("Channel " + channel_name + " exist", Terminal::BLUE);
 		++it->second->nb_users;
+		user->addChannelToList(it->second);
 	}
 	else
 	{
@@ -52,7 +53,9 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		_term->prtTmColor("Channel " + channel_name + " created", Terminal::BLUE);
 		new_channel->users.push_back(user);
 		nb_channel++;
+		user->addChannelToList(new_channel);
 	}
+
 	return 0;
 }
 
