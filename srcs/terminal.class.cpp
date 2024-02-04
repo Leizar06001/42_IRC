@@ -203,7 +203,7 @@ void Terminal::prtTmColor(const std::string& text, const std::string& color) con
 		std::cout << color << tm << " " << text.substr(0, i);
 		if (text.substr(i).length() > 0){
 			std::cout << "\033[S";	// scroll up
-			setCursor(WIN_H - 1, 19);
+			setCursor(WIN_H - 1, 11);
 			std::cout << text.substr(i);
 		}
 	}
