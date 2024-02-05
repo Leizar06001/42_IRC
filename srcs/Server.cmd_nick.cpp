@@ -34,7 +34,7 @@ void Server::cmd_nick(int fd, vector<string> tokens){
 		}
 		sendMessage(fd, ":" + user->getPrevNick() + " NICK " + nick);
 	} else if (ret == 0){
-		sendMessage(fd, ":NICK " + nick);
+		sendMessage(fd, ":" + _servername + " NICK " + nick);
 	}
 
 	_users->checkForRegistration(fd);
