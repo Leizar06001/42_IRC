@@ -22,12 +22,10 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 			sendServerMessage(fd, ERR_NOSUCHNICK, tokens[1]);
 			return;
 		}
-		if (tokens.size() < 3){		// NO MODE SPECIFIED : ONLY Getting mode infos
-			sendMessage(fd, ":" + _servername + " " + toString(RPL_UMODEIS) + " " + target->getNickname() + " " + target->getUserMode());
 
+		if (nick == tokens[1]) {		// SELF TARGETTING
 
-		} else {					// Try to set mode
-			if (nick == tokens[1]) {		// SELF TARGETTING
+			if (tokens.size() > 2){		// Try to set mode
 				bool add = 0;
 				bool rm = 0;
 				for(size_t i = 0; i < tokens[2].length(); ++i){
@@ -47,12 +45,12 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 						}
 					}
 				}
-				sendServerMessage(fd, RPL_UMODEIS, user->getUserMode());
-			} else {	// ERR cant change mode for other users
-				sendServerMessage(fd, ERR_USERSDONTMATCH, ":Cannot change mode for other users");
 			}
+			// SEND MODES
+			sendServerMessage(fd, RPL_UMODEIS, user->getUserMode());
+		} else {	// ERR cant change mode for other users
+			sendServerMessage(fd, ERR_USERSDONTMATCH, ":Cannot change mode for other users");
 		}
-
 	}
 }
 
