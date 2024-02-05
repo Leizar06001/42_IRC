@@ -23,7 +23,7 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 			return;
 		}
 		if (tokens.size() < 3){		// NO MODE SPECIFIED : ONLY Getting mode infos
-			sendServerMessage(fd, RPL_UMODEIS, target->getUserMode());
+			sendMessage(fd, _servername + " " + toString(RPL_UMODEIS) + " " + target->getNickname() + " " + target->getUserMode());
 
 
 		} else {					// Try to set mode
