@@ -24,7 +24,7 @@ void Server::performAction(userInfos* user){
 		// message = ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1";
 		// sendMessage(fd, message);
 
-		sendServerMessage(fd, RPL_WELCOME, ":Welcome to the iRisChat network, " + user->getNickname() + "!" + user->getUsername() + "@" + user->getIpAdress());
+		sendServerMessage(fd, RPL_WELCOME, ":Welcome to the iRisChat Network, " + user->getNickname());
 		sendServerMessage(fd, RPL_YOURHOST, ":Your host is " + _servername + ", running version 0.1");
 		sendServerMessage(fd, RPL_CREATED, ":This server was created at the beginning of the universe");
 		sendServerMessage(fd, RPL_MYINFO, _servername + " 0.1 iox ntb");
