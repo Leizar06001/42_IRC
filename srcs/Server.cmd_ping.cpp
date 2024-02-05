@@ -2,7 +2,7 @@
 
 void Server::cmd_ping(int fd, vector<string> tokens){
 	if (tokens.size() < 2)
-		sendMessage(fd, string("PONG"));
+		sendMessage(fd, _servername + " PONG " + _servername);
 	else
-		sendMessage(fd, string("PONG :" + tokens[1]));
+		sendMessage(fd, _servername + " PONG " + _servername + tokens[1]);
 }
