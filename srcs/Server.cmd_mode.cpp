@@ -16,8 +16,6 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 		}
 
 
-
-
 	} else {						// target is a user
 		userInfos* target = _users->getUserByNick(tokens[1]);
 		if (!target){	// NO SUCH USER
@@ -25,7 +23,7 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 			return;
 		}
 		if (tokens.size() < 3){		// NO MODE SPECIFIED : ONLY Getting mode infos
-			sendClientMessage(fd, "MODE " + nick + " " + target->getUserMode());
+			sendServerMessage(fd, RPL_UMODEIS, nick + " " + target->getUserMode());
 
 
 		} else {					// Try to set mode
@@ -49,7 +47,7 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 						}
 					}
 				}
-				sendClientMessage(fd, "MODE " + nick + " " + user->getUserMode());
+				sendServerMessage(fd, RPL_UMODEIS, nick + " " + user->getUserMode());
 			} else {	// ERR cant change mode for other users
 				sendServerMessage(fd, ERR_USERSDONTMATCH, nick + ":Cannot change mode for other users");
 			}
