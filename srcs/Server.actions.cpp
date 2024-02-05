@@ -24,11 +24,11 @@ void Server::performAction(userInfos* user){
 		// message = ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1";
 		// sendMessage(fd, message);
 
-		sendServerMessage(fd, RPL_WELCOME, ":Welcome to the iRisChat Network, " + user->getNickname());
-		sendServerMessage(fd, RPL_YOURHOST, ":Your host is " + _servername + ", running version 0.1");
-		sendServerMessage(fd, RPL_CREATED, ":This server was created at the beginning of the universe");
-		sendServerMessage(fd, RPL_MYINFO, _servername + " 0.1 iox ntb");
-		sendServerMessage(fd, RPL_ISUPPORT, "");
+		sendMessage(fd, ":" + _servername + " " + user->getNickname() + " 001 :Welcome to the iRisChat Network, " + user->getNickname());
+		sendMessage(fd, ":" + _servername + " " + user->getNickname() + " 002 :Your host is " + _servername + ", running version 0.1");
+		sendMessage(fd, ":" + _servername + " " + user->getNickname() + " 003 :This server was created at the beginning of the universe");
+		sendMessage(fd, ":" + _servername + " " + user->getNickname() + " 004 " +_servername + " 0.1 iox ntb");
+		sendMessage(fd, ":" + _servername + " " + user->getNickname() + " 005 ");
 
 		_users->validateRegistration(user);
 		vector<string> tokens;
