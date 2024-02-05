@@ -4,7 +4,12 @@ CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
 SRCS = 	srcs/main.cpp		\
-		srcs/Bot.class.cpp
+		srcs/Bot.class.cpp	\
+		srcs/Bot.cmds.cpp	\
+		srcs/Bot.connect.cpp	\
+		srcs/Bot.parse.cpp	\
+		srcs/Bot.read.cpp	\
+		prt.cpp
 
 OBJ_DIR = objs
 OBJS := $(SRCS:srcs/%=%)

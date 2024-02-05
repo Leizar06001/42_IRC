@@ -19,14 +19,15 @@ void Server::performAction(userInfos* user){
 	int fd = user->getFd();
 
 	if (action_type == ACT_REGISTRATION){
-		// sendMessage(fd, ":" + _servername + " 001 " + user->getNickname() + " :Welcome to the iRisChat network, "
-		// 				+ user->getNickname() + "!" + user->getUsername() + "@" + user->getIpAdress());
-		// message = ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1";
-		// sendMessage(fd, message);
+
+		tm* 	crea_time = localtime(&_creation_time);
+		char 	buf[22];
+		std::strftime(buf, sizeof(buf), "%d/%m/%yyyy %H:%M:%S", crea_time);
+		std::string		str_time = toString(buf);
 
 		sendMessage(fd, ":" + _servername + " 001 " + user->getNickname() + " :Welcome to the iRisChat Network, " + user->getNickname());
 		sendMessage(fd, ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1");
-		sendMessage(fd, ":" + _servername + " 003 " + user->getNickname() + " :This server was created at the beginning of the universe");
+		sendMessage(fd, ":" + _servername + " 003 " + user->getNickname() + " :This server was created the " + str_time);
 		sendMessage(fd, ":" + _servername + " 004 " + user->getNickname() + " " +_servername + " 0.1 iox ntb");
 		sendMessage(fd, ":" + _servername + " 005 " + user->getNickname() + " ");
 

@@ -2,6 +2,7 @@
 #include <iostream> // For cout
 #include <string>
 #include <signal.h>
+#include <unistd.h>
 
 #include "../includes/Bot.class.hpp"
 
@@ -32,11 +33,15 @@ int main(int argc, char **argv) {
 	init_sigaction();
 
 	Bot bot("RobotRock", "iRis Ope Bot");
+	// Bot bot("local", "iRis Ope Bot");
 
 	if (bot.connectTo(string(argv[1]), atoi(argv[2]), string(argv[3])) == -1)
 		return 1;
-	while (!quitok)
-		bot.botLoop();
+	int stop = 0;
+	while (!quitok && stop == 0){
+		stop = bot.botLoop();
+		usleep(1000);
+	}
 
 
 	return 0;

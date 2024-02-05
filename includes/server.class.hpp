@@ -48,6 +48,7 @@ class Server {
 		int				_initialized;
 		userList*		_users;
 		ChannelList*	_channels;
+		time_t			_creation_time;
 
 		time_t			_last_timeout_check;
 		fstream			_logStream;
