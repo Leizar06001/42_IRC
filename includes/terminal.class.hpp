@@ -38,7 +38,7 @@ public:
 	Terminal(fstream* logStream);
 	~Terminal(void);
 
-	void updateTitle(int port, int clients, int not_reg, int channels, int msgs, int max_con, int max_chans, const vector<string> &bans_ip);
+	void updateTitle(int port, int clients, int not_reg, int channels, int msgs, int max_con, int max_chans, const vector<string> &bans_ip, time_t createdAt);
 	void updateMenu(userList* users, ChannelList* channels);
 
 	void clearScreen() const;

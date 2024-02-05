@@ -22,7 +22,7 @@ void Server::performAction(userInfos* user){
 
 		tm* 	crea_time = localtime(&_creation_time);
 		char 	buf[22];
-		std::strftime(buf, sizeof(buf), "%d/%m/%yyyy %H:%M:%S", crea_time);
+		std::strftime(buf, sizeof(buf), "%d/%m/%Y %H:%M:%S", crea_time);
 		std::string		str_time = toString(buf);
 
 		sendMessage(fd, ":" + _servername + " 001 " + user->getNickname() + " :Welcome to the iRisChat Network, " + user->getNickname());

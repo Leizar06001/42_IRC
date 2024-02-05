@@ -86,7 +86,7 @@ void Terminal::updateMenu(userList* users, ChannelList* channels){
 	cout << flush;
 }
 
-void Terminal::updateTitle(int port, int clients, int not_reg, int channels, int msgs, int max_con, int max_chans, const vector<string> &bans_ip){
+void Terminal::updateTitle(int port, int clients, int not_reg, int channels, int msgs, int max_con, int max_chans, const vector<string> &bans_ip, time_t createdAt){
 	static int dec = 0;
 	// saveCursor();
 	for(int i = 1; i <= TITLE_H + 1; ++i){
@@ -124,6 +124,14 @@ void Terminal::updateTitle(int port, int clients, int not_reg, int channels, int
 	// CENTER
 	setCursor(7, 42);
 	prtColor("💀 Banned: " + toString(bans_ip.size()) + " 💀", Terminal::RED);
+
+	tm* 	now = localtime(&createdAt);
+	char 	buf[22];
+	std::strftime(buf, sizeof(buf), "%d/%m/%Y %H:%M:%S", now);
+	std::string		str = toString(buf);
+	setCursor(9, 34);
+	prtColor("Created at: " + str, Terminal::WHITE);
+
 	// RIGHT SIDE
 	setCursor(6, 75);
 	prtColor("Channels: " + toString(channels) + "/" + toString(max_chans), Terminal::MAGENTA);
