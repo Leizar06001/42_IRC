@@ -24,11 +24,11 @@ void Server::performAction(userInfos* user){
 		// message = ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1";
 		// sendMessage(fd, message);
 
-		sendMessage(fd, ":" + _servername + " " + user->getNickname() + " 001 :Welcome to the iRisChat Network, " + user->getNickname());
-		sendMessage(fd, ":" + _servername + " " + user->getNickname() + " 002 :Your host is " + _servername + ", running version 0.1");
-		sendMessage(fd, ":" + _servername + " " + user->getNickname() + " 003 :This server was created at the beginning of the universe");
-		sendMessage(fd, ":" + _servername + " " + user->getNickname() + " 004 " +_servername + " 0.1 iox ntb");
-		sendMessage(fd, ":" + _servername + " " + user->getNickname() + " 005 ");
+		sendMessage(fd, ":" + _servername + " 001 " + user->getNickname() + " :Welcome to the iRisChat Network, " + user->getNickname());
+		sendMessage(fd, ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1");
+		sendMessage(fd, ":" + _servername + " 003 " + user->getNickname() + " :This server was created at the beginning of the universe");
+		sendMessage(fd, ":" + _servername + " 004 " + user->getNickname() + " " +_servername + " 0.1 iox ntb");
+		sendMessage(fd, ":" + _servername + " 005 " + user->getNickname() + " ");
 
 		_users->validateRegistration(user);
 		vector<string> tokens;
