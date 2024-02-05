@@ -56,7 +56,7 @@ void Terminal::updateMenu(userList* users, ChannelList* channels){
 	if (!chan) prtTmColor("NO CHAN", Terminal::RED);
 	while ((h < WIN_H - 1) && chan){
 		setCursor(h, x + 4);
-		string color;
+		string color = Terminal::WHITE;
 		const string mode = chan->mode;
 		if (mode == "=") color = Terminal::WHITE;			// Public
 		else if (mode == "*") color = Terminal::BRIGHT_RED;	// Secret

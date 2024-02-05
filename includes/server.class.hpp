@@ -24,6 +24,7 @@
 #define CONNECTION_TIMEOUT		120
 #define TIMEOUT_CHECK_TIME		30
 #define MAX_CHANNELS			100
+#define MAX_USERS_PER_CHAN		100
 
 #define CONF_FILE				"conf.txt"
 #define CONF_FOLDER				"./conf/"
@@ -58,6 +59,7 @@ class Server {
 		int				_timeout_check_time;
 		int				_connection_timeout;
 		int				_registration_timeout;
+		int				_max_user_per_chan;
 
 
 		void	createSocket(int domain, int type, int protocol);
@@ -100,6 +102,7 @@ class Server {
 		void	cmd_userhost(int fd, vector<string> tokens);
 		void	cmd_notice(int fd, vector<string> tokens);
 		void	cmd_pass(int fd, vector<string> tokens);
+		void	cmd_list(int fd, vector<string> tokens);
 
 		void	rmUser(int fd, const string& reason);
 		void	forceDisconnect(int fd, const string& reason);

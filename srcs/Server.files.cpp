@@ -79,6 +79,11 @@ void Server::setVarsFromConf(string& str){
 				_registration_timeout = num;
 				_term.prtTmColor("sets to: " + toString(num), Terminal::GREEN);
 			} else _term.prtTmColor("default: " + toString(_registration_timeout), Terminal::YELLOW);
+		} else if(key == "max_users_chan") {
+			if (num > 0 && num < 10000){
+				_max_user_per_chan = num;
+				_term.prtTmColor("sets to: " + toString(num), Terminal::GREEN);
+			} else _term.prtTmColor("default: " + toString(_max_user_per_chan), Terminal::YELLOW);
 		}
 	}
 }

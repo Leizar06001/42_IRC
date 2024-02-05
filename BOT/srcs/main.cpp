@@ -3,7 +3,9 @@
 #include <string>
 #include <signal.h>
 
-#include "../includes/server.class.hpp"
+#include "../includes/Bot.class.hpp"
+
+using namespace std;
 
 namespace {
 	volatile sig_atomic_t quitok = false;
@@ -22,19 +24,19 @@ void	init_sigaction(){
 }
 
 int main(int argc, char **argv) {
-	if (argc < 3){
-		cout << "Error: Missing args { port, password }" << endl;
+	if (argc < 4){
+		cout << "Error: Missing args { host, port, password }" << endl;
 		return 1;
 	}
 
 	init_sigaction();
 
-	Server serv;
+	Bot bot("RobotRock", "iRis Ope Bot");
 
-	if (serv.init(atoi(argv[1]), string(argv[2])) == -1)
+	if (bot.connectTo(string(argv[1]), atoi(argv[2]), string(argv[3])) == -1)
 		return 1;
 	while (!quitok)
-		serv.handleEvents();
+		bot.botLoop();
 
 
 	return 0;

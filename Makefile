@@ -13,6 +13,7 @@ SRCS = 	srcs/main.cpp				\
 		srcs/Server.cmd_invite.cpp	\
 		srcs/Server.cmd_join.cpp	\
 		srcs/Server.cmd_kick.cpp	\
+		srcs/Server.cmd_list.cpp	\
 		srcs/Server.cmd_mode.cpp	\
 		srcs/Server.cmd_names.cpp	\
 		srcs/Server.cmd_nick.cpp	\

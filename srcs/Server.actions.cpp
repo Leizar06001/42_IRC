@@ -35,6 +35,7 @@ void Server::performAction(userInfos* user){
 		tokens.push_back("JOIN");
 		tokens.push_back("#General");
 		cmd_join(fd, tokens);
+		cmd_list(fd, tokens);
 	}
 
 	_users->rmFirstAction();

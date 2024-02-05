@@ -14,6 +14,7 @@ Server::Server(void):_initialized(0), _term(&_logStream){
 	_msg_nb = 0;
 	_connection_nb = 0;
 	_sockfd = 0;
+	_max_user_per_chan = MAX_USERS_PER_CHAN;
 	_admin_password = "";
 	for(int i = 0; i <= MAX_CLIENTS; ++i){
 		_fds[i].fd = -1;
