@@ -1,4 +1,5 @@
 #include "../includes/ChannelList.class.hpp"
+#include "../includes/toString.hpp"
 
 ChannelList::ChannelList(Terminal* term):_term(term)
 {
@@ -32,7 +33,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 {
 	if(nb_channel > max_channel)
 	{
-		_term->prtTmColor("Maximum number of Channel is" + max_channel, Terminal::RED);
+		_term->prtTmColor("Maximum number of Channel is" + toString(max_channel), Terminal::RED);
 		return 405;
 	}
 	if (channel_name[0] != '#')
@@ -47,7 +48,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		{
 			if(it->second->nb_users > max_in_channel)
 			{
-				_term->prtTmColor("Maximum number of client in Channel is" + max_in_channel, Terminal::RED);
+				_term->prtTmColor("Maximum number of client in Channel is" + toString(max_in_channel), Terminal::RED);
 				return 471;
 			}
 			it->second->users.push_back(user);

@@ -9,7 +9,7 @@ void	Server::cmd_list(int fd, vector<string>){
 			msg = type + chan->channel_name + " " + toString(chan->nb_users) + " :" + chan->topic;
 		}
 		sendServerMessage(fd, RPL_LIST, msg);
-		_channels->getNextChannel(0);
+		chan = _channels->getNextChannel(0);
 	}
 	sendServerMessage(fd, RPL_LISTEND, ":End of /LIST");
 }
