@@ -2,7 +2,7 @@
 
 void Server::cmd_nick(int fd, vector<string> tokens){
 	if (tokens.size() < 2){	// ERR not nickname
-		sendMessage(fd, string(":" + _servername + " " + toString(ERR_NEEDMOREPARAMS) + " :No nickname given"));
+		sendMessage(fd, ":" + _servername + " " + toString(ERR_NEEDMOREPARAMS) + " :No nickname given");
 		return;
 	}
 	userInfos* user = _users->getUserByFd(fd);
@@ -13,11 +13,11 @@ void Server::cmd_nick(int fd, vector<string> tokens){
 	if (nick.empty()) nick = tokens[1];
 	if (ret == ERR_NICKNAMEINUSE){
 		_term.prtTmColor("FD. " + toString(fd) + " nickname already in use\n", Terminal::BRIGHT_RED);
-		sendMessage(fd, string(":" + _servername + " " + toString(ERR_NICKNAMEINUSE) + " " + nick + " " + tokens[1] + " :Nickname already in use"));
+		sendServerMessage(fd, ERR_NICKNAMEINUSE, tokens[1] + " :Nickname already in use");
 		return ;
 	} else if (ret == ERR_ERRONEUSNICKNAME){
 		_term.prtTmColor("FD. " + toString(fd) + " wrong characters in nickname\n", Terminal::BRIGHT_RED);
-		sendMessage(fd, string(":" + _servername + " " + toString(ERR_ERRONEUSNICKNAME) + " " + nick + " " + tokens[1] + " :Erroneus nickname"));
+		sendServerMessage(fd, ERR_ERRONEUSNICKNAME, tokens[1] + " :Erroneus nickname");
 		return ;
 	} else if (ret == 1) { // Nick changed, must advertise new nick to others
 		int nb_users = _users->getNbUsers();
@@ -32,7 +32,10 @@ void Server::cmd_nick(int fd, vector<string> tokens){
 				target = _users->getNextUser(0);
 			}
 		}
+		sendMessage(fd, ":" + user->getPrevNick() + " NICK " + nick);
+	} else if (ret == 0){
+		sendMessage(fd, ":NICK " + nick);
 	}
-	sendMessage(fd, ":" + user->getPrevNick() + " NICK " + nick);
+
 	_users->checkForRegistration(fd);
 }
