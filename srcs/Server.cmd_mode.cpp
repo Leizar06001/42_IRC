@@ -10,20 +10,20 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 	if (tokens[1][0] == '#'){		// target is a channel
 		s_Channel* chan = _channels->getChannel(tokens[1]);
 		if (chan == NULL){ // channel not exists
-			sendServerMessage(fd, ERR_NOSUCHCHANNEL, nick + " :" + tokens[1]);
+			sendServerMessage(fd, ERR_NOSUCHCHANNEL, tokens[1]);
 		} else {
-			sendServerMessage(fd, RPL_CHANNELMODEIS, nick + " " + tokens[1] + " " + chan->mode);
+			sendServerMessage(fd, RPL_CHANNELMODEIS, tokens[1] + " " + chan->mode);
 		}
 
 
 	} else {						// target is a user
 		userInfos* target = _users->getUserByNick(tokens[1]);
 		if (!target){	// NO SUCH USER
-			sendServerMessage(fd, ERR_NOSUCHNICK, nick + " :" + tokens[1]);
+			sendServerMessage(fd, ERR_NOSUCHNICK, tokens[1]);
 			return;
 		}
 		if (tokens.size() < 3){		// NO MODE SPECIFIED : ONLY Getting mode infos
-			sendServerMessage(fd, RPL_UMODEIS, nick + " " + target->getUserMode());
+			sendServerMessage(fd, RPL_UMODEIS, target->getUserMode());
 
 
 		} else {					// Try to set mode
@@ -47,9 +47,9 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 						}
 					}
 				}
-				sendServerMessage(fd, RPL_UMODEIS, nick + " " + user->getUserMode());
+				sendServerMessage(fd, RPL_UMODEIS, user->getUserMode());
 			} else {	// ERR cant change mode for other users
-				sendServerMessage(fd, ERR_USERSDONTMATCH, nick + ":Cannot change mode for other users");
+				sendServerMessage(fd, ERR_USERSDONTMATCH, ":Cannot change mode for other users");
 			}
 		}
 
