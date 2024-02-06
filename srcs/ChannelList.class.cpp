@@ -53,7 +53,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 			}
 			it->second->users.push_back(user);
 			if (user->isAdmin())
-				it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 3));
+				it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 2));
 			else
 				it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 0));
 			_term->prtTmColor("Channel " + channel_name + " exist", Terminal::BLUE);
@@ -65,7 +65,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 			s_Channel *new_channel = new s_Channel;
 			new_channel->channel_name = channel_name;
 			new_channel->channel_type = "=";
-			new_channel->mode = "+ntlb";
+			new_channel->mode = "+mntlb";	// mod, no msg from out, topic protect, limit, ban
 			new_channel->deletable = 1;
 			new_channel->nb_users = 1;
 			channel.insert(std::pair<std::string, s_Channel *>(channel_name, new_channel));
