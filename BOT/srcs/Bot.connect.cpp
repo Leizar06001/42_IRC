@@ -27,7 +27,7 @@ int		Bot::connectTo(const string& host, int port, const string& pass){
 		close(_socket);
 		return 1;
 	}
-	prt("Connected to " + host + " " + toString(port) + "\n", BRIGHT_BLUE);
+	prt("Connected to " + host + " " + toString(port) + "\n", BRIGHT_GREEN);
 
 	_spollfd.fd = _socket;
 	_spollfd.events = POLLIN;

@@ -18,6 +18,11 @@ class ChannelList
 		int max_channel;
 		int max_in_channel;
 
+
+		// !!!!!!! SEG FAULT ON KICK !!!!!!!
+
+
+
 	public:
 		ChannelList(Terminal* term);
 		~ChannelList();

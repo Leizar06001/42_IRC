@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "../includes/Bot.class.hpp"
+#include "../includes/prt.hpp"
 
 using namespace std;
 
@@ -33,16 +34,20 @@ int main(int argc, char **argv) {
 	init_sigaction();
 
 	Bot bot("RobotRock", "iRis Ope Bot");
-	// Bot bot("local", "iRis Ope Bot");
 
-	if (bot.connectTo(string(argv[1]), atoi(argv[2]), string(argv[3])) == -1)
-		return 1;
-	int stop = 0;
-	while (!quitok && stop == 0){
-		stop = bot.botLoop();
-		usleep(1000);
+	while (!quitok){
+
+		if (bot.connectTo(string(argv[1]), atoi(argv[2]), string(argv[3])) != -1){
+			int stop = 0;
+			while (!quitok && stop == 0){
+				stop = bot.botLoop();
+			}
+		}
+		if (!quitok){
+			prt("Connection lost, retry...\n", BRIGHT_RED);
+			sleep(5);
+		}
 	}
-
 
 	return 0;
 }
