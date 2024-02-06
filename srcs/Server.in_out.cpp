@@ -102,12 +102,13 @@ void Server::sendMessage(int fd, const string& msg){
 	if (fd <= 0 || fd > _max_fd_allowed) return ;
 	if (_fds[fd].fd == -1) return ;
 	if (msg.length() <= 0) return ;
-	if (isSocketOpen(fd) == false) return ;
 	string final_msg = msg + "\r\n";
-	int ret = send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
-	(void)ret;
-	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE\n", Terminal::RED);
-	else _term.prtTmColor("OUT: '" + Terminal::MAGENTA + msg + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+
+	int ret = send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), MSG_NOSIGNAL);
+	if (ret == -1){
+		 _term.prtTmColor("ERROR SENDING MESSAGE\n", Terminal::RED);
+		rmUser(fd, "Client's socket closed");
+	} else _term.prtTmColor("OUT: '" + Terminal::MAGENTA + msg + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
 
 void Server::sendClientMessage(int fd, const string& msg){
@@ -115,10 +116,11 @@ void Server::sendClientMessage(int fd, const string& msg){
 	const string final_msg = ":" + dest->getNickname() + "!" + dest->getUsername() + "@" + _servername + " " + msg;
 	const string msg_to_send = final_msg + "\r\n";
 
-	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
-	(void)ret;
-	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
-	else _term.prtTmColor("OUT: '" + Terminal::MAGENTA + final_msg + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), MSG_NOSIGNAL);
+	if (ret == -1){
+		 _term.prtTmColor("ERROR SENDING MESSAGE " + final_msg, Terminal::RED);
+		rmUser(fd, "Client's socket closed");
+	} else _term.prtTmColor("OUT: '" + Terminal::MAGENTA + final_msg + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
 
 void Server::sendClientMessageShowIp(int fd, const string& msg){
@@ -126,10 +128,11 @@ void Server::sendClientMessageShowIp(int fd, const string& msg){
 	const string msg_to_print = ":" + Terminal::YELLOW + dest->getNickname() + Terminal::BRIGHT_MAGENTA + "!" + dest->getUsername() + "@" + dest->getIpAdress() + " " + msg;
 	const string msg_to_send = ":" + dest->getNickname() + "!" + dest->getUsername() + "@" + dest->getIpAdress() + " " + msg + "\r\n";
 
-	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
-	(void)ret;
-	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + msg_to_print, Terminal::RED);
-	else _term.prtTmColor("OUT: '" + Terminal::BRIGHT_MAGENTA + msg_to_print + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), MSG_NOSIGNAL);
+	if (ret == -1){
+		 _term.prtTmColor("ERROR SENDING MESSAGE " + msg_to_print, Terminal::RED);
+		rmUser(fd, "Client's socket closed");
+	} else _term.prtTmColor("OUT: '" + Terminal::BRIGHT_MAGENTA + msg_to_print + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
 
 void Server::sendServerMessage(int fd, int rpl_err_code, const string& msg){
@@ -138,10 +141,12 @@ void Server::sendServerMessage(int fd, int rpl_err_code, const string& msg){
 	const string msg_to_print = ":" + _servername + " " + toString(rpl_err_code) + " " + Terminal::YELLOW + nick + Terminal::MAGENTA + " " + msg;
 	const string msg_to_send = ":" + _servername + " " + toString(rpl_err_code) + " " + nick + " " + msg + "\r\n";
 
-	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), 0);
+	int ret = send(_fds[fd].fd, msg_to_send.c_str(), msg_to_send.size(), MSG_NOSIGNAL);
 	(void)ret;
-	if (ret == -1) _term.prtTmColor("ERROR SENDING MESSAGE " + msg_to_print, Terminal::RED);
-	else _term.prtTmColor("OUT: '" + Terminal::MAGENTA + msg_to_print + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
+	if (ret == -1){
+		 _term.prtTmColor("ERROR SENDING MESSAGE " + msg_to_print, Terminal::RED);
+		rmUser(fd, "Client's socket closed");
+	} else _term.prtTmColor("OUT: '" + Terminal::MAGENTA + msg_to_print + "'" + Terminal::YELLOW + " -> " + toString(fd) + "\n", Terminal::BRIGHT_MAGENTA);
 }
 
 void	Server::sendMsgToList(int fd_source, const string& msg, const map<int, size_t> &lst){
@@ -190,23 +195,23 @@ void	Server::sendServerMsgToList(int fd_source, const string& msg, vector<userIn
 	}
 }
 
-bool Server::isSocketOpen(int fd) {
-	struct pollfd pfd;
-	pfd.fd = _fds[fd].fd;
-	pfd.events = POLLOUT;
+// bool Server::isSocketOpen(int fd) {
+// 	struct pollfd pfd;
+// 	pfd.fd = _fds[fd].fd;
+// 	pfd.events = POLLOUT;
 
-	int ret = poll(&pfd, 1, 0);
-	if (ret == -1) {
-		_term.prtTmColor("SOCKET CLOSED\n", Terminal::RED);
-		rmUser(fd, "Client's socket closed");
-		return false;
-	} else if (ret == 0) {
-		_term.prtTmColor("SOCKET TM\n", Terminal::RED);
-		// Timeout occurred, socket is not ready for writing
-		return false;
-	} else {
-		// _term.prtTmColor("SOCKET OPEN\n", Terminal::RED);
-		// Socket is ready for writing
-		return true;
-	}
-}
+// 	int ret = poll(&pfd, 1, 0);
+// 	if (ret == -1) {
+// 		_term.prtTmColor("SOCKET CLOSED\n", Terminal::RED);
+// 		rmUser(fd, "Client's socket closed");
+// 		return false;
+// 	} else if (ret == 0) {
+// 		_term.prtTmColor("SOCKET TM\n", Terminal::RED);
+// 		// Timeout occurred, socket is not ready for writing
+// 		return false;
+// 	} else {
+// 		// _term.prtTmColor("SOCKET OPEN\n", Terminal::RED);
+// 		// Socket is ready for writing
+// 		return true;
+// 	}
+// }

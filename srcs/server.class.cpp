@@ -240,3 +240,4 @@ void Server::forceDisconnect(int fd, const string& reason){
 	tokens.push_back(reason);
 	cmd_quit(fd, tokens);
 }
+
