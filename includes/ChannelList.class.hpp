@@ -56,6 +56,6 @@ class ChannelList
 		void setMaxInChannel(int max_in_channel);
 };
 
-// modes : n: no external messages, b: block users, t: mod topic, i: invite only = private ?, m: moderated,
+// modes : n: no external messages, b: block users, t: mod topic, i: invite only = private ?, m: moderated, l: limited nb user
 // channels   = : public, * : secret, @ : private
 // users      @ : operator

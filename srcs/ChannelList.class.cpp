@@ -6,7 +6,7 @@ ChannelList::ChannelList(Terminal* term):_term(term)
 	s_Channel *general = new s_Channel;
 	general->channel_name = "#General";
 	general->channel_type = "=";
-	general->mode = "+nbt";
+	general->mode = "+mntlb";
 	general->deletable = 0;
 	general->nb_users = 0;
 	channel.insert(std::pair<std::string, s_Channel *>("#General", general));
@@ -44,7 +44,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
 	if(!is_in_Channel(user, channel_name))
 	{
-		if (it != channel.end())
+		if (it != channel.end())	// CHANNEL EXISTS
 		{
 			if(it->second->nb_users > max_in_channel)
 			{
@@ -52,24 +52,24 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 				return 471;
 			}
 			it->second->users.push_back(user);
-			it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 3));
+			it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 0));
 			_term->prtTmColor("Channel " + channel_name + " exist", Terminal::BLUE);
 			++it->second->nb_users;
 			user->addChannelToList(it->second);
 		}
-		else
+		else						// NEW CHANNEL
 		{
 			s_Channel *new_channel = new s_Channel;
 			new_channel->channel_name = channel_name;
 			new_channel->channel_type = "=";
-			new_channel->mode = "+nbt";
+			new_channel->mode = "+ntlb";
 			new_channel->deletable = 1;
 			new_channel->nb_users = 1;
 			channel.insert(std::pair<std::string, s_Channel *>(channel_name, new_channel));
 			_term->prtTmColor("Channel " + channel_name + " created", Terminal::BLUE);
 			new_channel->users.push_back(user);
 			new_channel->operators.push_back(user);
-			new_channel->prefix.insert(std::pair<std::string, int>(user->getNickname(), 0));
+			new_channel->prefix.insert(std::pair<std::string, int>(user->getNickname(), 4));
 			nb_channel++;
 			user->addChannelToList(new_channel);
 		}
@@ -140,30 +140,47 @@ void ChannelList::quitServer(userInfos* user)
 
 int ChannelList::kickChannel(userInfos* kicker, userInfos* user, std::string channel_name)
 {
-	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
-	if (it != channel.end())
-	{
-		if(is_operators(kicker, channel_name) || kicker->getUserMode().find("A") != std::string::npos) // Is operator or Server Admin
-		{
+	if (!user || !kicker) return -1;
 
-			// it->second->kicklist.push_back(user);		?? une ban list ?
-			partChannel(user, channel_name);
-			_term->prtTmColor("User " + Terminal::BRIGHT_YELLOW + user->getNickname() + Terminal::BRIGHT_RED + " has been kicked from " + channel_name, Terminal::BRIGHT_RED);
-			return 0;
-		}
-		else
-		{
-			_term->prtTmColor("The user don't have the privilege " + kicker->getNickname(), Terminal::YELLOW);
-			return ERR_CHANOPRIVSNEEDED;
-		}
-	}
-	else
+	// Check if chan exists
+	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
+	if (it == channel.end())
 	{
-		_term->prtTmColor("The Channel don't exist " + channel_name, Terminal::YELLOW);
+		_term->prtTmColor("KICK error, The Channel doesn't exist " + channel_name, Terminal::YELLOW);
 		return ERR_NOSUCHCHANNEL;
 	}
 
+	// Case if the kicker is SERVER ADMIN, can do anything he wants
+	if (kicker->getUserMode().find("A") != std::string::npos){
+		partChannel(user, channel_name);
+		_term->prtTmColor("User " + Terminal::BRIGHT_YELLOW + user->getNickname() + Terminal::BRIGHT_RED + " has been kicked from " + channel_name, Terminal::BRIGHT_RED);
+		return 0;
+	}
+
+	map<string, int>::iterator priv_kicker = it->second->prefix.find(kicker->getNickname());		// Get kicker priviledges
+	if (priv_kicker != it->second->prefix.end()){													// kicker is in the map
+
+		map<string, int>::iterator priv_target = it->second->prefix.find(user->getNickname());		// Get target priviledges
+		if(priv_kicker->second > 0 && priv_kicker->second > priv_target->second) 					// Is not a simple user & has more priviledges than target
+		{
+
+			// OK FOR KICK
+			partChannel(user, channel_name);
+			_term->prtTmColor("User " + Terminal::BRIGHT_YELLOW + user->getNickname() + Terminal::BRIGHT_RED + " has been kicked from " + channel_name, Terminal::BRIGHT_RED);
+			return 0;
+
+			// it->second->kicklist.push_back(user);		?? une ban list ?
+		}
+	}
+
+	// If we get here > The kicker doesn't have enough priviledges to kick the target
+	_term->prtTmColor("KICK error, The user don't have enough privilege " + kicker->getNickname(), Terminal::YELLOW);
+	return ERR_CHANOPRIVSNEEDED;
+
+	// ****************************************
 	// AJOUTER ERR_USERNOTINCHANNEL		(user in not in this channel)
+	//
+	// ****************************************
 }
 
 s_Channel	*ChannelList::getChannel(std::string& channel_name)
@@ -218,17 +235,21 @@ std::string ChannelList::getUsersNicksInChan(string& channel_name)
 		std::vector<userInfos *>::iterator it_u = it->second->users.begin();
 		while(it_u != it->second->users.end())
 		{
-			if (it->second->prefix.find((*it_u)->getNickname())->second == 0)
+			if (it->second->prefix.find((*it_u)->getNickname())->second == 4)
 			{
-				users += "@";
+				users += "~";		// FOUNDER
 			}
-			else if (it->second->prefix.find((*it_u)->getNickname())->second == 1)
+			else if (it->second->prefix.find((*it_u)->getNickname())->second == 3)
 			{
-				users += "&";
+				users += "&";		// PROTECTED
 			}
 			else if (it->second->prefix.find((*it_u)->getNickname())->second == 2)
 			{
-				users += "@";
+				users += "@";		// OPE
+			}
+			else if (it->second->prefix.find((*it_u)->getNickname())->second == 1)
+			{
+				users += "%";		// HALF OP
 			}
 			users += (*it_u)->getNickname();
 			users += " ";
