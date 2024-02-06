@@ -19,9 +19,6 @@ class ChannelList
 		int max_in_channel;
 
 
-		// !!!!!!! SEG FAULT ON KICK !!!!!!!
-		// ajoute le mode l (client limit)
-
 
 	public:
 		ChannelList(Terminal* term);

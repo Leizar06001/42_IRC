@@ -141,15 +141,15 @@ int ChannelList::kickChannel(userInfos* user, std::string channel_name)
 	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
 	if (it != channel.end())
 	{
-		if(is_operators(user, channel_name))
-		{
-		it->second->kicklist.push_back(user);
-		return 0;
+		if(is_operators(user, channel_name) || user->getUserMode().find("A") != std::string::npos)
+		{	// Is operator or Server Admin
+			it->second->kicklist.push_back(user);
+			return 0;
 		}
 		else
 		{
-		_term->prtTmColor("The user don't have the privilege", Terminal::RED);
-		return 482;
+			_term->prtTmColor("The user don't have the privilege", Terminal::RED);
+			return 482;
 		}
 	}
 	else
