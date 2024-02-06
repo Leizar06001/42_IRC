@@ -62,7 +62,7 @@ int		Bot::connectTo(const string& host, int port, const string& pass){
 	}
 
 	if (_botnick != _nickOnServ){
-		prt("Bot nick has been changed to: " + _nickOnServ + "\n", BRIGHT_RED);
+		prt("Bot nick has been changed to: " + _nickOnServ + "\n\n", BRIGHT_RED);
 	}
 
 	_connected = 1;

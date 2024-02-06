@@ -20,7 +20,7 @@ class ChannelList
 
 
 		// !!!!!!! SEG FAULT ON KICK !!!!!!!
-
+		// ajoute le mode l (client limit)
 
 
 	public:
@@ -59,5 +59,6 @@ class ChannelList
 		void setMaxInChannel(int max_in_channel);
 };
 
+// modes : n: no external messages, b: block users, t: mod topic, i: invite only = private ?, m: moderated,
 // channels   = : public, * : secret, @ : private
 // users      @ : operator
