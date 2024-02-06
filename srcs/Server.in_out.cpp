@@ -102,7 +102,7 @@ void Server::sendMessage(int fd, const string& msg){
 	if (fd <= 0 || fd > _max_fd_allowed) return ;
 	if (_fds[fd].fd == -1) return ;
 	if (msg.length() <= 0) return ;
-	if (isSocketOpen(_fds[fd].fd) == false) return ;
+	if (isSocketOpen(fd) == false) return ;
 	string final_msg = msg + "\r\n";
 	int ret = send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
 	(void)ret;
@@ -192,20 +192,20 @@ void	Server::sendServerMsgToList(int fd_source, const string& msg, vector<userIn
 
 bool Server::isSocketOpen(int fd) {
 	struct pollfd pfd;
-	pfd.fd = fd;
+	pfd.fd = _fds[fd].fd;
 	pfd.events = POLLOUT;
 
-	int ret = poll(&pfd, 1, 0);
+	int ret = poll(&pfd, 1, 1);
 	if (ret == -1) {
-		_term.prtTmColor("SOCKET CLOSED", Terminal::RED);
+		_term.prtTmColor("SOCKET CLOSED\n", Terminal::RED);
 		rmUser(fd, "Client's socket closed");
 		return false;
 	} else if (ret == 0) {
-		_term.prtTmColor("SOCKET TM", Terminal::RED);
+		_term.prtTmColor("SOCKET TM\n", Terminal::RED);
 		// Timeout occurred, socket is not ready for writing
 		return false;
 	} else {
-		_term.prtTmColor("SOCKET OPEN", Terminal::RED);
+		// _term.prtTmColor("SOCKET OPEN\n", Terminal::RED);
 		// Socket is ready for writing
 		return true;
 	}
