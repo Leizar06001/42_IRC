@@ -27,7 +27,7 @@ void Server::cmd_kick(int fd, vector<string> tokens){
 		case 0:
 			string reason = (tokens.size() >= 3) ? tokens[3] : "" ;
 			sendMessage(user->getFd(),":" + kicker->getNickname() + "!" + kicker->getUsername() + "@" + _servername + " KICK " + tokens[1] + " " + tokens[2] + " :" + reason);
-			sendServerMsgToList(fd, "KICK " + tokens[1] + " " + tokens[2] , _channels->getChannel(tokens[1])->users);
+			sendServerMsgToList(fd, kicker->getNickname() + " KICK " + tokens[1] + " " + tokens[2] , _channels->getChannel(tokens[1])->users);
 			break;
 	}
 }
