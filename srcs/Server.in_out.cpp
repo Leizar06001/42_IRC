@@ -151,9 +151,7 @@ void	Server::sendMsgToList(int fd_source, const string& msg, const map<int, size
 
 void	Server::sendMsgToList(int fd_source, const string& msg, vector<userInfos*> lst){
 	userInfos* source = _users->getUserByFd(fd_source);
-	(void)lst;
 	vector<userInfos*>::iterator it = lst.begin();
-	(void)it;
 	if (msg.length() == 0 || !source) return;
 	while (it != lst.end()){
 		if ((*it)->getFd() != fd_source){
@@ -164,15 +162,11 @@ void	Server::sendMsgToList(int fd_source, const string& msg, vector<userInfos*> 
 }
 
 void	Server::sendServerMsgToList(int fd_source, const string& msg, vector<userInfos*> lst){
-	userInfos* source = _users->getUserByFd(fd_source);
-	(void)lst;
+	(void)fd_source;
 	vector<userInfos*>::iterator it = lst.begin();
-	(void)it;
-	if (msg.length() == 0 || !source) return;
+	if (msg.length() == 0) return;
 	while (it != lst.end()){
-		if ((*it)->getFd() != fd_source){
-			sendMessage((*it)->getFd(), ":" + _servername + " " + msg);
-		}
+		sendMessage((*it)->getFd(), ":" + _servername + " " + msg);
 		++it;
 	}
 }
