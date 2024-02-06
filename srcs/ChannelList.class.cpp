@@ -100,6 +100,8 @@ void ChannelList::partChannel(userInfos* user, std::string channel_name)
 			else
 				++it_u;
 		}
+	} else {
+		_term->prtTmColor("PART: Channel not found " + channel_name, Terminal::RED);
 	}
 }
 
@@ -146,7 +148,7 @@ int ChannelList::kickChannel(userInfos* kicker, userInfos* user, std::string cha
 
 			// it->second->kicklist.push_back(user);		?? une ban list ?
 			partChannel(user, channel_name);
-			_term->prtTmColor("User " + user->getNickname() + " has been kicked from " + channel_name, Terminal::BRIGHT_RED);
+			_term->prtTmColor("User " + Terminal::BRIGHT_YELLOW + user->getNickname() + Terminal::BRIGHT_RED + " has been kicked from " + channel_name, Terminal::BRIGHT_RED);
 			return 0;
 		}
 		else
