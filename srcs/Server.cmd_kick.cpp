@@ -25,7 +25,7 @@ void Server::cmd_kick(int fd, vector<string> tokens){
 			sendServerMessage(fd, ERR_USERNOTINCHANNEL, "KICK :The targeted user is not in this channel");
 			break;
 		case 0:
-			sendClientMessage(user->getFd(), "KICK " + tokens[1] + " " + tokens[2]);
+			sendMessage(user->getFd(),":" + kicker->getNickname() + "!" + kicker->getUsername() + "@" + _servername + " KICK " + tokens[1] + " " + tokens[2]);
 			sendServerMsgToList(fd, "KICK " + tokens[1] + " " + tokens[2] + " :" + kicker->getNickname(), _channels->getChannel(tokens[1])->users);
 			break;
 	}

@@ -28,11 +28,12 @@ void	Bot::cmd_privmsg(const vector<string>& tokens){
 			if (it != _nickMap.end()){   // Check if user exceeded warnings max
 				if (it->second->nb_warnings_forbidden >= WARNINGS_BEFORE_KICK_FORBIDDEN){
 					sendMsg("KICK #General " + nick + " :Your recent messages contain inappropriate language. We encourage respectful communication in this community.");
+				} else {
+					sendMsg("PRIVMSG #General :" + nick + " this kind of word is forbidden on this channel \"" + word + "\", you'll be kicked if you continue !");
 				}
 			}
 
 			prt("Forbidden word: " + word + "\n", BRIGHT_RED);
-			sendMsg("PRIVMSG #General :" + nick + " this kind of word is forbidden on this channel \"" + word + "\", you'll be kicked if you continue !");
 
 			// Add one warning
 			it = _nickMap.find(nick);
