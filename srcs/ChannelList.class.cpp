@@ -31,15 +31,18 @@ ChannelList::~ChannelList()
 
 int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 {
+	// ****** LISTE DES ERREURS ******
+	// ERR_TOOMANYCHANNELS ERR_BADCHANMASK ERR_BANNEDFROMCHAN ERR_CHANNELISFULL ERR_INVITEONLYCHAN
+
 	if(nb_channel > max_channel)
 	{
-		_term->prtTmColor("Maximum number of Channel is" + toString(max_channel), Terminal::RED);
-		return 405;
+		// _term->prtTmColor("Maximum number of Channel is" + toString(max_channel), Terminal::RED);
+		return ERR_TOOMANYCHANNELS;
 	}
 	if (channel_name[0] != '#')
 	{
-		_term->prtTmColor("Channel must begin with #", Terminal::RED);
-		return 1;
+		// _term->prtTmColor("Channel must begin with #", Terminal::RED);
+		return ERR_BADCHANMASK;
 	}
 	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
 	if(!is_in_Channel(user, channel_name))
@@ -267,6 +270,23 @@ int ChannelList::getNbChannel()
 	return(this->nb_channel);
 }
 
+const string ChannelList::getUserPriviledges(const string& nick, const string& chan_name){
+	// FIND CHANNEL
+	map<string, s_Channel*>::iterator it = channel.find(chan_name);
+	if (it == channel.end()) return "";
+	// FIND USER IN CHANNEL
+	map<string, int>::iterator itt = it->second->prefix.find(nick);
+	if (itt == it->second->prefix.end()) return "";
+	switch (itt->second){
+		case 1: return "%";	// half op
+		case 2: return "@";	// op
+		case 3: return "@";	// protect	Should be &
+		case 4: return "@";	// founder	Should be ~
+		default: return "";
+	}
+	return "";
+}
+
 s_Channel* ChannelList::getNextChannel(int reset){
 	static map<string, s_Channel*>::iterator it;
 	if (reset) it = channel.begin();
@@ -288,3 +308,5 @@ void ChannelList::setMaxInChannel(int max_in_channel)
 {
 	this->max_in_channel = max_in_channel;
 }
+
+
