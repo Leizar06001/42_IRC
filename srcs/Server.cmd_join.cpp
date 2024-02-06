@@ -27,10 +27,10 @@ void Server::cmd_join(int fd, vector<string> tokens){
 
 
 			case 0:
-				sendMessage(fd, ":" + _channels->getUserPriviledges(user->getNickname(), tokens[i]) + user->getNickname() + "!" + user->getUsername() + "@" + user->getIpAdress() + " " +  "JOIN " + tokens[i]);
+				sendMessage(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + user->getIpAdress() + " " +  "JOIN " + tokens[i]);
 				s_Channel* chan = _channels->getChannel(tokens[i]);
 				if (chan){
-					sendRawMsgToList(fd, ":" + _channels->getUserPriviledges(user->getNickname(), tokens[i]) + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " " +  "JOIN " + tokens[i], chan->users);
+					sendRawMsgToList(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " " +  "JOIN " + tokens[i], chan->users);
 				}
 				// SEND ALL USERS OF THE CHANNEL TO THE NEW
 				vector<string> toks;
