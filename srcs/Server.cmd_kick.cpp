@@ -26,7 +26,7 @@ void Server::cmd_kick(int fd, vector<string> tokens){
 			break;
 		case 0:
 			sendClientMessage(fd, "KICK " + tokens[1] + " " + tokens[2]);
-			sendServerMsgToList(fd, "KICK " + tokens[1] + " " + tokens[2] + " :" + kicker->getNickname(), _channels->getChannel(tokens[2])->users);
+			sendServerMsgToList(fd, "KICK " + tokens[1] + " " + tokens[2] + " :" + kicker->getNickname(), _channels->getChannel(tokens[1])->users);
 			break;
 	}
 }
