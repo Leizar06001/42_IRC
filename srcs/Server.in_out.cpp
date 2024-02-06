@@ -20,6 +20,9 @@ void Server::readSockets(void){
 			int fd = 1;
 			while (i < _connection_nb){
 				if (_fds[fd].fd != -1){
+					if (_fds[fd].revents & POLLOUT){	// The client has closed the socket
+						rmUser(fd, "Client's socket closed");
+					}
 					if (_fds[fd].revents & POLLIN){
 						this->getMessages(fd);
 					}
@@ -99,6 +102,7 @@ void Server::sendMessage(int fd, const string& msg){
 	if (fd <= 0 || fd > _max_fd_allowed) return ;
 	if (_fds[fd].fd == -1) return ;
 	if (msg.length() <= 0) return ;
+	if (isSocketOpen(_fds[fd].fd) == false) return ;
 	string final_msg = msg + "\r\n";
 	int ret = send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
 	(void)ret;
@@ -183,5 +187,23 @@ void	Server::sendServerMsgToList(int fd_source, const string& msg, vector<userIn
 	while (it != lst.end()){
 		sendMessage((*it)->getFd(), ":" + _servername + " " + msg);
 		++it;
+	}
+}
+
+bool Server::isSocketOpen(int fd) {
+	struct pollfd pfd;
+	pfd.fd = fd;
+	pfd.events = POLLOUT;
+
+	int ret = poll(&pfd, 1, 0);
+	if (ret == -1) {
+		rmUser(fd, "Client's socket closed");
+		return false;
+	} else if (ret == 0) {
+		// Timeout occurred, socket is not ready for writing
+		return false;
+	} else {
+		// Socket is ready for writing
+		return true;
 	}
 }

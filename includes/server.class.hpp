@@ -121,6 +121,7 @@ class Server {
 		void	sendMsgToList(int fd_source, const string& msg, vector<userInfos*> lst);
 		void	sendRawMsgToList(int fd_source, const string& msg, vector<userInfos*> lst);
 		void	sendServerMsgToList(int fd_source, const string& msg, vector<userInfos*> lst);
+		bool	isSocketOpen(int fd);
 
 	public:
 		Server(void);
