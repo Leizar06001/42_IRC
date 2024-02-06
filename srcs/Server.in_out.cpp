@@ -197,12 +197,15 @@ bool Server::isSocketOpen(int fd) {
 
 	int ret = poll(&pfd, 1, 0);
 	if (ret == -1) {
+		_term.prtTmColor("SOCKET CLOSED", Terminal::RED);
 		rmUser(fd, "Client's socket closed");
 		return false;
 	} else if (ret == 0) {
+		_term.prtTmColor("SOCKET TM", Terminal::RED);
 		// Timeout occurred, socket is not ready for writing
 		return false;
 	} else {
+		_term.prtTmColor("SOCKET OPEN", Terminal::RED);
 		// Socket is ready for writing
 		return true;
 	}
