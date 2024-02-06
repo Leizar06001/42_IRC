@@ -77,7 +77,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 	return 0;
 }
 
-void ChannelList::quitChannel(userInfos* user, std::string channel_name)
+void ChannelList::partChannel(userInfos* user, std::string channel_name)
 {
 	if (!user) return;
 	std::map<std::string, s_Channel*>::iterator it = channel.find(channel_name);
@@ -103,7 +103,7 @@ void ChannelList::quitChannel(userInfos* user, std::string channel_name)
 	}
 }
 
-void ChannelList::leaveServer(userInfos* user)
+void ChannelList::quitServer(userInfos* user)
 {
 	if (!user) return;
     std::map<std::string, s_Channel*>::iterator it = channel.begin();
@@ -136,27 +136,32 @@ void ChannelList::leaveServer(userInfos* user)
     }
 }
 
-int ChannelList::kickChannel(userInfos* user, std::string channel_name)
+int ChannelList::kickChannel(userInfos* kicker, userInfos* user, std::string channel_name)
 {
 	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
 	if (it != channel.end())
 	{
-		if(is_operators(user, channel_name) || user->getUserMode().find("A") != std::string::npos)
-		{	// Is operator or Server Admin
-			it->second->kicklist.push_back(user);
+		if(is_operators(kicker, channel_name) || kicker->getUserMode().find("A") != std::string::npos) // Is operator or Server Admin
+		{
+
+			// it->second->kicklist.push_back(user);		?? une ban list ?
+			partChannel(user, channel_name);
+
 			return 0;
 		}
 		else
 		{
-			_term->prtTmColor("The user don't have the privilege", Terminal::RED);
-			return 482;
+			// _term->prtTmColor("The user don't have the privilege", Terminal::RED);
+			return ERR_CHANOPRIVSNEEDED;
 		}
 	}
 	else
 	{
-		_term->prtTmColor("The Channel don't exist", Terminal::RED);
-		return 403;
+		// _term->prtTmColor("The Channel don't exist", Terminal::RED);
+		return ERR_NOSUCHCHANNEL;
 	}
+
+	// AJOUTER ERR_USERNOTINCHANNEL		(user in not in this channel)
 }
 
 s_Channel	*ChannelList::getChannel(std::string& channel_name)

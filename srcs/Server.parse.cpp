@@ -68,7 +68,7 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 			_term.prtTmColor(user->getNickname() + " has " + toString(user->getWrongCmdsNb()) + " wrong commands", Terminal::RED);
 		}
 		if (user->getWrongCmdsNb() > 10){
-			_channels->leaveServer(user);
+			_channels->quitServer(user);
 			rmUser(fd, string("QUIT Too many wrong messages"));
 		}
 	}

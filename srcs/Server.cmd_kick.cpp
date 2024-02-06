@@ -2,20 +2,31 @@
 
 void Server::cmd_kick(int fd, vector<string> tokens){
 	if (tokens.size() < 3){
-		// NO KICKNAME
+		sendServerMessage(fd, ERR_NEEDMOREPARAMS, "KICK :Target or channel missing");
 		return;
 	}
-	userInfos* moder = _users->getUserByFd(fd);
-	if (!moder) return;
+	userInfos* kicker = _users->getUserByFd(fd);
+	if (!kicker) return;
 	userInfos* user = _users->getUserByNick(tokens[2]);
 	if (!user){
-		// NO SUCH NICK
+		sendServerMessage(fd, ERR_NOSUCHNICK, "KICK :User not found");
 		return ;
 	}
 
-	int ret = _channels->kickChannel(user, tokens[1]);
-	if (ret == 0){
-		_term.prtTmColor(tokens[2] + " kicked of channel " + tokens[1], Terminal::BRIGHT_RED);
-		sendMsgToList(fd, "KICK " + tokens[1] + " " + tokens[2] + " :" + moder->getNickname(), _channels->getChannel(tokens[2])->users);
+	int ret = _channels->kickChannel(kicker, user, tokens[1]);
+	switch (ret){
+		case ERR_NOSUCHCHANNEL:
+			sendServerMessage(fd, ERR_NOSUCHCHANNEL, "KICK :No such channel");
+			break;
+		case ERR_CHANOPRIVSNEEDED:
+			sendServerMessage(fd, ERR_CHANOPRIVSNEEDED, "KICK :You don't have the priviledges for this action");
+			break;
+		case ERR_USERNOTINCHANNEL:
+			sendServerMessage(fd, ERR_USERNOTINCHANNEL, "KICK :The targeted user is not in this channel");
+			break;
+		case 0:
+			sendClientMessage(fd, "KICK " + tokens[1] + " " + tokens[2]);
+			sendServerMsgToList(fd, "KICK " + tokens[1] + " " + tokens[2] + " :" + kicker->getNickname(), _channels->getChannel(tokens[2])->users);
+			break;
 	}
 }

@@ -8,7 +8,7 @@ void Server::cmd_part(int fd, vector<string> tokens){
 	} else {
 		for(size_t i = 1; i < tokens.size(); ++i){
 			int ret = 0;
-			_channels->quitChannel(user, tokens[i]);
+			_channels->partChannel(user, tokens[i]);
 			if (ret == 0){
 				sendClientMessage(fd, "PART " + tokens[i]);
 				s_Channel* chan = _channels->getChannel(tokens[i]);

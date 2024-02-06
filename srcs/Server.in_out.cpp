@@ -40,7 +40,7 @@ void Server::getMessages(int fd){
 		// ERROR
 		if (errno != EAGAIN && errno != EWOULDBLOCK) {
 			_term.prtTmColor("RECV ERROR: " + toString(strerror(errno)), Terminal::BRIGHT_RED);
-			_channels->leaveServer(_users->getUserByFd(fd));
+			_channels->quitServer(_users->getUserByFd(fd));
 			//rmUser(fd, string("QUIT Weird messages"));
 			forceDisconnect(fd, "Weird");
 		}
@@ -158,6 +158,20 @@ void	Server::sendMsgToList(int fd_source, const string& msg, vector<userInfos*> 
 	while (it != lst.end()){
 		if ((*it)->getFd() != fd_source){
 			sendMessage((*it)->getFd(), ":" + source->getNickname() + "!" + source->getUsername() + "@" + _servername + " " + msg);
+		}
+		++it;
+	}
+}
+
+void	Server::sendServerMsgToList(int fd_source, const string& msg, vector<userInfos*> lst){
+	userInfos* source = _users->getUserByFd(fd_source);
+	(void)lst;
+	vector<userInfos*>::iterator it = lst.begin();
+	(void)it;
+	if (msg.length() == 0 || !source) return;
+	while (it != lst.end()){
+		if ((*it)->getFd() != fd_source){
+			sendMessage((*it)->getFd(), ":" + _servername + " " + msg);
 		}
 		++it;
 	}
