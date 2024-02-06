@@ -72,7 +72,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 			_term->prtTmColor("Channel " + channel_name + " created", Terminal::BLUE);
 			new_channel->users.push_back(user);
 			new_channel->operators.push_back(user);
-			new_channel->prefix.insert(std::pair<std::string, int>(user->getNickname(), 4));
+			new_channel->prefix.insert(std::pair<std::string, int>(user->getNickname(), 2));
 			nb_channel++;
 			user->addChannelToList(new_channel);
 		}
