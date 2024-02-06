@@ -4,7 +4,8 @@
 #include <sys/resource.h> // for getrlimit (nb fd allowed)
 
 Server::Server(void):_initialized(0), _term(&_logStream){
-	_servername = "IRis.Chat";
+	// _servername = "IRis.Chat";
+	_servername = "86.210.59.196";
 	_users = new userList(&_term, PRINT_DEBUG_INFOS);
 	_channels = new ChannelList(&_term);
 	_timeout_check_time = TIMEOUT_CHECK_TIME;
