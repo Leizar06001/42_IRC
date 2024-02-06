@@ -146,18 +146,18 @@ int ChannelList::kickChannel(userInfos* kicker, userInfos* user, std::string cha
 
 			// it->second->kicklist.push_back(user);		?? une ban list ?
 			partChannel(user, channel_name);
-
+			_term->prtTmColor("User " + user->getNickname() + " has been kicked from " + channel_name, Terminal::BRIGHT_RED);
 			return 0;
 		}
 		else
 		{
-			// _term->prtTmColor("The user don't have the privilege", Terminal::RED);
+			_term->prtTmColor("The user don't have the privilege " + kicker->getNickname(), Terminal::YELLOW);
 			return ERR_CHANOPRIVSNEEDED;
 		}
 	}
 	else
 	{
-		// _term->prtTmColor("The Channel don't exist", Terminal::RED);
+		_term->prtTmColor("The Channel don't exist " + channel_name, Terminal::YELLOW);
 		return ERR_NOSUCHCHANNEL;
 	}
 
