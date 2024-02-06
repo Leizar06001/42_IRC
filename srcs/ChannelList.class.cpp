@@ -52,7 +52,10 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 				return 471;
 			}
 			it->second->users.push_back(user);
-			it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 0));
+			if (user->isAdmin())
+				it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 3));
+			else
+				it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 0));
 			_term->prtTmColor("Channel " + channel_name + " exist", Terminal::BLUE);
 			++it->second->nb_users;
 			user->addChannelToList(it->second);
