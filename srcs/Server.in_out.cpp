@@ -96,6 +96,9 @@ void Server::getMessages(int fd){
 }
 
 void Server::sendMessage(int fd, const string& msg){
+	if (fd <= 0 || fd > _max_fd_allowed) return ;
+	if (_fds[fd].fd == -1) return ;
+	if (msg.length() <= 0) return ;
 	string final_msg = msg + "\r\n";
 	int ret = send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), 0);
 	(void)ret;

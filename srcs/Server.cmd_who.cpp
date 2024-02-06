@@ -36,10 +36,10 @@ void Server::cmd_who(int fd, vector<string> tokens){
 			sendServerMessage(fd, ERR_NOSUCHNICK, tokens[1] + " :No such nickname");
 		} else {
 			if (target == user){		// SELF TARGETTING GIVE IP
-				sendServerMessage(fd, RPL_WHOREPLY, "#General" + target->getUsername() + " " + target->getIpAdress() + " " + _servername + " "
+				sendServerMessage(fd, RPL_WHOREPLY, "#General " + target->getUsername() + " " + target->getIpAdress() + " " + _servername + " "
 						+ _channels->getUserPriviledges(target->getNickname(), "#General") + target->getNickname() + " H :0 " + target->getRealname());
 			} else {
-				sendServerMessage(fd, RPL_WHOREPLY, "#General" + target->getUsername() + " " + _servername + " " + _servername + " "
+				sendServerMessage(fd, RPL_WHOREPLY, "#General " + target->getUsername() + " " + _servername + " " + _servername + " "
 						+ _channels->getUserPriviledges(target->getNickname(), "#General") + target->getNickname() + " H :0 " + target->getRealname());
 			}
 			sendServerMessage(fd, RPL_ENDOFWHO, tokens[1] + " :End of /WHO list");

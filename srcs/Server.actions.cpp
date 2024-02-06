@@ -35,7 +35,7 @@ void Server::performAction(userInfos* user){
 		vector<string> tokens;
 		tokens.push_back("JOIN");
 		tokens.push_back("#General");
-		cmd_list(fd, tokens);
+		// cmd_list(fd, tokens);
 		cmd_join(fd, tokens);
 
 	}
