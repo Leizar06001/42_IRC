@@ -195,7 +195,7 @@ bool Server::isSocketOpen(int fd) {
 	pfd.fd = _fds[fd].fd;
 	pfd.events = POLLOUT;
 
-	int ret = poll(&pfd, 1, 1);
+	int ret = poll(&pfd, 1, 0);
 	if (ret == -1) {
 		_term.prtTmColor("SOCKET CLOSED\n", Terminal::RED);
 		rmUser(fd, "Client's socket closed");
