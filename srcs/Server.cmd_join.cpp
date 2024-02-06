@@ -19,7 +19,7 @@ void Server::cmd_join(int fd, vector<string> tokens){
 			case ERR_BADCHANMASK:
 				sendServerMessage(fd, ret, "JOIN :Bad channel name, dont forget the prefix"); break;
 			case ERR_BANNEDFROMCHAN:
-				sendServerMessage(fd, ret, "JOIN :You are banned from this chnnel");
+				sendServerMessage(fd, ret, "JOIN :You are banned from this chnnel"); break;
 			case ERR_CHANNELISFULL:
 				sendServerMessage(fd, ret, "JOIN :This channel is full"); break;
 			case ERR_INVITEONLYCHAN:
