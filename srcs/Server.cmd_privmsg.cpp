@@ -5,16 +5,19 @@ void Server::cmd_msg(int fd, vector<string> tokens){
 	if (tokens.size() > 1){
 		if (tokens.size() > 2){
 			// Check if dest is a channel
+			userInfos* user = _users->getUserByFd(fd);
+			if (!user) return ;
 			if (tokens[1][0] == '#'){
-				if (tokens[1] == "#General"){
-					sendMsgToList(fd, "PRIVMSG " + tokens[1] + " :" + tokens[2], _users->getIDmap());
-				} else {
-					if (1){
+				s_Channel* chan = _channels->getChannel(tokens[1]);
+				if (chan){		// Channel exists
+					if (_channels->is_in_Channel(user, tokens[1])){		// User in channel ?
 						s_Channel* chan = _channels->getChannel(tokens[1]);
 						sendMsgToList(fd, "PRIVMSG " + tokens[1] + " :" + tokens[2], chan->users);
-					} else
-						err = ERR_NOSUCHCHANNEL;
-				}
+					} else {
+						sendServerMessage(fd, ERR_NOTONCHANNEL, "PRIVMSG :You are not in channel " + tokens[1]);
+					}
+				} else
+					sendServerMessage(fd, ERR_NOSUCHCHANNEL, "PRIVMSG :No such channel " + tokens[1]);
 			} else {
 				userInfos* dest = _users->getUserByNick(tokens[1]);
 				if (dest){
