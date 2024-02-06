@@ -104,7 +104,7 @@ void Server::sendMessage(int fd, const string& msg){
 	if (msg.length() <= 0) return ;
 	string final_msg = msg + "\r\n";
 
-	int ret = send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), MSG_NOSIGNAL);
+	int ret = send(_fds[fd].fd, final_msg.c_str(), final_msg.size(), MSG_NOSIGNAL);	// Dont create SIGPIPE signal
 	if (ret == -1){
 		 _term.prtTmColor("ERROR SENDING MESSAGE\n", Terminal::RED);
 		rmUser(fd, "Client's socket closed");

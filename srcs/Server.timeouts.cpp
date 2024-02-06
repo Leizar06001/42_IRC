@@ -18,7 +18,7 @@ void Server::checkIfClientsAlive(void){
 			// _term.prtTmColor((*it)->getNickname() + " Ping? " + toString((*it)->getPong()) + " t: " + toString(time(NULL) - (*it)->getLastMessageTime()), Terminal::BRIGHT_CYAN);
 			if (!(*it)->getPong()){	// send PING to check alive
 				(*it)->setPong(true);
-				sendMessage((*it)->getFd(), "PING :test_alive");
+				sendMessage((*it)->getFd(), "PING :" + _servername);
 			} else {
 				vector<string> tokens;
 				tokens.push_back("QUIT");
