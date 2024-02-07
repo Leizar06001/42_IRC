@@ -1,4 +1,4 @@
-#include "../includes/timeStamp.hpp"
+#include "../includes/timestamp.hpp"
 
 std::string timestamp(void){
 	time_t	t = time(NULL);
