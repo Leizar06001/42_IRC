@@ -11,7 +11,7 @@ int		Bot::connectTo(const string& host, int port, const string& pass){
 	_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket == -1) {
 		prt( "Error creating socket\n", BRIGHT_RED);
-		return 1;
+		return -1;
 	}
 	prt("..Socket created\n", GREEN);
 
@@ -25,7 +25,7 @@ int		Bot::connectTo(const string& host, int port, const string& pass){
 	if (connect(_socket, reinterpret_cast<struct sockaddr*>(&serverAddr), sizeof(serverAddr)) == -1) {
 		prt("Error connecting to the server\n", BRIGHT_RED);
 		close(_socket);
-		return 1;
+		return -1;
 	}
 	prt("Connected to " + host + " " + toString(port) + "\n", BRIGHT_GREEN);
 
