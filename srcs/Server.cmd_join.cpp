@@ -1,4 +1,5 @@
 #include "../includes/server.class.hpp"
+#include <sstream>
 
 void Server::cmd_join(int fd, vector<string> tokens){
 	userInfos* user = _users->getUserByFd(fd);
@@ -8,10 +9,11 @@ void Server::cmd_join(int fd, vector<string> tokens){
 		return ;
 	}
 
-
-	for(size_t i = 1; i < tokens.size(); ++i){	// FOR EACH CHANNEL IN TOKENS
+	std::istringstream ss(tokens[1]);
+	std::string channel;
+	while (std::getline(ss, channel, ',')) {
 		int ret = 0;
-		_channels->joinChannel(user, tokens[i]);
+		_channels->joinChannel(user, channel);
 
 		switch (ret){
 			case ERR_TOOMANYCHANNELS:
@@ -25,20 +27,19 @@ void Server::cmd_join(int fd, vector<string> tokens){
 			case ERR_INVITEONLYCHAN:
 				sendServerMessage(fd, ret, "JOIN :You must be invited to join this channel"); break;
 
-
 			case 0:
-				sendMessage(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + user->getIpAdress() + " " +  "JOIN " + tokens[i]);
-				string user_mode = _channels->getUserModes(user, tokens[i]);
-				s_Channel* chan = _channels->getChannel(tokens[i]);
+				sendMessage(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + user->getIpAdress() + " " +  "JOIN " + channel);
+				string user_mode = _channels->getUserModes(user, channel);
+				s_Channel* chan = _channels->getChannel(channel);
 				if (chan){
-					sendRawMsgToList(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " " +  "JOIN " + tokens[i], chan->users);
-					sendRawMsgToList(fd, ":" + _servername + " MODE " + tokens[i] + " " + user_mode + " " + user->getNickname(), chan->users);
+					sendRawMsgToList(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " " +  "JOIN " + channel, chan->users);
+					sendRawMsgToList(fd, ":" + _servername + " MODE " + channel + " " + user_mode + " " + user->getNickname(), chan->users);
 				}
 				// SEND ALL USERS OF THE CHANNEL TO THE NEW
 				vector<string> toks;
 				toks.push_back("NAMES");
-				toks.push_back(tokens[1]);
-				toks.push_back(_channels->getUsersNicksInChan(tokens[i]));
+				toks.push_back(channel);
+				toks.push_back(_channels->getUsersNicksInChan(channel));
 				cmd_names(fd, toks);
 				break;
 		}
