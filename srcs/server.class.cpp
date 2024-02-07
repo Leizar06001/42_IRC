@@ -234,7 +234,7 @@ void Server::handleEvents(void){
 void Server::rmUser(int fd, const string& reason){
 	userInfos* user = _users->getUserByFd(fd);
 	if (!user) return ;
-	writeToConLog(timestamp_fail2ban() + " " + _users->getUserByFd(fd)->getIpAdress() + " Disconnected: " + reason);
+	writeToConLog(timestamp_fail2ban() + " CLIENT: " + _users->getUserByFd(fd)->getIpAdress() + " Disconnected: " + reason);
 	_term.prtTmColor("X Client # " + toString(fd) + " disconnected: " + reason + "\n", Terminal::RED);
 	_channels->quitServer(user);
 	_users->rmUser(fd);
