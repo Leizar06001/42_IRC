@@ -16,6 +16,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <fstream>
+#include "timestamp.hpp"
 
 #define PRINT_DEBUG_INFOS		0
 

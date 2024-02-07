@@ -2,7 +2,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/resource.h> // for getrlimit (nb fd allowed)
-#include "../includes/timestamp.hpp"
 
 Server::Server(void):_initialized(0), _term(&_logStream){
 	_servername = "IRis.Chat";

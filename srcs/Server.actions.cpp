@@ -1,5 +1,4 @@
 #include "../includes/server.class.hpp"
-#include "../includes/timestamp.hpp"
 
 void Server::checkPendingActions(void){
 	userInfos* user;

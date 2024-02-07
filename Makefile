@@ -36,7 +36,8 @@ SRCS = 	srcs/main.cpp				\
 		srcs/userList.class.cpp		\
 		srcs/userInfos.class.cpp	\
 		srcs/terminal.class.cpp		\
-		srcs/sha256.cpp
+		srcs/sha256.cpp				\
+		srcs/timestamp.cpp
 
 OBJ_DIR = objs
 OBJS := $(SRCS:srcs/%=%)

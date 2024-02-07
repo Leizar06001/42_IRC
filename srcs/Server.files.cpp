@@ -1,6 +1,5 @@
 #include "../includes/server.class.hpp"
 #include <sys/stat.h>	// MKDIR
-#include "../includes/timestamp.hpp"
 
 void Server::writeToConLog(const string& str){
 	_logConStream << str;
