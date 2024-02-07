@@ -74,7 +74,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 			channel.insert(std::pair<std::string, s_Channel *>(channel_name, new_channel));
 			_term->prtTmColor("Channel " + channel_name + " created", Terminal::BLUE);
 			new_channel->users.push_back(user);
-			new_channel->operators.push_back(user);
+			new_channel->operators.insert(make_pair<string, userInfos*>(user->getNickname(), user));
 			new_channel->prefix.insert(std::pair<std::string, int>(user->getNickname(), 2));
 			nb_channel++;
 			user->addChannelToList(new_channel);
@@ -106,6 +106,10 @@ void ChannelList::partChannel(userInfos* user, std::string channel_name)
 			else
 				++it_u;
 		}
+		// Delete user from prefix map
+		it->second->prefix.erase(user->getNickname());
+		// Delete user from operator map
+		it->second->operators.erase(user->getNickname());
 	} else {
 		_term->prtTmColor("PART: Channel not found " + channel_name, Terminal::RED);
 	}
@@ -220,13 +224,9 @@ bool ChannelList::is_operators(userInfos* user, string channel_name)
 	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
 	if(it != channel.end())
 	{
-		std::vector<userInfos *>::iterator it_u = it->second->operators.begin();
-		while(it_u != it->second->operators.end())
-		{
-			if((*it_u) == user)
-				return(1);
-			it_u++;
-		}
+		std::map<std::string, userInfos *>::iterator it_u = it->second->operators.find(user->getNickname());
+		if(it_u != it->second->operators.end())
+			return(1);
 	}
 	return(0);
 }
