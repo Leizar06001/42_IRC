@@ -161,7 +161,7 @@ string const &userInfos::getRealname(void) const{
 }
 string const userInfos::getUserMode(void) const{
 	string mode = "+";
-	if (_is_admin) mode += "Aao";
+	if (_is_admin) mode += "Aa";
 	if (_hide_host) mode += "x";
 	if (_is_invisible) mode += "i";
 
