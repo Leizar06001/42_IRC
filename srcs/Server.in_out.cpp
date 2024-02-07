@@ -20,7 +20,7 @@ void Server::readSockets(void){
 			int fd = 1;
 			while (i < _connection_nb){
 				if (_fds[fd].fd != -1){
-					if (_fds[fd].revents & POLLOUT){	// The client has closed the socket
+					if (_fds[fd].revents & POLLHUP){	// The client has closed the socket
 						rmUser(fd, "Client's socket closed");
 					}
 					if (_fds[fd].revents & POLLIN){
@@ -41,14 +41,13 @@ void Server::getMessages(int fd){
 
 	if (bytesRead < 0 ){
 		// ERROR
-		if (errno != EAGAIN && errno != EWOULDBLOCK) { // If EAGAIN or EWOULDBLOCK, simply no data available now, not an error
+		if (errno != EAGAIN && errno != EWOULDBLOCK) {
 			_term.prtTmColor("RECV ERROR: " + toString(strerror(errno)), Terminal::BRIGHT_RED);
 			_channels->quitServer(_users->getUserByFd(fd));
 			//rmUser(fd, string("QUIT Weird messages"));
-			//
-		} else {
 			forceDisconnect(fd, "Weird");
 		}
+		// If EAGAIN or EWOULDBLOCK, simply no data available now, not an error
 
 	} else if (bytesRead == 0){	// CLIENT DISCONNECTED
 		forceDisconnect(fd, "Connection lost");

@@ -2,7 +2,7 @@
 #include <sys/stat.h>	// MKDIR
 
 void Server::writeToConLog(const string& str){
-	_term.prtTmColor(str, Terminal::BRIGHT_CYAN);
+	_term.prtTmColor(str, Terminal::BLUE);
 	_logConStream << str;
 	if (str[str.length() - 1] != '\n'){
 		_logConStream << "\n";

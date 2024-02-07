@@ -85,35 +85,35 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 
 void ChannelList::partChannel(userInfos* user, std::string channel_name)
 {
-	if (!user) return;
-	std::map<std::string, s_Channel*>::iterator it = channel.find(channel_name);
+    if (!user) return;
+    std::map<std::string, s_Channel*>::iterator it = channel.find(channel_name);
 
-	if (it != channel.end())
-	{
-		std::vector<userInfos*>::iterator it_u = it->second->users.begin();
-		while (it_u != it->second->users.end())
-		{
-			if (*it_u == user){
-				it_u = it->second->users.erase(it_u);
-				--it->second->nb_users;
-				if(it->second->nb_users == 0)    //suprimer le chan
-				{
-					channel_map.erase(channel_name);
-					channel.erase(channel_name);
-					delete it->second;
-					return;
-				}
-			}
-			else
-				++it_u;
-		}
-		// Delete user from prefix map
-		it->second->prefix.erase(user->getNickname());
-		// Delete user from operator map
-		it->second->operators.erase(user->getNickname());
-	} else {
-		_term->prtTmColor("PART: Channel not found " + channel_name, Terminal::RED);
-	}
+    if (it != channel.end())
+    {
+        std::vector<userInfos*>::iterator it_u = it->second->users.begin();
+        while (it_u != it->second->users.end())
+        {
+            if (*it_u == user){
+                it_u = it->second->users.erase(it_u);
+                --it->second->nb_users;
+                if(it->second->nb_users == 0 && it->second->deletable)    //suprimer le chan
+                {
+                    channel_map.erase(channel_name);
+                    delete it->second;
+                    channel.erase(it);
+                    return;
+                }
+            }
+            else
+                ++it_u;
+        }
+        // Delete user from prefix map
+        it->second->prefix.erase(user->getNickname());
+        // Delete user from operator map
+        it->second->operators.erase(user->getNickname());
+    } else {
+        _term->prtTmColor("PART: Channel not found " + channel_name, Terminal::RED);
+    }
 }
 
 void ChannelList::quitServer(userInfos* user)
@@ -133,9 +133,15 @@ void ChannelList::quitServer(userInfos* user)
         }
         if (it_u != it->second->users.end())
         {
+            std::map<std::string, s_Channel*>::iterator next_it = it;
+            ++next_it;
             partChannel(user, it->first);
+            it = next_it;
         }
-        ++it;
+        else
+        {
+            ++it;
+        }
     }
 }
 
