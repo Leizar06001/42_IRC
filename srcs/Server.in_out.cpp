@@ -41,13 +41,15 @@ void Server::getMessages(int fd){
 
 	if (bytesRead < 0 ){
 		// ERROR
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		if (errno != EAGAIN && errno != EWOULDBLOCK) { // If EAGAIN or EWOULDBLOCK, simply no data available now, not an error
 			_term.prtTmColor("RECV ERROR: " + toString(strerror(errno)), Terminal::BRIGHT_RED);
 			_channels->quitServer(_users->getUserByFd(fd));
 			//rmUser(fd, string("QUIT Weird messages"));
+			//
+		} else {
 			forceDisconnect(fd, "Weird");
 		}
-		// If EAGAIN or EWOULDBLOCK, simply no data available now, not an error
+
 	} else if (bytesRead == 0){	// CLIENT DISCONNECTED
 		forceDisconnect(fd, "Connection lost");
 	} else {				// TREAT MESSAGE
