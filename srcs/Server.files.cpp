@@ -38,7 +38,7 @@ void Server::openLog(void){
 	if (!_logConStream.is_open()) {
 		_term.prtTmColor("ERROR: CANNOT OPEN CONNECTIONS LOG FILE\n", Terminal::BRIGHT_RED);
 	} else {
-		writeToConLog(timestamp() + " Starting server..");
+		writeToConLog(timestamp_fail2ban() + " Starting server..");
 	}
 }
 

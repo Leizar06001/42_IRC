@@ -25,7 +25,7 @@ void Server::performAction(userInfos* user){
 		std::strftime(buf, sizeof(buf), "%d/%m/%Y %H:%M:%S", crea_time);
 		std::string		str_time = toString(buf);
 
-		writeToConLog(timestamp() + " " + _users->getUserByFd(fd)->getIpAdress() + " Registered: " + user->getNickname());
+		writeToConLog(timestamp_fail2ban() + " " + _users->getUserByFd(fd)->getIpAdress() + " Registered: " + user->getNickname());
 
 		sendMessage(fd, ":" + _servername + " 001 " + user->getNickname() + " :Welcome to the iRisChat Network, " + user->getNickname());
 		sendMessage(fd, ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1");

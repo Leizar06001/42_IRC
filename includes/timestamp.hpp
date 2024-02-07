@@ -6,6 +6,6 @@
 #include "toString.hpp"
 
 std::string timestamp(void);
-
+std::string timestamp_fail2ban(void);
 
 #endif

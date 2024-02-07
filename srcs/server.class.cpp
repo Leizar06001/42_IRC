@@ -197,7 +197,7 @@ void Server::getConnection(void){
 	userInfos* new_user = _users->addUser(i);
 	new_user->setIpAddr(ip_str);
 
-	writeToConLog(timestamp() + " " + ip_str + " Connected");
+	writeToConLog(timestamp_fail2ban() + " " + ip_str + " Connected");
 	_term.prtTmColor(">>> " + string(client_ip) + " FD." + toString(i) + Terminal::BRIGHT_CYAN + " | " + toString(_connection_nb) + " / " + toString(_max_clients) + " clients\n", Terminal::GREEN);
 }
 
@@ -234,7 +234,7 @@ void Server::handleEvents(void){
 void Server::rmUser(int fd, const string& reason){
 	userInfos* user = _users->getUserByFd(fd);
 	if (!user) return ;
-	writeToConLog(timestamp() + " " + _users->getUserByFd(fd)->getIpAdress() + " Disconnected: " + reason);
+	writeToConLog(timestamp_fail2ban() + " " + _users->getUserByFd(fd)->getIpAdress() + " Disconnected: " + reason);
 	_term.prtTmColor("X Client # " + toString(fd) + " disconnected: " + reason + "\n", Terminal::RED);
 	_channels->quitServer(user);
 	_users->rmUser(fd);
