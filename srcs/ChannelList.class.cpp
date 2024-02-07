@@ -100,6 +100,7 @@ void ChannelList::partChannel(userInfos* user, std::string channel_name)
 				{
 					channel_map.erase(channel_name);
 					channel.erase(channel_name);
+					delete it->second;
 					return;
 				}
 			}
@@ -118,34 +119,17 @@ void ChannelList::partChannel(userInfos* user, std::string channel_name)
 void ChannelList::quitServer(userInfos* user)
 {
 	if (!user) return;
-    std::map<std::string, s_Channel*>::iterator it = channel.begin();
+	std::map<std::string, s_Channel*>::iterator it = channel.begin();
 
-    while (it != channel.end())
-    {
-        std::vector<userInfos*>::iterator it_u = it->second->users.begin();
-        while (it_u != it->second->users.end())
-        {
-            if (*it_u == user)
-            {
-                it_u = it->second->users.erase(it_u);
-				--it->second->nb_users;
-				if(it->second->nb_users == 0)    //suprimer le chan
-				{
-					if(it->second->deletable == 1)
-					{
-						channel_map.erase(it->first);
-						channel.erase(it->first);
-						return;
-					}
-				}
-            }
-            else
-            {
-                ++it_u;
-            }
-        }
+	while (it != channel.end())
+	{
+		std::vector<userInfos*>::iterator it_u = std::find(it->second->users.begin(), it->second->users.end(), user);
+		if (it_u != it->second->users.end())
+		{
+			partChannel(user, it->first);
+		}
 		it++;
-    }
+	}
 }
 
 int ChannelList::kickChannel(userInfos* kicker, userInfos* user, std::string channel_name)

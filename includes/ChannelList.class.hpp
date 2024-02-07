@@ -18,7 +18,6 @@ class ChannelList
 		int max_channel;
 		int max_in_channel;
 
-		// >>>>> DES LEEKS DE CHANNELS <<<<<<
 
 	public:
 		ChannelList(Terminal* term);
