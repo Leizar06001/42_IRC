@@ -16,14 +16,6 @@ namespace {
 	}
 }
 
-// void	sigPipeHandler(int sig){
-// 	(void)sig;
-// 	// rmUser(_readedFd, "Socket Closed");
-// 	cout << "**** SIGPIPE ****" << endl;
-// 	sleep(5);
-// }
-
-
 void	init_sigaction(){
 	struct	sigaction sigbreak;
 	sigbreak.sa_handler = &handle_break;
@@ -31,7 +23,6 @@ void	init_sigaction(){
 	sigbreak.sa_flags = 0;
 	if (sigaction(SIGINT, &sigbreak, NULL) != 0)
 		std::cerr << "Error: sigaction\n";
-	// signal(SIGPIPE, sigPipeHandler);
 }
 
 int main(int argc, char **argv) {

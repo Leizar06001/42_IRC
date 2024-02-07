@@ -30,7 +30,7 @@ int		Bot::botLoop(void){
 
 void	Bot::sendMsg(const string &msg){
 	string out = msg + "\r\n";
-	send(_socket, out.c_str(), out.length(), 0);
+	send(_socket, out.c_str(), out.length(), MSG_NOSIGNAL);
 	prt("<< " + msg + "\n", YELLOW);
 }
 

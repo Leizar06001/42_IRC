@@ -20,6 +20,9 @@ const string Bot::readSocket(void){
 				return msg;
 			}
 			// If EAGAIN or EWOULDBLOCK, simply no data available now, not an error
+			cout << "Connection lost" << endl;
+			_connected = false;
+			close(_socket);
 
 
 		} else if (bytesRead == 0){	// DISCONNECTED
