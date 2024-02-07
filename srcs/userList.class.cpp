@@ -74,8 +74,10 @@ void userList::rmUser(int fd){
 		size_t	index = itID->second;
 		map<string, size_t>::iterator itNick = _mapNick.find(_userlist[index]->getNickname());
 		if (itNick != _mapNick.end()) _mapNick.erase(itNick);
-		delete _userlist[index];
-		_userlist[index] = NULL;
+		if (_userlist[index] != NULL){
+			delete _userlist[index];
+			_userlist[index] = NULL;
+		}
 		if (_prt_debug){
 			_term->prtTmColor("FD.'" + toString(fd) + "' deleted from vector index : " + toString(index) + "\n", Terminal::BRIGHT_BLUE);
 			_term->prtTmColor("Removing FD " + toString(itID->first) + " index " + toString(itID->second) + " from mapID\n", Terminal::BRIGHT_BLUE);

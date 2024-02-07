@@ -83,6 +83,7 @@ void Server::setVarsFromConf(string& str){
 			if (num > 0 && num < 10000){
 				_max_channels = num;
 				_term.prtTmColor("sets to: " + toString(num), Terminal::GREEN);
+				_channels->setMaxChannels(num);
 			} else _term.prtTmColor("default: " + toString(_max_channels), Terminal::YELLOW);
 		} else if(key == "timeout_check_time") {
 			if (num > 0 &&num < 120){
@@ -103,6 +104,7 @@ void Server::setVarsFromConf(string& str){
 			if (num > 0 && num < 10000){
 				_max_user_per_chan = num;
 				_term.prtTmColor("sets to: " + toString(num), Terminal::GREEN);
+				_channels->setMaxInChannel(num);
 			} else _term.prtTmColor("default: " + toString(_max_user_per_chan), Terminal::YELLOW);
 		}
 	}

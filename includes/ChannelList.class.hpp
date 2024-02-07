@@ -55,7 +55,7 @@ class ChannelList
 
 		s_Channel* getNextChannel(int reset);
 
-		void setMaxChannel(int max_channel);
+		void setMaxChannels(int max_channel);
 		void setMaxInChannel(int max_in_channel);
 };
 

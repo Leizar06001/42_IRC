@@ -317,7 +317,7 @@ s_Channel* ChannelList::getNextChannel(int reset){
 	return chan;
 }
 
-void ChannelList::setMaxChannel(int max_channel)
+void ChannelList::setMaxChannels(int max_channel)
 {
 	this->max_channel = max_channel;
 }
