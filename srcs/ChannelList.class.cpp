@@ -118,18 +118,25 @@ void ChannelList::partChannel(userInfos* user, std::string channel_name)
 
 void ChannelList::quitServer(userInfos* user)
 {
-	if (!user) return;
-	std::map<std::string, s_Channel*>::iterator it = channel.begin();
+    if (!user) return;
+    std::map<std::string, s_Channel*>::iterator it = channel.begin();
 
-	while (it != channel.end())
-	{
-		std::vector<userInfos*>::iterator it_u = std::find(it->second->users.begin(), it->second->users.end(), user);
-		if (it_u != it->second->users.end())
-		{
-			partChannel(user, it->first);
-		}
-		it++;
-	}
+    while (it != channel.end())
+    {
+        std::vector<userInfos*>::iterator it_u;
+        for (it_u = it->second->users.begin(); it_u != it->second->users.end(); ++it_u)
+        {
+            if (*it_u == user)
+            {
+                break;
+            }
+        }
+        if (it_u != it->second->users.end())
+        {
+            partChannel(user, it->first);
+        }
+        ++it;
+    }
 }
 
 int ChannelList::kickChannel(userInfos* kicker, userInfos* user, std::string channel_name)
