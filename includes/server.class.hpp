@@ -30,6 +30,7 @@
 #define CONF_FOLDER				"./conf/"
 #define LOG_FILE				"last_log.txt"
 #define LOG_FOLDER				"./log/"
+#define CON_LOG_FILE			"connections.log"
 
 using namespace std;
 class Server {
@@ -52,6 +53,7 @@ class Server {
 
 		time_t			_last_timeout_check;
 		fstream			_logStream;
+		fstream			_logConStream;
 		Terminal		_term;
 
 		vector<string>	_bans_ip;
@@ -113,6 +115,7 @@ class Server {
 		void	readConf(void);
 		void	setVarsFromConf(string &str);
 		void	openLog(void);
+		void	writeToConLog(const string& str);
 
 		int		isIPBanned(const string& ip);
 		void	addToBannedList(const string& ip);

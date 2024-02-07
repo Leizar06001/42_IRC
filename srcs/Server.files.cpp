@@ -1,5 +1,12 @@
 #include "../includes/server.class.hpp"
 #include <sys/stat.h>	// MKDIR
+#include "../includes/timestamp.hpp"
+
+void Server::writeToConLog(const string& str){
+	_logConStream << str;
+	if (str[str.length() - 1] != '\n')
+		_logConStream << "\n";
+}
 
 void Server::writeToLog(const string& str){
 	_logStream << str;
@@ -19,6 +26,15 @@ void Server::openLog(void){
 	_logStream.open((path + LOG_FILE).c_str(), std::fstream::out ); //| std::fstream::app
 	if (!_logStream.is_open()) {
 		_term.prtTmColor("ERROR: CANNOT OPEN LOG FILE\n", Terminal::BRIGHT_RED);
+	} else {
+		writeToLog(timestamp() + " Starting server..");
+	}
+
+	_logConStream.open((path + CON_LOG_FILE).c_str(), std::fstream::out ); //| std::fstream::app
+	if (!_logConStream.is_open()) {
+		_term.prtTmColor("ERROR: CANNOT OPEN CONNECTIONS LOG FILE\n", Terminal::BRIGHT_RED);
+	} else {
+		writeToConLog(timestamp() + " Starting server..");
 	}
 }
 
