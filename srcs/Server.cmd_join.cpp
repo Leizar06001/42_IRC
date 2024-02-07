@@ -33,7 +33,7 @@ void Server::cmd_join(int fd, vector<string> tokens){
 				s_Channel* chan = _channels->getChannel(channel);
 				if (chan){
 					sendRawMsgToList(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " " +  "JOIN " + channel, chan->users);
-					if (user_mode.find_first_of("Aao"))
+					if (user_mode.find_first_of("Aao") != string::npos)
 						sendRawMsgToList(fd, ":" + _servername + " MODE " + channel + " " + user_mode + " " + user->getNickname() + " " + user->getNickname(), chan->users);
 				}
 				// SEND ALL USERS OF THE CHANNEL TO THE NEW
