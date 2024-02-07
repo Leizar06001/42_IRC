@@ -124,6 +124,7 @@ void ChannelList::quitServer(userInfos* user)
     {
 		if (it_chan->second->users.find(user->getNickname()) != it_chan->second->users.end())
 			chans_user_is_in.push_back(it_chan->second);
+		++it_chan;
     }
 
 	// Remove user from all the chans he's in
