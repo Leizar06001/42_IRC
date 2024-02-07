@@ -125,9 +125,9 @@ class Server {
 		void	addToBannedList(const string& ip);
 		bool	isBotTraffic(const string &str);
 		void	sendMsgToList(int fd_source, const string& msg, const map<int, size_t> &lst);
-		void	sendMsgToList(int fd_source, const string& msg, vector<userInfos*> lst);
-		void	sendRawMsgToList(int fd_source, const string& msg, vector<userInfos*> lst);
-		void	sendServerMsgToList(int fd_source, const string& msg, vector<userInfos*> lst);
+		void	sendMsgToList(int fd_source, const string& msg,  map<string, userInfos*> lst);
+		void	sendRawMsgToList(int fd_source, const string& msg,  map<string, userInfos*> lst);
+		void	sendServerMsgToList(int fd_source, const string& msg,  map<string, userInfos*> lst);
 		// bool	isSocketOpen(int fd);
 		// void	sigPipeHandler(int fd);
 

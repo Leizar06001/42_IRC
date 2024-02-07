@@ -16,14 +16,14 @@ void Server::cmd_who(int fd, vector<string> tokens){
 		if (!chan){	// channel not found
 			sendServerMessage(fd, ERR_NOSUCHCHANNEL, tokens[1] + " :No such channel");
 		} else {	// send list
-			vector<userInfos*> list = chan->users;
-			for(vector<userInfos*>::iterator it = list.begin(); it != list.end(); ++it){
-				if ((*it) == user){		// SELF TARGETTING GIVE IP
-					sendServerMessage(fd, RPL_WHOREPLY, tokens[1] + " " + (*it)->getUsername() + " " + (*it)->getIpAdress() + " " + _servername
-						+ " " + _channels->getUserPriviledges((*it)->getNickname(), tokens[1]) + (*it)->getNickname() + " H :0 " + (*it)->getRealname());
+			map<string, userInfos*> list = chan->users;
+			for(map<string, userInfos*>::iterator it = list.begin(); it != list.end(); ++it){
+				if (it->second == user){		// SELF TARGETTING GIVE IP
+					sendServerMessage(fd, RPL_WHOREPLY, tokens[1] + " " + it->second->getUsername() + " " + it->second->getIpAdress() + " " + _servername
+						+ " " + _channels->getUserPriviledges(it->second->getNickname(), tokens[1]) + it->second->getNickname() + " H :0 " + it->second->getRealname());
 				} else {
-					sendServerMessage(fd, RPL_WHOREPLY, tokens[1] + " " + (*it)->getUsername() + " " + _servername + " " + _servername + " "
-						+ _channels->getUserPriviledges((*it)->getNickname(), tokens[1]) + (*it)->getNickname() + " H :0 " + (*it)->getRealname());
+					sendServerMessage(fd, RPL_WHOREPLY, tokens[1] + " " + it->second->getUsername() + " " + _servername + " " + _servername + " "
+						+ _channels->getUserPriviledges(it->second->getNickname(), tokens[1]) + it->second->getNickname() + " H :0 " + it->second->getRealname());
 				}
 			}
 			sendServerMessage(fd, RPL_ENDOFWHO, tokens[1] + " :End of /WHO list");
