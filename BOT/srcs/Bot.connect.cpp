@@ -7,7 +7,12 @@ int		Bot::connectTo(const string& host, int port, const string& pass){
 	_host = host;
 	_pass = pass;
 
-	// Create a socket
+	// Close the socket if it is already open
+	if (_socket != -1){
+		close(_socket);
+	}
+
+	// Create a new socket
 	_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (_socket == -1) {
 		prt( "Error creating socket\n", BRIGHT_RED);
