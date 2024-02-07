@@ -14,7 +14,8 @@ class ChannelList;
 class Terminal {
 
 private:
-	fstream* _logStream;
+	fstream* 	_logStream;
+	bool		_new_datas_printed;
 
 public:
 	static const std::string BLACK;
@@ -45,8 +46,8 @@ public:
 	void clearLine(int row) const;
 	void clearLineAfter(void) const;
 	void setCursor(int row, int col) const;
-	void prtColor(const std::string& text, const std::string& color) const;
-	void prtTmColor(const std::string& text, const std::string& color) const;
+	void prtColor(const std::string& text, const std::string& color);
+	void prtTmColor(const std::string& text, const std::string& color);
 	void saveCursor(void) const;
 	void restoreCursor(void) const;
 

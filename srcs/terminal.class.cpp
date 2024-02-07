@@ -26,11 +26,21 @@ const std::string Terminal::BRIGHT_CYAN = "\033[96m";
 const std::string Terminal::BRIGHT_WHITE = "\033[97m";
 const std::string Terminal::RESET = "\033[0m";
 
-Terminal::Terminal(fstream* logStream):_logStream(logStream){};
+Terminal::Terminal(fstream* logStream):_logStream(logStream), _new_datas_printed(1){};
 
 Terminal::~Terminal(void){};
 
 void Terminal::updateMenu(userList* users, ChannelList* channels){
+	static int prev_nb_chans;
+	static int prev_nb_users;
+
+	int nb_users = users->getNbUsers();
+	int nb_channels = channels->getNbChannel();
+	if (!_new_datas_printed && nb_channels == prev_nb_chans && nb_users == prev_nb_users) return;
+
+	prev_nb_chans = nb_channels;
+	prev_nb_users = nb_users;
+
 	// saveCursor();
 	(void)users;
 
@@ -181,11 +191,11 @@ void Terminal::setCursor(int row, int col) const {
 }
 
 // Print text in a specific color
-void Terminal::prtColor(const std::string& text, const std::string& color) const {
+void Terminal::prtColor(const std::string& text, const std::string& color) {
 	std::cout << color << text << RESET;
 }
 
-void Terminal::prtTmColor(const std::string& text, const std::string& color) const {
+void Terminal::prtTmColor(const std::string& text, const std::string& color) {
 	clearLine(WIN_H);
 	setCursor(WIN_H - 1, 3);
 	string tm = timestamp();
@@ -231,6 +241,7 @@ void Terminal::prtTmColor(const std::string& text, const std::string& color) con
 	prtColor("■▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰┷▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰■", Terminal::BLUE);
 	setCursor(WIN_H - 1, 3);
 	std::cout << flush;
+	_new_datas_printed = 1;
 }
 
 void Terminal::saveCursor(void) const {
