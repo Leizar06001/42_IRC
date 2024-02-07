@@ -51,6 +51,7 @@ class ChannelList
 		int getNbUserInChannel();
 
 		const string getUserPriviledges(const string& nick, const string& chan_name);
+		const string getUserModes(const string& nick, const string& chan_name);
 
 		s_Channel* getNextChannel(int reset);
 

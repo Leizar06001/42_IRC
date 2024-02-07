@@ -287,6 +287,24 @@ const string ChannelList::getUserPriviledges(const string& nick, const string& c
 	return "";
 }
 
+const string ChannelList::getUserModes(userInfos* user, const string& chan_name){
+	string modes = user->getUserMode();
+	// FIND CHANNEL
+	map<string, s_Channel*>::iterator it = channel.find(chan_name);
+	if (it == channel.end()) return "";
+	// FIND USER IN CHANNEL
+	map<string, int>::iterator itt = it->second->prefix.find(user->getNickname());
+	if (itt == it->second->prefix.end()) return "";
+	switch (itt->second){
+		case 1: modes += "h";	// half op
+		case 2: modes += "o";	// op
+		case 3: modes += "p";	// protect
+		case 4: modes += "q";	// founder
+	}
+
+	return modes;
+}
+
 s_Channel* ChannelList::getNextChannel(int reset){
 	static map<string, s_Channel*>::iterator it;
 	if (reset) it = channel.begin();
