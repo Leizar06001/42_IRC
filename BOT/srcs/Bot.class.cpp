@@ -5,6 +5,7 @@
 Bot::Bot(string nickname, string realname):_connected(0), _botnick(nickname), _botname(nickname), _botreal(realname), _data_buffer(""){
 	prt("BOT Created: " + nickname + "\n", BRIGHT_YELLOW);
 	_forbiddenWords = getForbiddenWords();
+	_socket = -1;
 }
 Bot::~Bot(void){
 	close(_socket);
