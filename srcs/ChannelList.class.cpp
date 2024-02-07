@@ -9,7 +9,8 @@ ChannelList::ChannelList(Terminal* term):_term(term)
 	general->mode = "+mntlb";
 	general->deletable = 0;
 	general->nb_users = 0;
-	channel.insert(std::pair<std::string, s_Channel *>("#General", general));
+	// channel.insert(std::pair<std::string, s_Channel *>("#General", general));
+	channels["#General"] = general;
 	nb_channel = 1;
 	max_channel = 100;
 	max_in_channel = 100;
@@ -17,16 +18,14 @@ ChannelList::ChannelList(Terminal* term):_term(term)
 
 ChannelList::~ChannelList()
 {
-	std::map<std::string, s_Channel*>::iterator it = channel.begin();
-	while (it != channel.end())
+	std::map<std::string, s_Channel*>::iterator it = channels.begin();
+	while (it != channels.end())
 	{
 		if (it->second)
-		{
 			delete it->second;
-		}
 		++it;
 	}
-	channel.clear();
+	channels.clear();
 }
 
 int ChannelList::joinChannel(userInfos* user, std::string channel_name)
@@ -44,22 +43,22 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		// _term->prtTmColor("Channel must begin with #", Terminal::RED);
 		return ERR_BADCHANMASK;
 	}
-	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
+	std::map<std::string, s_Channel *>::iterator it = channels.find(channel_name);
 	if(!is_in_Channel(user, channel_name))
 	{
-		if (it != channel.end())	// CHANNEL EXISTS
+		if (it != channels.end())	// CHANNEL EXISTS
 		{
 			if(it->second->nb_users > max_in_channel)
 			{
 				_term->prtTmColor("Maximum number of client in Channel is" + toString(max_in_channel), Terminal::RED);
 				return 471;
 			}
-			it->second->users.push_back(user);
+			it->second->users[user->getNickname()] = user;
 			if (user->isAdmin())
 				it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 2));
 			else
 				it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 0));
-			_term->prtTmColor("Channel " + channel_name + " exist", Terminal::BLUE);
+			// _term->prtTmColor("Channel " + channel_name + " exist", Terminal::BLUE);
 			++it->second->nb_users;
 			user->addChannelToList(it->second);
 		}
@@ -71,9 +70,9 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 			new_channel->mode = "+mntlb";	// mod, no msg from out, topic protect, limit, ban
 			new_channel->deletable = 1;
 			new_channel->nb_users = 1;
-			channel.insert(std::pair<std::string, s_Channel *>(channel_name, new_channel));
-			_term->prtTmColor("Channel " + channel_name + " created", Terminal::BLUE);
-			new_channel->users.push_back(user);
+			channels.insert(std::pair<std::string, s_Channel *>(channel_name, new_channel));
+			_term->prtTmColor("Channel " + channel_name + " created", Terminal::BRIGHT_BLUE);
+			new_channel->users[user->getNickname()] = user;
 			new_channel->operators.insert(make_pair<string, userInfos*>(user->getNickname(), user));
 			new_channel->prefix.insert(std::pair<std::string, int>(user->getNickname(), 2));
 			nb_channel++;
@@ -86,63 +85,51 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 void ChannelList::partChannel(userInfos* user, std::string channel_name)
 {
     if (!user) return;
-    std::map<std::string, s_Channel*>::iterator it = channel.find(channel_name);
+    std::map<std::string, s_Channel*>::iterator itchan = channels.find(channel_name);
 
-    if (it != channel.end())
-    {
-        std::vector<userInfos*>::iterator it_u = it->second->users.begin();
-        while (it_u != it->second->users.end())
-        {
-            if (*it_u == user){
-                it_u = it->second->users.erase(it_u);
-                --it->second->nb_users;
-                if(it->second->nb_users == 0 && it->second->deletable)    //suprimer le chan
-                {
-                    channel_map.erase(channel_name);
-                    delete it->second;
-                    channel.erase(it);
-                    return;
-                }
-            }
-            else
-                ++it_u;
-        }
-        // Delete user from prefix map
-        it->second->prefix.erase(user->getNickname());
-        // Delete user from operator map
-        it->second->operators.erase(user->getNickname());
-    } else {
-        _term->prtTmColor("PART: Channel not found " + channel_name, Terminal::RED);
-    }
+    if (itchan == channels.end()){
+		_term->prtTmColor("PART: Channel not found " + channel_name, Terminal::RED);
+		return ;
+	}
+
+	std::map<string, userInfos*>::iterator ituser = itchan->second->users.find(user->getNickname());
+	if (ituser == itchan->second->users.end())	// find user in channel user list
+		return ;					// User not in this channel
+
+	itchan->second->users.erase(ituser);	// remove user from channel's user list
+	--itchan->second->nb_users;
+	if(itchan->second->nb_users <= 0 && itchan->second->deletable)    //suprimer le chan si vide
+	{
+		delete itchan->second;
+		channels.erase(itchan);
+		nb_channel--;
+		return ;
+	}
+
+	// Delete user from this channel's prefix map
+	itchan->second->prefix.erase(user->getNickname());
+	// Delete user from this channel's operator map
+	itchan->second->operators.erase(user->getNickname());
+
 }
 
 void ChannelList::quitServer(userInfos* user)
 {
     if (!user) return;
-    std::map<std::string, s_Channel*>::iterator it = channel.begin();
+    std::map<std::string, s_Channel*>::iterator it_chan = channels.begin();
 
-    while (it != channel.end())
+	// Create a vector of all the chans to remove
+	vector<s_Channel*> chans_user_is_in;
+    while (it_chan != channels.end())	// For each channel, check if user is in it
     {
-        std::vector<userInfos*>::iterator it_u;
-        for (it_u = it->second->users.begin(); it_u != it->second->users.end(); ++it_u)
-        {
-            if (*it_u == user)
-            {
-                break;
-            }
-        }
-        if (it_u != it->second->users.end())
-        {
-            std::map<std::string, s_Channel*>::iterator next_it = it;
-            ++next_it;
-            partChannel(user, it->first);
-            it = next_it;
-        }
-        else
-        {
-            ++it;
-        }
+		if (it_chan->second->users.find(user->getNickname()) != it_chan->second->users.end())
+			chans_user_is_in.push_back(it_chan->second);
     }
+
+	// Remove user from all the chans he's in
+	for (size_t i = 0; i < chans_user_is_in.size(); ++i){
+		partChannel(user, chans_user_is_in[i]->channel_name);
+	}
 }
 
 int ChannelList::kickChannel(userInfos* kicker, userInfos* user, std::string channel_name)
@@ -150,8 +137,8 @@ int ChannelList::kickChannel(userInfos* kicker, userInfos* user, std::string cha
 	if (!user || !kicker) return -1;
 
 	// Check if chan exists
-	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
-	if (it == channel.end())
+	std::map<std::string, s_Channel *>::iterator it = channels.find(channel_name);
+	if (it == channels.end())
 	{
 		_term->prtTmColor("KICK error, The Channel doesn't exist " + channel_name, Terminal::YELLOW);
 		return ERR_NOSUCHCHANNEL;
@@ -192,8 +179,8 @@ int ChannelList::kickChannel(userInfos* kicker, userInfos* user, std::string cha
 
 s_Channel	*ChannelList::getChannel(std::string& channel_name)
 {
-	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
-	if (it != channel.end())
+	std::map<std::string, s_Channel *>::iterator it = channels.find(channel_name);
+	if (it != channels.end())
 	{
 		return (it->second);
 	}
@@ -202,24 +189,19 @@ s_Channel	*ChannelList::getChannel(std::string& channel_name)
 
 bool ChannelList::is_in_Channel(userInfos* user, string channel_name)
 {
-	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
-	if(it != channel.end())
+	std::map<std::string, s_Channel *>::iterator it = channels.find(channel_name);
+	if(it != channels.end())
 	{
-		std::vector<userInfos *>::iterator it_u = it->second->users.begin();
-		while(it_u != it->second->users.end())
-		{
-			if((*it_u) == user)
-				return(1);
-			it_u++;
-		}
+		if(it->second->users.find(user->getNickname()) != it->second->users.end())
+			return(1);
 	}
 	return(0);
 }
 
 bool ChannelList::is_operators(userInfos* user, string channel_name)
 {
-	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
-	if(it != channel.end())
+	std::map<std::string, s_Channel *>::iterator it = channels.find(channel_name);
+	if(it != channels.end())
 	{
 		std::map<std::string, userInfos *>::iterator it_u = it->second->operators.find(user->getNickname());
 		if(it_u != it->second->operators.end())
@@ -230,35 +212,28 @@ bool ChannelList::is_operators(userInfos* user, string channel_name)
 
 std::string ChannelList::getUsersNicksInChan(string& channel_name)
 {
-	std::map<std::string, s_Channel *>::iterator it = channel.find(channel_name);
-	std::string users;
+	std::map<std::string, s_Channel *>::iterator itchan = channels.find(channel_name);
+	std::string users = "";
 
-	if(it != channel.end())
+	if(itchan == channels.end())
+		return users;
+
+	std::map<string, userInfos *>::iterator it_u = itchan->second->users.begin();
+	while(it_u != itchan->second->users.end())
 	{
-		std::vector<userInfos *>::iterator it_u = it->second->users.begin();
-		while(it_u != it->second->users.end())
-		{
-			if (it->second->prefix.find((*it_u)->getNickname())->second == 4)
-			{
-				users += "~";		// FOUNDER
-			}
-			else if (it->second->prefix.find((*it_u)->getNickname())->second == 3)
-			{
-				users += "&";		// PROTECTED
-			}
-			else if (it->second->prefix.find((*it_u)->getNickname())->second == 2)
-			{
-				users += "@";		// OPE
-			}
-			else if (it->second->prefix.find((*it_u)->getNickname())->second == 1)
-			{
-				users += "%";		// HALF OP
-			}
-			users += (*it_u)->getNickname();
-			users += " ";
-			it_u++;
+		int user_grade = itchan->second->prefix.find(it_u->second->getNickname())->second;
+		switch (user_grade){
+			case 1: users += "%"; break;	// half op
+			case 2: users += "@"; break;	// op
+			case 3: users += "@"; break;	// protect
+			case 4: users += "@"; break;	// founder
 		}
+
+		users += it_u->second->getNickname();
+		users += " ";
+		it_u++;
 	}
+
 	return users;
 }
 
@@ -269,8 +244,8 @@ int ChannelList::getNbChannel()
 
 const string ChannelList::getUserPriviledges(const string& nick, const string& chan_name){
 	// FIND CHANNEL
-	map<string, s_Channel*>::iterator it = channel.find(chan_name);
-	if (it == channel.end()) return "";
+	map<string, s_Channel*>::iterator it = channels.find(chan_name);
+	if (it == channels.end()) return "";
 	// FIND USER IN CHANNEL
 	map<string, int>::iterator itt = it->second->prefix.find(nick);
 	if (itt == it->second->prefix.end()) return "";
@@ -279,7 +254,6 @@ const string ChannelList::getUserPriviledges(const string& nick, const string& c
 		case 2: return "@";	// op
 		case 3: return "@";	// protect	Should be &
 		case 4: return "@";	// founder	Should be ~
-		default: return "";
 	}
 	return "";
 }
@@ -287,8 +261,8 @@ const string ChannelList::getUserPriviledges(const string& nick, const string& c
 const string ChannelList::getUserModes(userInfos* user, const string& chan_name){
 	string modes = user->getUserMode();
 	// FIND CHANNEL
-	map<string, s_Channel*>::iterator it = channel.find(chan_name);
-	if (it == channel.end()) return "";
+	map<string, s_Channel*>::iterator it = channels.find(chan_name);
+	if (it == channels.end()) return "";
 	// FIND USER IN CHANNEL
 	map<string, int>::iterator itt = it->second->prefix.find(user->getNickname());
 	if (itt == it->second->prefix.end()) return "";
@@ -304,11 +278,11 @@ const string ChannelList::getUserModes(userInfos* user, const string& chan_name)
 
 s_Channel* ChannelList::getNextChannel(int reset){
 	static map<string, s_Channel*>::iterator it;
-	if (reset) it = channel.begin();
-	if (it == channel.end()) return NULL;
-	while (it != channel.end() && it->second == NULL)
+	if (reset) it = channels.begin();
+	if (it == channels.end()) return NULL;
+	while (it != channels.end() && it->second == NULL)
 		++it;
-	if (it == channel.end()) return NULL;
+	if (it == channels.end()) return NULL;
 	s_Channel*	chan = it->second;
 	++it;
 	return chan;
