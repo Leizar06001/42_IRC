@@ -2,15 +2,20 @@
 #include <sys/stat.h>	// MKDIR
 
 void Server::writeToConLog(const string& str){
+	_term.prtTmColor(str, Terminal::BRIGHT_CYAN);
 	_logConStream << str;
-	if (str[str.length() - 1] != '\n')
+	if (str[str.length() - 1] != '\n'){
 		_logConStream << "\n";
+		_logConStream.flush();
+	}
 }
 
 void Server::writeToLog(const string& str){
 	_logStream << str;
-	if (str[str.length() - 1] != '\n')
+	if (str[str.length() - 1] != '\n'){
 		_logStream << "\n";
+		_logStream.flush();
+	}
 }
 
 void Server::openLog(void){
