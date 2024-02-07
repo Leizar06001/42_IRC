@@ -193,7 +193,7 @@ void Server::getConnection(void){
 	int i = 1;
 	while (_fds[i].fd > 0) ++i;
 	_fds[i].fd = connection;
-	_fds[i].events = POLLIN | POLLOUT | POLLHUP;// | POLLHUP;
+	_fds[i].events = POLLIN | POLLHUP;// POLLIN ready to read POLLOUT ready to write POLLHUP closed
 
 	userInfos* new_user = _users->addUser(i);
 	new_user->setIpAddr(ip_str);
