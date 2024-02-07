@@ -27,6 +27,8 @@
 #define MAX_CHANNELS			100
 #define MAX_USERS_PER_CHAN		100
 
+#define	VERSION					"0.1 Beta"
+
 #define CONF_FILE				"conf.txt"
 #define CONF_FOLDER				"./conf/"
 #define LOG_FILE				"last_log.txt"
@@ -38,10 +40,11 @@ class Server {
 
 	private:
 		string			_servername;
-		int				_max_fd_allowed;
 		int				_port;
 		string			_password;
+		string			_version;
 		string			_admin_password;
+		int				_max_fd_allowed;
 		int 			_sockfd;
 		sockaddr_in		_sockaddr;
 		struct pollfd 	_fds[MAX_CLIENTS + 1];

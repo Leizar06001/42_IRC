@@ -28,7 +28,7 @@ void Server::performAction(userInfos* user){
 		writeToConLog(timestamp_fail2ban() + " CLIENT: " + _users->getUserByFd(fd)->getIpAdress() + " Registered: " + user->getNickname());
 
 		sendMessage(fd, ":" + _servername + " 001 " + user->getNickname() + " :Welcome to the iRisChat Network, " + user->getNickname());
-		sendMessage(fd, ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version 0.1");
+		sendMessage(fd, ":" + _servername + " 002 " + user->getNickname() + " :Your host is " + _servername + ", running version " + _version);
 		sendMessage(fd, ":" + _servername + " 003 " + user->getNickname() + " :This server was created the " + str_time);
 		sendMessage(fd, ":" + _servername + " 004 " + user->getNickname() + " " +_servername + " 0.1 iox ntilm");
 		sendMessage(fd, ":" + _servername + " 005 " + user->getNickname() + " ");

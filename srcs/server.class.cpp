@@ -11,6 +11,7 @@ Server::Server(void):_initialized(0), _term(&_logStream){
 	_registration_timeout = REGISTRATION_TIMEOUT;
 	_connection_timeout = CONNECTION_TIMEOUT;
 	_max_channels = MAX_CHANNELS;
+	_version = VERSION;
 	_msg_nb = 0;
 	_connection_nb = 0;
 	_sockfd = 0;
