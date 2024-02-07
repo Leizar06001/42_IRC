@@ -26,6 +26,8 @@ void Server::cmd_join(int fd, vector<string> tokens){
 				sendServerMessage(fd, ret, "JOIN :This channel is full"); break;
 			case ERR_INVITEONLYCHAN:
 				sendServerMessage(fd, ret, "JOIN :You must be invited to join this channel"); break;
+			case ERR_INPUTTOOLONG:
+				sendServerMessage(fd, ret, "JOIN :Channel name max 15 characters"); break;
 
 			case 0:
 				sendMessage(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + user->getIpAdress() + " " +  "JOIN " + channel);

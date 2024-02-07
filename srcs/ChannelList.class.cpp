@@ -34,25 +34,18 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 	// ERR_TOOMANYCHANNELS ERR_BADCHANMASK ERR_BANNEDFROMCHAN ERR_CHANNELISFULL ERR_INVITEONLYCHAN
 
 	if(nb_channel > max_channel)
-	{
-		// _term->prtTmColor("Maximum number of Channel is" + toString(max_channel), Terminal::RED);
 		return ERR_TOOMANYCHANNELS;
-	}
 	if (channel_name[0] != '#')
-	{
-		// _term->prtTmColor("Channel must begin with #", Terminal::RED);
 		return ERR_BADCHANMASK;
-	}
+
 	std::map<std::string, s_Channel *>::iterator it = channels.find(channel_name);
 	if(!is_in_Channel(user, channel_name))
 	{
 		if (it != channels.end())	// CHANNEL EXISTS
 		{
 			if(it->second->nb_users > max_in_channel)
-			{
-				_term->prtTmColor("Maximum number of client in Channel is" + toString(max_in_channel), Terminal::RED);
-				return 471;
-			}
+				return ERR_CHANNELISFULL;
+
 			it->second->users[user->getNickname()] = user;
 			if (user->isAdmin())
 				it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 2));
@@ -64,6 +57,14 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		}
 		else						// NEW CHANNEL
 		{
+			// check if name is valid
+			string wrong_char = " :&%^@!*\"\t\n\r";
+			if (wrong_char.find(channel_name[0]) != string::npos)
+				return ERR_BADCHANMASK;
+			if (channel_name.length() > 15)
+				return ERR_INPUTTOOLONG;
+
+			// CREATE NEW CHANNEL
 			s_Channel *new_channel = new s_Channel;
 			new_channel->channel_name = channel_name;
 			new_channel->channel_type = "=";

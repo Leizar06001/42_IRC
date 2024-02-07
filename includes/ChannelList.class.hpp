@@ -7,6 +7,9 @@
 
 using namespace std;
 
+// RESTE TOPIC ET INVITES ET MODES (set unset)
+
+
 class ChannelList
 {
 	private:
