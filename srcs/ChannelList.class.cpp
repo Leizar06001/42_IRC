@@ -296,10 +296,10 @@ const string ChannelList::getUserModes(userInfos* user, const string& chan_name)
 	map<string, int>::iterator itt = it->second->prefix.find(user->getNickname());
 	if (itt == it->second->prefix.end()) return "";
 	switch (itt->second){
-		case 1: modes += "h";	// half op
-		case 2: modes += "o";	// op
-		case 3: modes += "p";	// protect
-		case 4: modes += "q";	// founder
+		case 1: modes += "h"; break;	// half op
+		case 2: modes += "o"; break;	// op
+		case 3: modes += "p"; break;	// protect
+		case 4: modes += "q"; break;	// founder
 	}
 
 	return modes;
