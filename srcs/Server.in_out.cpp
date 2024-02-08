@@ -56,6 +56,9 @@ void Server::getMessages(int fd){
 		if (isBotTraffic(answer)){					// BOT DETECTION
 			userInfos* bot = _users->getUserByFd(fd);
 			if (bot) addToBannedList(bot->getIpAdress());
+			_term.prtTmColor("************************************", Terminal::BRIGHT_RED);
+			_term.prtTmColor("BOT DETECTED: " + bot->getIpAdress(), Terminal::BRIGHT_RED);
+			_term.prtTmColor("************************************", Terminal::BRIGHT_RED);
 			forceDisconnect(fd, "BANNED");
 			return;
 		}
