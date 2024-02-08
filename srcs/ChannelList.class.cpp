@@ -86,19 +86,19 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 	return 0;
 }
 
-void ChannelList::partChannel(userInfos* user, std::string channel_name)
+int ChannelList::partChannel(userInfos* user, std::string channel_name)
 {
     if (!user) return;
     std::map<std::string, s_Channel*>::iterator itchan = channels.find(channel_name);
 
     if (itchan == channels.end()){
 		_term->prtTmColor("PART: Channel not found " + channel_name, Terminal::RED);
-		return ;
+		return ERR_NOSUCHCHANNEL;
 	}
 
 	std::map<string, userInfos*>::iterator ituser = itchan->second->users.find(user->getNickname());
 	if (ituser == itchan->second->users.end())	// find user in channel user list
-		return ;					// User not in this channel
+		return ERR_NOTONCHANNEL;					// User not in this channel
 
 	itchan->second->users.erase(ituser);	// remove user from channel's user list
 	--itchan->second->nb_users;

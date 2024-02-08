@@ -34,7 +34,7 @@ class ChannelList
 		s_Channel* getChannel(string& channel_name);
 		string getUsersNicksInChan(string& chanel_name);
 
-		void partChannel(userInfos* user, std::string channel_name);
+		int partChannel(userInfos* user, std::string channel_name);
 
 		void quitServer(userInfos* user);
 

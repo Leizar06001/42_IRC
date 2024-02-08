@@ -10,8 +10,7 @@ void Server::cmd_part(int fd, vector<string> tokens){
 		istringstream ss(tokens[1]);
 		string channel;
 		while (getline(ss, channel, ',')){
-			int ret = 0;
-			_channels->partChannel(user, channel);
+			int ret = _channels->partChannel(user, channel);
 			if (ret == 0){
 				sendClientMessage(fd, "PART " + channel);
 				s_Channel* chan = _channels->getChannel(channel);
