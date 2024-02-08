@@ -37,7 +37,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		return ERR_TOOMANYCHANNELS;
 	if (channel_name[0] != '#')
 		return ERR_BADCHANMASK;
-	string wrong_char = "@#/\\|=+-*%`~\'(): ";
+	string wrong_char = "@&$#/\\|=+-*%`~\'\"(): ";
 	if (channel_name.substr(1).find_first_of(wrong_char) != string::npos)
 		return ERR_BADCHANMASK;
 
