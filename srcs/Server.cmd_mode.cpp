@@ -49,7 +49,19 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 			// SEND MODES
 			sendServerMessage(fd, RPL_UMODEIS, user->getUserMode());
 		} else {	// ERR cant change mode for other users
-			sendServerMessage(fd, ERR_USERSDONTMATCH, ":Cannot change mode for other users");
+			if (tokens.size() > 2){
+				sendServerMessage(fd, ERR_USERSDONTMATCH, ":Cannot change mode for other users");
+			} else {
+				userInfos* target = _users->getUserByNick(tokens[1]);
+				if (target){
+					string target_mode = target->getUserMode();
+					if (target_mode.length() > 0)
+						sendMessage(fd, ":" + _servername + " MODE " + "#General" + " " + target_mode + " " + target->getNickname() + " " + target->getNickname());
+				}
+
+			}
+			// sendServerMessage(fd, ERR_USERSDONTMATCH, ":Cannot change mode for other users");
+
 		}
 	}
 }

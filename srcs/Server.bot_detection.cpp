@@ -12,7 +12,7 @@ bool Server::isBotTraffic(const string& str){
 	}
 
 	for(size_t i = 0; i < str.size(); ++i){
-		if ((str[i] < 32 || str[i] > 126) && str[i] != '\r' && str[i] != '\n') return true;
+		if ((str[i] < 32) && str[i] != '\r' && str[i] != '\n') return true;
 	}
 	return false;
 }
