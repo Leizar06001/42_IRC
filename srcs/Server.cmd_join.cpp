@@ -12,8 +12,7 @@ void Server::cmd_join(int fd, vector<string> tokens){
 	std::istringstream ss(tokens[1]);
 	std::string channel;
 	while (std::getline(ss, channel, ',')) {
-		int ret = 0;
-		_channels->joinChannel(user, channel);
+		int ret = _channels->joinChannel(user, channel);
 
 		switch (ret){
 			case ERR_TOOMANYCHANNELS:
