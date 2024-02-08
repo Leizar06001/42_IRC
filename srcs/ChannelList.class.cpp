@@ -37,9 +37,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		return ERR_TOOMANYCHANNELS;
 	if (channel_name[0] != '#')
 		return ERR_BADCHANMASK;
-	string wrong_char = "@&$#/\\|=+-*%`~\'\"(): ";
-	if (channel_name.substr(1).find_first_of(wrong_char) != string::npos)
-		return ERR_BADCHANMASK;
+
 
 	std::map<std::string, s_Channel *>::iterator it = channels.find(channel_name);
 	if(!is_in_Channel(user, channel_name))
@@ -61,10 +59,10 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 		else						// NEW CHANNEL
 		{
 			// check if name is valid
-			string wrong_char = " :&%^@!*\"\t\n\r";
-			if (wrong_char.find(channel_name[0]) != string::npos)
+			string wrong_char = "@&$#/\\|=+-*%`~\'\"(): ";
+			if (channel_name.substr(1).find_first_of(wrong_char) != string::npos)
 				return ERR_BADCHANMASK;
-			if (channel_name.length() > 15)
+			if (channel_name.length() > 16)
 				return ERR_INPUTTOOLONG;
 
 			// CREATE NEW CHANNEL

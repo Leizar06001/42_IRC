@@ -94,8 +94,8 @@ int userList::setNickname(int fd, string& nickname){
 	if (nickname.find_first_of(wrong_char) != string::npos)
 		return ERR_ERRONEUSNICKNAME;
 	string valid_nick = nickname;
-	if (valid_nick.length() > 10)
-		valid_nick = valid_nick.substr(0, 10);
+	if (valid_nick.length() > 16)
+		valid_nick = valid_nick.substr(0, 16);
 	userInfos* check = getUserByNick(valid_nick);
 	if (check)
 		return ERR_NICKNAMEINUSE;
