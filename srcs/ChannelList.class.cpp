@@ -88,7 +88,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 
 int ChannelList::partChannel(userInfos* user, std::string channel_name)
 {
-    if (!user) return;
+    if (!user) return -1;
     std::map<std::string, s_Channel*>::iterator itchan = channels.find(channel_name);
 
     if (itchan == channels.end()){
