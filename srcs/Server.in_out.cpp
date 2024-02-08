@@ -53,14 +53,17 @@ void Server::getMessages(int fd){
 		forceDisconnect(fd, "Connection lost");
 	} else {				// TREAT MESSAGE
 		string answer(buffer, bytesRead);
-		if (isBotTraffic(answer)){					// BOT DETECTION
-			userInfos* bot = _users->getUserByFd(fd);
-			if (bot) addToBannedList(bot->getIpAdress());
-			_term.prtTmColor("************************************", Terminal::BRIGHT_RED);
-			_term.prtTmColor("BOT DETECTED: " + bot->getIpAdress(), Terminal::BRIGHT_RED);
-			_term.prtTmColor("************************************", Terminal::BRIGHT_RED);
-			forceDisconnect(fd, "BANNED");
-			return;
+		if (!_users->getUserByFd(fd)->isRegistered()){
+			if (isBotTraffic(answer)){					// BOT DETECTION
+				userInfos* bot = _users->getUserByFd(fd);
+				if (bot) addToBannedList(bot->getIpAdress());
+				writeToLog(timestamp() + answer);
+				_term.prtTmColor("************************************", Terminal::BRIGHT_RED);
+				_term.prtTmColor("BOT DETECTED: " + bot->getIpAdress(), Terminal::BRIGHT_RED);
+				_term.prtTmColor("************************************", Terminal::BRIGHT_RED);
+				forceDisconnect(fd, "BANNED");
+				return;
+			}
 		}
 
 		userInfos* user = _users->getUserByFd(fd);
