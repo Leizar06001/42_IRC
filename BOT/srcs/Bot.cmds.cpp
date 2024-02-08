@@ -59,6 +59,8 @@ void	Bot::cmd_privmsg(const vector<string>& tokens){
 					sendMsg("KICK #General " + nick + " :You are spamming the channel. Please respect the community and avoid spamming.");
 				} else {
 					sendMsg("PRIVMSG #General :" + nick + " you are spamming the channel, you'll be kicked if you continue !");
+					// reset user msg list
+					user->msg_times.clear();
 				}
 				++(user->nb_warnings_spam);
 			}
