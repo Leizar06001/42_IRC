@@ -107,14 +107,14 @@ int ChannelList::partChannel(userInfos* user, std::string channel_name)
 		delete itchan->second;
 		channels.erase(itchan);
 		nb_channel--;
-		return ;
+		return 0;
 	}
 
 	// Delete user from this channel's prefix map
 	itchan->second->prefix.erase(user->getNickname());
 	// Delete user from this channel's operator map
 	itchan->second->operators.erase(user->getNickname());
-
+	return 0;
 }
 
 void ChannelList::quitServer(userInfos* user)
