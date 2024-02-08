@@ -40,6 +40,7 @@ s_user* Bot::createNewUser(const string& nick){
 	user->nick = nick;
 	user->nb_warnings_forbidden = 0;
 	user->last_warning_forbidden = 0;
+	user->nb_warnings_spam = 0;
 	prt(nick + " new user create\n", BRIGHT_CYAN);
 	return user;
 }
