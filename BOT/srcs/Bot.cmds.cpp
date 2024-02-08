@@ -11,7 +11,7 @@ void	Bot::cmd_privmsg(const vector<string>& tokens){
 	map<string, s_user*>::iterator it = _nickMap.find(nick);
 
 	if (it == _nickMap.end()){	// Create new user
-		_nickMap.insert(make_pair<string, s_user*>(nick, createNewUser(nick)));
+		_nickMap[nick] = createNewUser(nick);
 		prt(nick + " added to map\n", WHITE);
 	} else {
 		// Check times to reset warnings
@@ -20,26 +20,48 @@ void	Bot::cmd_privmsg(const vector<string>& tokens){
 		}
 	}
 
-	if (tokens.size() > 3){
-		string word = checkForbiddenWords(tokens[3]);
+	s_user* user = _nickMap[nick];
 
+	if (tokens.size() > 3){
+
+		// ANALYSE MOTS INTERDITS
+		string word = checkForbiddenWords(tokens[3]);
 		if (word.length() > 0){
 
-			if (it != _nickMap.end()){   // Check if user exceeded warnings max
-				if (it->second->nb_warnings_forbidden >= WARNINGS_BEFORE_KICK_FORBIDDEN){
-					sendMsg("KICK #General " + nick + " :Your recent messages contain inappropriate language. We encourage respectful communication in this community.");
-				} else {
-					sendMsg("PRIVMSG #General :" + nick + " this kind of word is forbidden on this channel \"" + word + "\", you'll be kicked if you continue !");
-				}
+			  // Check if user exceeded warnings max
+			if (user->nb_warnings_forbidden >= WARNINGS_BEFORE_KICK_FORBIDDEN){
+				sendMsg("KICK #General " + nick + " :Your recent messages contain inappropriate language. We encourage respectful communication in this community.");
+			} else {
+				sendMsg("PRIVMSG #General :" + nick + " this kind of word is forbidden on this channel \"" + word + "\", you'll be kicked if you continue !");
 			}
 
 			prt("Forbidden word: " + word + "\n", BRIGHT_RED);
 
 			// Add one warning
 			it = _nickMap.find(nick);
-			++(it->second->nb_warnings_forbidden);
-			it->second->last_warning_forbidden = time(NULL);
-			prt(nick + " nb warnings: " + toString(it->second->nb_warnings_forbidden) + "\n", WHITE);
+			++(user->nb_warnings_forbidden);
+			user->last_warning_forbidden = time(NULL);
+			prt(nick + " nb warnings: " + toString(user->nb_warnings_forbidden) + "\n", WHITE);
+		}
+
+		// ANALYSE SPAM
+		// Add message time to user's message list to check spam
+		user->msg_times.push_back(time(NULL));
+		if (user->msg_times.size() > NB_MESSAGE_SPAM){
+			user->msg_times.erase(user->msg_times.begin());
+		}
+
+		// Check if user is spamming
+		if (user->msg_times.size() == NB_MESSAGE_SPAM){
+			if (time(NULL) - user->msg_times[0] < TIME_BEFORE_KICK_SPAM){
+				// Spamming
+				if (user->nb_warnings_spam >= WARNINGS_BEFORE_KICK_SPAM){
+					sendMsg("KICK #General " + nick + " :You are spamming the channel. Please respect the community and avoid spamming.");
+				} else {
+					sendMsg("PRIVMSG #General :" + nick + " you are spamming the channel, you'll be kicked if you continue !");
+				}
+				++(user->nb_warnings_spam);
+			}
 		}
 	}
 }

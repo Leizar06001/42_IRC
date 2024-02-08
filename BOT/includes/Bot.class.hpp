@@ -24,15 +24,17 @@
 
 #define NB_MESSAGE_SPAM					5
 #define WARNINGS_BEFORE_KICK_SPAM		3
-#define TIME_BEFORE_KICK_SPAM			120
+#define TIME_BEFORE_KICK_SPAM			10
 
 
 using namespace std;
 
 typedef struct s_user {
-	string 	nick;
-	int		nb_warnings_forbidden;
-	time_t	last_warning_forbidden;
+	string 			nick;
+	int				nb_warnings_forbidden;
+	time_t			last_warning_forbidden;
+	int				nb_warnings_spam;
+	vector<time_t>	msg_times;
 
 }				t_user;
 
