@@ -8,6 +8,7 @@ SRCS = 	srcs/main.cpp		\
 		srcs/Bot.cmds.cpp	\
 		srcs/Bot.connect.cpp	\
 		srcs/Bot.forbidden_words.cpp	\
+		srcs/Bot.kick.cpp		\
 		srcs/Bot.parse.cpp	\
 		srcs/Bot.read.cpp	\
 		prt.cpp
