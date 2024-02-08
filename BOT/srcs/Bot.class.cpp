@@ -26,6 +26,18 @@ int		Bot::botLoop(void){
 		chooseCmd(tokens);
 	}
 
+	// Check banned users
+	map<string, time_t>::iterator it = _bannedUsers.begin();
+	while (it != _bannedUsers.end()){
+		if (time(NULL) - it->second > TIME_BEFORE_UNBAN){
+			prt(it->first + " unbanned\n", BRIGHT_GREEN);
+			sendMsg("MODE #General -b " + it->first);
+			_bannedUsers.erase(it++);
+		} else {
+			++it;
+		}
+	}
+
 	return 0;
 }
 

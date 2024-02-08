@@ -26,6 +26,9 @@
 #define WARNINGS_BEFORE_KICK_SPAM		3
 #define TIME_BEFORE_KICK_SPAM			10
 
+#define TIME_BEFORE_RESET_KICKS			600
+#define NB_KICK_BEFORE_BAN				1
+#define TIME_BEFORE_UNBAN				600
 
 using namespace std;
 
@@ -35,7 +38,9 @@ typedef struct s_user {
 	time_t			last_warning_forbidden;
 	int				nb_warnings_spam;
 	vector<time_t>	msg_times;
-
+	int 			nb_times_kicked;
+	time_t			last_kick;
+	bool			banned;
 }				t_user;
 
 class Bot {
@@ -60,6 +65,7 @@ class Bot {
 		set<string> _forbiddenWords;
 
 		map<string, s_user*>	_nickMap;
+		map<string, time_t>		_bannedUsers;
 
 
 		const string 	readSocket(void);
@@ -78,6 +84,10 @@ class Bot {
 		const string	getNickFromMsg(const string& str);
 
 		s_user*	createNewUser(const string& nick);
+
+		void	checkForForbiddenWords(const string& msg, s_user* user);
+		void 	checkForSpam(s_user* user);
+		void	kickUser(s_user* user, const string& reason);
 
 	public:
 		Bot(string nickname, string realname);
