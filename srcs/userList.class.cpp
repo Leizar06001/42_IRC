@@ -90,8 +90,8 @@ void userList::rmUser(int fd){
 }
 
 int userList::setNickname(int fd, string& nickname){
-	string wrong_first_char = "#/\\|=+-*%`~\'(): 0123456789";
-	if (wrong_first_char.find(nickname[0]) != string::npos)
+	string wrong_char = "@#/\\|=+-*%`~\'(): 0123456789";
+	if (nickname.find_first_of(wrong_char) != string::npos)
 		return ERR_ERRONEUSNICKNAME;
 	string valid_nick = nickname;
 	if (valid_nick.length() > 10)
