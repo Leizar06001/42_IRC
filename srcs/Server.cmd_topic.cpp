@@ -38,6 +38,7 @@ void Server::cmd_topic(int fd, vector<string> tokens)
 
 	if (hasTopicPermission(_users->getUserByFd(fd), channel)) {
 		channel->topic = tokens[2];
+		_term.prtTmColor("TOPIC Channel " + tokens[1] + " changed to " + tokens[2], Terminal::GREEN);
 		sendServerMessage(fd, RPL_TOPIC, tokens[1] + " :" + tokens[2]);
 		sendServerMsgToList(fd, "322 TOPIC " + tokens[1] + " :" + tokens[2], channel->users);
 	} else {
