@@ -7,10 +7,11 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 
 	string	nick = user->getNickname();
 
+	int ret = 0;
 	if (tokens[1][0] == '#'){		// target is a channel
 		s_Channel* chan = _channels->getChannel(tokens[1]);
 		if (chan == NULL){ // channel not exists
-			sendServerMessage(fd, ERR_NOSUCHCHANNEL, tokens[1]);
+			sendServerMessage(fd, ERR_NOSUCHCHANNEL, tokens[1] + ":No such channel");
 		} else {
 			if (tokens.size() > 2){
 				if (tokens[2].find_first_of("+-") == string::npos){	// SHOW MODES
@@ -20,9 +21,24 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 				} else {							// SET MODES
 					if (tokens.size() > 3){
 						userInfos* target = _users->getUserByNick(tokens[3]);
-						_channels->setMode(user, tokens[1], tokens[2], tokens[3], target);
+						ret = _channels->setMode(user, tokens[1], tokens[2], tokens[3], target);
 					} else
-						_channels->setMode(user, tokens[1], tokens[2], "", NULL);
+						ret = _channels->setMode(user, tokens[1], tokens[2], "", NULL);
+					if (ret == ERR_CHANOPRIVSNEEDED)
+						sendServerMessage(fd, ERR_CHANOPRIVSNEEDED, ":You're not channel operator");
+					else if (ret == ERR_UNKNOWNMODE)
+						sendServerMessage(fd, ERR_UNKNOWNMODE, ":Unknown mode flag");
+					else if (ret == ERR_BADCHANMASK)
+						sendServerMessage(fd, ERR_BADCHANMASK, ":Bad channel name, dont forget the prefix");
+					else if (ret == ERR_NEEDMOREPARAMS)
+						sendServerMessage(fd, ERR_NEEDMOREPARAMS, ":Need more params");
+					else if (ret == ERR_NOSUCHNICK)
+						sendServerMessage(fd, ERR_NOSUCHNICK, ":User not found");
+					else if (ret == ERR_USERNOTINCHANNEL)
+						sendServerMessage(fd, ERR_USERNOTINCHANNEL, ":The targeted user is not in this channel");
+					else if (ret == 0){
+						sendRawMsgToList(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " MODE " + tokens[1] + " " + tokens[2] + " " + tokens[3], chan->users);
+					}
 				}
 			} else {	// SHOW MODES
 				sendServerMessage(fd, RPL_CHANNELMODEIS, tokens[1] + " " + chan->mode);
