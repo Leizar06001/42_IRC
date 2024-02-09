@@ -48,6 +48,11 @@ class ChannelList
 
 		void setMaxChannels(int max_channel);
 		void setMaxInChannel(int max_in_channel);
+
+		int banUser(userInfos* user, string& channel_name);
+		int unbanUser(userInfos* user, string& channel_name);
+
+		int setMode(userInfos* user, string& channel_name, string& mode, string args, userInfos* target);
 };
 
 // modes : n: no external messages, b: block users, t: mod topic, i: invite only = private ?, m: moderated, l: limited nb user

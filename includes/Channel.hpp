@@ -12,7 +12,7 @@ typedef struct	t_Channel
 	std::map<string, userInfos *>	users;
 	std::map<string, userInfos *>	operators;
 	std::map<std::string, int>		prefix; // 0 = normal 1 = halfop 2 = operator 3 = protected(admin) 4 = founder
-	// std::vector<userInfos *>		kicklist;
+	std::map<string, userInfos *>	banlist;
 	bool							deletable;
 	std::string						topic;
 	int								nb_users;

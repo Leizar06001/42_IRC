@@ -12,7 +12,19 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 		if (chan == NULL){ // channel not exists
 			sendServerMessage(fd, ERR_NOSUCHCHANNEL, tokens[1]);
 		} else {
-			sendServerMessage(fd, RPL_CHANNELMODEIS, tokens[1] + " " + chan->mode);
+			if (tokens.size() > 2){
+				if (tokens[2].find_first_of("+-") == string::npos){	// SHOW MODES
+					sendServerMessage(fd, RPL_CHANNELMODEIS, tokens[1] + " " + chan->mode);
+
+
+				} else {							// SET MODES
+					if (tokens.size() > 3){
+						userInfos* target = _users->getUserByNick(tokens[3]);
+						_channels->setMode(user, tokens[1], tokens[2], tokens[3], target);
+					} else
+						_channels->setMode(user, tokens[1], tokens[2], "", NULL);
+				}
+			}
 		}
 
 

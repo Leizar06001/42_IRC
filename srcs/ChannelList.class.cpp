@@ -44,6 +44,9 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 	{
 		if (it != channels.end())	// CHANNEL EXISTS
 		{
+			// Check if user is banned
+			if (it->second->banlist.find(user->getNickname()) != it->second->banlist.end())
+				return ERR_BANNEDFROMCHAN;
 			if(it->second->nb_users > max_in_channel)
 				return ERR_CHANNELISFULL;
 
@@ -301,4 +304,64 @@ void ChannelList::setMaxInChannel(int max_in_channel)
 	this->max_in_channel = max_in_channel;
 }
 
+int	ChannelList::banUser(userInfos* user, string& channel_name)
+{
+	std::map<std::string, s_Channel*>::iterator it = channels.find(channel_name);
+	if (it == channels.end())
+		return ERR_NOSUCHCHANNEL;
+	if (it->second->banlist.find(user->getNickname()) != it->second->banlist.end())
+		return ERR_BANNEDFROMCHAN;
+	it->second->banlist[user->getNickname()] = user;
+	return 0;
+}
 
+int ChannelList::unbanUser(userInfos* user, string& channel_name)
+{
+	std::map<std::string, s_Channel*>::iterator it = channels.find(channel_name);
+	if (it == channels.end())
+		return ERR_NOSUCHCHANNEL;
+	if (it->second->banlist.find(user->getNickname()) == it->second->banlist.end())
+		return ERR_BANNEDFROMCHAN;
+	it->second->banlist.erase(user->getNickname());
+	return 0;
+}
+
+int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, string args, userInfos* target)
+{
+	// if mode ban, target should be a user, else NULL
+
+	std::map<std::string, s_Channel*>::iterator it = channels.find(channel_name);
+	if (it == channels.end())	// channel not found
+		return ERR_NOSUCHCHANNEL;
+	if (it->second->prefix.find(user->getNickname()) == it->second->prefix.end()) // user not in channel
+		return ERR_CHANOPRIVSNEEDED;
+	else if (it->second->prefix.find(user->getNickname())->second < 2) // user not operator
+		return ERR_CHANOPRIVSNEEDED;
+
+	int set = 0;
+	if (mode[0] == '+')
+		set = 1;
+	else if (mode[0] == '-')
+		set = -1;
+	else
+		return ERR_UNKNOWNMODE;
+
+	for (size_t i = 1; i < mode.length(); ++i){
+		if (mode[i] == 'n' || mode[i] == 't' || mode[i] == 'm' || mode[i] == 'l'){
+			if (set == 1  && it->second->mode.find(mode[i]) == string::npos)
+				it->second->mode += mode[i];
+			else if (set == -1)
+				it->second->mode.erase(it->second->mode.find(mode[i]), 1);
+
+		} else if (mode[i] == 'b'){
+			if (set == 1){
+				// BAN USER
+				return banUser(target, channel_name);
+			} else if (set == -1){
+				// UNBAN USER
+				return unbanUser(target, channel_name);
+			}
+		}
+	}
+	return 0;
+}
