@@ -1,5 +1,6 @@
 #include "../includes/ChannelList.class.hpp"
 #include "../includes/toString.hpp"
+#include <cstdlib>
 
 ChannelList::ChannelList(Terminal* term):_term(term)
 {
@@ -369,7 +370,7 @@ int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, st
 				it->second->channel_key = args;
 
 			} else if (mode[i] == 'l'){
-				int max_users = stoi(args);
+				int max_users = atoi(args.c_str());
 				if (max_users < 1) return ERR_NEEDMOREPARAMS;
 				it->second->max_users = atoi(args.c_str());
 
