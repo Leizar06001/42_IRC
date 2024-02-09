@@ -30,16 +30,16 @@ void Server::cmd_topic(int fd, vector<string> tokens)
 	string topic = channel->topic;
 	if (tokens.size() < 3){ 	// SEND TOPIC
 		if (topic.empty())
-			sendServerMessage(fd, RPL_NOTOPIC, user->getNickname() + " " + tokens[1] + " :No topic is set");
+			sendServerMessage(fd, RPL_NOTOPIC, tokens[1] + " :No topic is set");
 		else
-			sendServerMessage(fd, RPL_TOPIC, user->getNickname() + " " + tokens[1] + " :" + topic);
+			sendServerMessage(fd, RPL_TOPIC, tokens[1] + " :" + topic);
 		return ;
 	}
 
 	if (hasTopicPermission(_users->getUserByFd(fd), channel)) {
 		channel->topic = tokens[2];
-		sendServerMessage(fd, RPL_TOPIC, user->getNickname() + " " + tokens[1] + " :" + tokens[2]);
-		sendServerMsgToList(fd, user->getNickname() + " TOPIC " + tokens[1] + " :" + tokens[2], channel->users);
+		sendServerMessage(fd, RPL_TOPIC, tokens[1] + " :" + tokens[2]);
+		sendServerMsgToList(fd, "322 TOPIC " + tokens[1] + " :" + tokens[2], channel->users);
 	} else {
 		sendServerMessage(fd, ERR_CHANOPRIVSNEEDED, user->getNickname() +  " :You're not channel operator");
 	}
