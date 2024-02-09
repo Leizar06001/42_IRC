@@ -5,7 +5,7 @@ bool hasTopicPermission(userInfos* user, s_Channel* channel)
     std::map<std::string, int>::iterator prefix_it = channel->prefix.find(user->getNickname());
 
     if (prefix_it != channel->prefix.end()){
-        if (prefix_it->second >= 1 || channel->mode.find('t') == std::string::npos)
+        if (prefix_it->second >= 1 || channel->mode.find('t') == std::string::npos || user->isAdmin())
             return true;
 		else
             return false;
@@ -36,10 +36,11 @@ void Server::cmd_topic(int fd, vector<string> tokens)
 		return ;
 	}
 
-	if (hasTopicPermission(_users->getUserByFd(fd), channel)) {
+	if (hasTopicPermission(user, channel)) {
 		channel->topic = tokens[2];
-		sendServerMessage(fd, RPL_TOPIC, tokens[1] + " :" + tokens[2]);
-		sendServerMsgToList(fd, "322 TOPIC " + tokens[1] + " :" + tokens[2], channel->users);
+		_term.prtTmColor("TOPIC Channel " + tokens[1] + " changed to " + tokens[2], Terminal::GREEN);
+		//sendServerMessage(fd, RPL_TOPIC, tokens[1] + " :" + tokens[2]);
+		sendServerMsgToList(fd, "332 " + user->getNickname() + " " + tokens[1] + " :" + tokens[2], channel->users);
 	} else {
 		sendServerMessage(fd, ERR_CHANOPRIVSNEEDED, user->getNickname() +  " :You're not channel operator");
 	}
