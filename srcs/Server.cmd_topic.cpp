@@ -40,7 +40,7 @@ void Server::cmd_topic(int fd, vector<string> tokens)
 		channel->topic = tokens[2];
 		_term.prtTmColor("TOPIC Channel " + tokens[1] + " changed to " + tokens[2], Terminal::GREEN);
 		//sendServerMessage(fd, RPL_TOPIC, tokens[1] + " :" + tokens[2]);
-		sendServerMsgToList(fd, "332 " + user->getNickname() + tokens[1] + " :" + tokens[2], channel->users);
+		sendServerMsgToList(fd, "332 " + user->getNickname() + " " + tokens[1] + " :" + tokens[2], channel->users);
 	} else {
 		sendServerMessage(fd, ERR_CHANOPRIVSNEEDED, user->getNickname() +  " :You're not channel operator");
 	}
