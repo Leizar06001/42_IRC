@@ -8,6 +8,8 @@ void Server::cmd_nick(int fd, vector<string> tokens){
 	userInfos* user = _users->getUserByFd(fd);
 	if (tokens[1] == user->getNickname())
 		return ;
+
+	string prevnick = user->getNickname();
 	int ret = _users->setNickname(fd, tokens[1]);
 	string nick = user->getNickname();
 	if (nick.empty()) nick = tokens[1];
@@ -31,6 +33,10 @@ void Server::cmd_nick(int fd, vector<string> tokens){
 	} else if (ret == 1) { // Nick changed, must advertise new nick to others
 		int nb_users = _users->getNbUsers();
 		userInfos* target = _users->getNextUser(1);
+
+		// first, change nickname in channels lists
+		_channels->changeNickInChannels(prevnick, nick);
+
 		int i = 0;
 		while (i < nb_users){
 			if (target){

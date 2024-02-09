@@ -343,7 +343,7 @@ int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, st
 {
 	// if mode ban, target should be a user, else NULL
 	(void)args; // can be used to topic or limit
-
+	_term->prtTmColor("MODE " + channel_name + " " + mode + " " + args, Terminal::BRIGHT_YELLOW);
 	std::map<std::string, s_Channel*>::iterator it = channels.find(channel_name);
 	if (it == channels.end())	// channel not found
 		return ERR_NOSUCHCHANNEL;
@@ -424,4 +424,43 @@ bool ChannelList::isUserInvited(userInfos* user, std::string channel_name)
 	std::map<std::string, s_Channel*>::iterator it = channels.find(channel_name);
 
     return ( it->second->invited_users.find(user->getNickname()) != it->second->invited_users.end() );
+}
+
+void ChannelList::changeNickInChannels(const string &prevnick, const string& newnick)
+{
+	std::map<std::string, s_Channel*>::iterator it = channels.begin();
+	while (it != channels.end())
+	{
+		std::map<std::string, userInfos*>::iterator it_user = it->second->users.find(prevnick);
+		if (it_user != it->second->users.end())
+		{
+			it->second->users[newnick] = it_user->second;
+			it->second->users.erase(it_user);
+		}
+		std::map<std::string, int>::iterator it_prefix = it->second->prefix.find(prevnick);
+		if (it_prefix != it->second->prefix.end())
+		{
+			it->second->prefix[newnick] = it_prefix->second;
+			it->second->prefix.erase(it_prefix);
+		}
+		std::map<std::string, userInfos*>::iterator it_operator = it->second->operators.find(prevnick);
+		if (it_operator != it->second->operators.end())
+		{
+			it->second->operators[newnick] = it_operator->second;
+			it->second->operators.erase(it_operator);
+		}
+		std::map<std::string, userInfos*>::iterator it_invited = it->second->invited_users.find(prevnick);
+		if (it_invited != it->second->invited_users.end())
+		{
+			it->second->invited_users[newnick] = it_invited->second;
+			it->second->invited_users.erase(it_invited);
+		}
+		std::map<std::string, userInfos*>::iterator it_ban = it->second->banlist.find(prevnick);
+		if (it_ban != it->second->banlist.end())
+		{
+			it->second->banlist[newnick] = it_ban->second;
+			it->second->banlist.erase(it_ban);
+		}
+		++it;
+	}
 }

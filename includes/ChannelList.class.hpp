@@ -39,7 +39,6 @@ class ChannelList
 		void quitServer(userInfos* user);
 
 		int getNbChannel();
-		int getNbUserInChannel();
 
 		const string getUserPriviledges(const string& nick, const string& chan_name);
 		const string getUserModes(userInfos* user, const string& chan_name);
@@ -56,6 +55,8 @@ class ChannelList
 
 		void inviteUser(userInfos* user, std::string channel_name);
 		bool isUserInvited(userInfos* user, std::string channel_name);
+
+		void changeNickInChannels(const string &prevnick, const string& newnick);
 };
 
 // modes : n: no external messages, b: block users, t: mod topic, i: invite only = private ?, m: moderated, l: limited nb user
