@@ -329,6 +329,7 @@ int ChannelList::unbanUser(userInfos* user, string& channel_name)
 int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, string args, userInfos* target)
 {
 	// if mode ban, target should be a user, else NULL
+	(void)args; // can be used to topic or limit
 
 	std::map<std::string, s_Channel*>::iterator it = channels.find(channel_name);
 	if (it == channels.end())	// channel not found
