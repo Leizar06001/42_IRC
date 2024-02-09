@@ -80,7 +80,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 			s_Channel *new_channel = new s_Channel;
 			new_channel->channel_name = channel_name;
 			new_channel->channel_type = "=";
-			new_channel->mode = "+mntlb";	// mod, no msg from out, topic protect, limit, ban
+			new_channel->mode = "+nlb";	// mod, no msg from out, limit, ban
 			new_channel->deletable = 1;
 			new_channel->nb_users = 1;
 			new_channel->max_users = max_in_channel;
