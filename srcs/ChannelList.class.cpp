@@ -371,7 +371,7 @@ int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, st
 			} else if (mode[i] == 'l'){
 				int max_users = stoi(args);
 				if (max_users < 1) return ERR_NEEDMOREPARAMS;
-				it->second->max_users = stoi(args);
+				it->second->max_users = atoi(args.c_str());
 
 			} else if (mode[i] == 'o'){	// Set operator
 				if (it->second->prefix.find(args) == it->second->prefix.end())
