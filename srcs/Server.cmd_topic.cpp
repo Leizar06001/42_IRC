@@ -17,6 +17,7 @@ void Server::cmd_topic(int fd, vector<string> tokens)
 {
     if (tokens.size() < 2)	// No channel
         return;
+
 	s_Channel* channel = _channels->getChannel(tokens[1]);
 	if (!channel){
 		sendServerMessage(fd, ERR_NOSUCHCHANNEL, tokens[1]);
