@@ -15,8 +15,9 @@ bool hasTopicPermission(userInfos* user, s_Channel* channel)
 
 void Server::cmd_topic(int fd, vector<string> tokens)
 {
-    if (tokens.size() < 2)	// No channel
+    if (tokens.size() < 2){	// No channel
         return;
+	}
 
 	s_Channel* channel = _channels->getChannel(tokens[1]);
 	if (!channel){
