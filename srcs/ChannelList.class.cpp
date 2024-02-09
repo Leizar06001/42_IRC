@@ -50,11 +50,11 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 			// Check if user is banned
 			if (it->second->banlist.find(user->getNickname()) != it->second->banlist.end())
 				return ERR_BANNEDFROMCHAN;
-			if(it->second->mode.find("l") != string::npos && it->second->nb_users >= it->second->max_users)
+			if(it->second->mode.find("l") != string::npos && it->second->nb_users >= it->second->max_users && !user->isAdmin())
 				return ERR_CHANNELISFULL;
-			if(it->second->mode.find("i") != string::npos)
+			if(it->second->mode.find("i") != string::npos && !isUserInvited(user, channel_name) && !user->isAdmin())
 				return ERR_INVITEONLYCHAN;
-			if(it->second->mode.find("k") != string::npos)
+			if(it->second->mode.find("k") != string::npos && !user->isAdmin())
 				return ERR_BADCHANNELKEY;
 
 			// JOIN CHANNEL
@@ -410,4 +410,18 @@ int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, st
 		}
 	}
 	return 0;
+}
+
+void ChannelList::inviteUser(userInfos* user, std::string channel_name)
+{
+	std::map<std::string, s_Channel*>::iterator it = channels.find(channel_name);
+
+    it->second->invited_users[user->getNickname()] = user;
+}
+
+bool ChannelList::isUserInvited(userInfos* user, std::string channel_name)
+{
+	std::map<std::string, s_Channel*>::iterator it = channels.find(channel_name);
+
+    return ( it->second->invited_users.find(user->getNickname()) != it->second->invited_users.end() );
 }

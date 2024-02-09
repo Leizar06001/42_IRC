@@ -53,6 +53,9 @@ class ChannelList
 		int unbanUser(userInfos* user, string& channel_name);
 
 		int setMode(userInfos* user, string& channel_name, string& mode, string args, userInfos* target);
+
+		void inviteUser(userInfos* user, std::string channel_name);
+		bool isUserInvited(userInfos* user, std::string channel_name);
 };
 
 // modes : n: no external messages, b: block users, t: mod topic, i: invite only = private ?, m: moderated, l: limited nb user
