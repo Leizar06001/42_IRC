@@ -24,7 +24,7 @@ class ChannelList
 	public:
 		ChannelList(Terminal* term);
 		~ChannelList();
-		int joinChannel(userInfos* user, string channel_name);
+		int joinChannel(userInfos* user, string channel_name, string key);
 
 		int kickChannel(userInfos* kicker, userInfos* user, std::string channel_name);
 

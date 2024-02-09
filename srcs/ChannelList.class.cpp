@@ -31,7 +31,7 @@ ChannelList::~ChannelList()
 	channels.clear();
 }
 
-int ChannelList::joinChannel(userInfos* user, std::string channel_name)
+int ChannelList::joinChannel(userInfos* user, std::string channel_name, string key)
 {
 	// ****** LISTE DES ERREURS ******
 	// ERR_TOOMANYCHANNELS ERR_BADCHANMASK ERR_BANNEDFROMCHAN ERR_CHANNELISFULL ERR_INVITEONLYCHAN
@@ -54,7 +54,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 				return ERR_CHANNELISFULL;
 			if(it->second->mode.find("i") != string::npos && !isUserInvited(user, channel_name) && !user->isAdmin())
 				return ERR_INVITEONLYCHAN;
-			if(it->second->mode.find("k") != string::npos && !user->isAdmin())
+			if(it->second->mode.find("k") != string::npos && key != it->second->channel_key && !user->isAdmin())
 				return ERR_BADCHANNELKEY;
 
 			// JOIN CHANNEL

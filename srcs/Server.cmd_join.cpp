@@ -8,11 +8,15 @@ void Server::cmd_join(int fd, vector<string> tokens){
 		sendServerMessage(fd, ERR_NEEDMOREPARAMS, " :Need more params");
 		return ;
 	}
+	string key = "";
+	if (tokens.size() > 2){
+		key = tokens[2];
+	}
 
 	std::istringstream ss(tokens[1]);
 	std::string channel;
 	while (std::getline(ss, channel, ',')) {
-		int ret = _channels->joinChannel(user, channel);
+		int ret = _channels->joinChannel(user, channel, key);
 
 		switch (ret){
 			case ERR_TOOMANYCHANNELS:
