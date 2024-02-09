@@ -355,6 +355,7 @@ int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, st
 				it->second->mode.erase(it->second->mode.find(mode[i]), 1);
 
 		} else if (mode[i] == 'b'){
+			if (!user) return ERR_NEEDMOREPARAMS;
 			if (set == 1){
 				// BAN USER
 				return banUser(target, channel_name);

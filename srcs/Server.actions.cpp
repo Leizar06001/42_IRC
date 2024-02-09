@@ -37,7 +37,7 @@ void Server::performAction(userInfos* user){
 		sendServerMessage(fd, RPL_MOTD, " :- " + _servername + " Message of the day - ");
 		sendServerMessage(fd, RPL_MOTD, " :- Welcome to the iRisChat Network");
 		sendServerMessage(fd, RPL_MOTD, " :- Enjoy your stay and have fun!");
-		sendServerMessage(fd, RPL_ENDOFMOTD, " :End of /MOTD command.");
+		sendServerMessage(fd, RPL_ENDOFMOTD, " ");
 
 
 		_users->validateRegistration(user);
