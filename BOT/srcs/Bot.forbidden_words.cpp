@@ -19,7 +19,7 @@ const string	Bot::checkForbiddenWords(string str){
 		size_t start = 0;
 		while ((pos = str.find((*it), start)) != std::string::npos){
 			// check if the word is not part of another word
-			if (pos > 0 && isalpha(str[pos - 1]) || pos + (*it).size() < str.size() && isalpha(str[pos + (*it).size()])){
+			if ((pos == 0 || !isalpha(str[pos - 1])) && (pos + (*it).size() == str.size() || !isalpha(str[pos + (*it).size()]))){
 				start = pos + 1;
 				continue;
 			}
