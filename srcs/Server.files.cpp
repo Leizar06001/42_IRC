@@ -129,9 +129,9 @@ void Server::readConf(void){
 			if (line == "[BANNED IP]"){
 				_term.prtTmColor("BANNED\n", Terminal::MAGENTA);
 				while(getline(conf, line)){
-					if (line.empty() || line[0] == '[')
+					if (line[0] == '[')
 						break;
-					if (line.length() < 20){
+					if (line.length() < 20 && !line.empty()){
 						_term.prtTmColor(line + "\n", Terminal::BRIGHT_RED);
 						_bans_ip.push_back(line);
 					}

@@ -312,6 +312,7 @@ int	ChannelList::banUser(userInfos* user, string& channel_name)
 	if (it->second->banlist.find(user->getNickname()) != it->second->banlist.end())
 		return ERR_BANNEDFROMCHAN;
 	it->second->banlist[user->getNickname()] = user;
+	_term->prtTmColor("User " + user->getNickname() + " has been banned from " + channel_name, Terminal::BRIGHT_RED);
 	return 0;
 }
 
@@ -323,6 +324,7 @@ int ChannelList::unbanUser(userInfos* user, string& channel_name)
 	if (it->second->banlist.find(user->getNickname()) == it->second->banlist.end())
 		return ERR_BANNEDFROMCHAN;
 	it->second->banlist.erase(user->getNickname());
+	_term->prtTmColor("User " + user->getNickname() + " has been unbanned from " + channel_name, Terminal::BRIGHT_GREEN);
 	return 0;
 }
 
