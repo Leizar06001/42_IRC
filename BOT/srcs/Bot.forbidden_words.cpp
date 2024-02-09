@@ -20,15 +20,17 @@ const string	Bot::checkForbiddenWords(string str){
 		while ((pos = str.find((*it), start)) != std::string::npos){
 			// check if the word is not part of another word
 			if ((pos == 0 || !isalpha(str[pos - 1])) && (pos + (*it).size() == str.size() || !isalpha(str[pos + (*it).size()]))){
-				start = pos + 1;
-				continue;
-			}
-			start = pos + 1;
 
-			string ret((*it).size(), '*');
-			ret[0] = (*it)[0];
-			ret[(*it).size() - 1] = (*it)[(*it).size() - 1];
-			return ret;
+				start = pos + 1;
+
+				string ret((*it).size(), '*');
+				ret[0] = (*it)[0];
+				ret[(*it).size() - 1] = (*it)[(*it).size() - 1];
+				return ret;
+			} else {
+				start = pos + 1;
+			}
+
 		}
 		++it;
 	}
