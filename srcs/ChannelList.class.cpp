@@ -343,7 +343,7 @@ int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, st
 {
 	// if mode ban, target should be a user, else NULL
 	(void)args; // can be used to topic or limit
-	_term->prtTmColor("MODE " + channel_name + " " + mode + " " + args, Terminal::BRIGHT_YELLOW);
+	_term->prtTmColor("MODE " + channel_name + " " + mode + " " + args, Terminal::BRIGHT_BLUE);
 	std::map<std::string, s_Channel*>::iterator it = channels.find(channel_name);
 	if (it == channels.end())	// channel not found
 		return ERR_NOSUCHCHANNEL;
@@ -389,8 +389,10 @@ int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, st
 			}
 
 			// Add mode to channel
-			if (it->second->mode.find(mode[i]) == string::npos)
+			if (it->second->mode.find(mode[i]) == string::npos){
+				_term->prtTmColor(channel_name + " MODE " + mode[i] + " added", Terminal::GREEN);
 				it->second->mode += mode[i];
+			}
 
 
 		} else if (set == -1){	// Unset mode
@@ -405,8 +407,10 @@ int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, st
 			}
 
 			// Remove mode from channel
-			if (it->second->mode.find(mode[i]) != string::npos)
+			if (it->second->mode.find(mode[i]) != string::npos){
+				_term->prtTmColor(channel_name + " MODE " + mode[i] + " removed", Terminal::RED);
 				it->second->mode.erase(it->second->mode.find(mode[i]), 1);
+			}
 		}
 	}
 	return 0;
