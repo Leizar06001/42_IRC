@@ -50,7 +50,7 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 			// Check if user is banned
 			if (it->second->banlist.find(user->getNickname()) != it->second->banlist.end())
 				return ERR_BANNEDFROMCHAN;
-			if(it->second->mode.find("l") != string::npos && it->second->nb_users > it->second->max_users)
+			if(it->second->mode.find("l") != string::npos && it->second->nb_users >= it->second->max_users)
 				return ERR_CHANNELISFULL;
 			if(it->second->mode.find("i") != string::npos)
 				return ERR_INVITEONLYCHAN;
@@ -359,9 +359,11 @@ int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, st
 		set = -1;
 	else
 		return ERR_UNKNOWNMODE;
+	if (mode.find_first_of("kolbimnt") == string::npos)
+		return ERR_UNKNOWNMODE;
 
 	// Need i (invite) t (topic protection) k (key) o (operator) l (limit)
-	// maybe n (no external messages) m (moderated)
+	// maybe n (no external messages) m (moderated) b (block users)
 	for (size_t i = 1; i < mode.length(); ++i){
 
 		if (set == 1){	// Those mode requiere a parameter

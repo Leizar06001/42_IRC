@@ -8,9 +8,8 @@ bool hasTopicPermission(userInfos* user, s_Channel* channel)
 	{
         int userPrefix = prefix_it->second;
 
-        if (userPrefix <= 2)
+        if (userPrefix >= 1)
 		{
-            // Les founder (0), les protected (1) et les operators (2) ont le droit de modifier le topic
             return true;
         }
 		else

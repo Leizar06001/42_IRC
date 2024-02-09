@@ -24,6 +24,8 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 					} else
 						_channels->setMode(user, tokens[1], tokens[2], "", NULL);
 				}
+			} else {	// SHOW MODES
+				sendServerMessage(fd, RPL_CHANNELMODEIS, tokens[1] + " " + chan->mode);
 			}
 		}
 
