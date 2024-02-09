@@ -4,17 +4,19 @@
 
 ChannelList::ChannelList(Terminal* term):_term(term)
 {
-	s_Channel *general = new s_Channel;
-	general->channel_name = "#General";
-	general->channel_type = "=";
-	general->mode = "+mntlb";
-	general->deletable = 0;
-	general->nb_users = 0;
-	// channel.insert(std::pair<std::string, s_Channel *>("#General", general));
-	channels["#General"] = general;
 	nb_channel = 1;
 	max_channel = 100;
 	max_in_channel = 100;
+
+	s_Channel *general = new s_Channel;
+	general->channel_name = "#General";
+	general->channel_type = "=";
+	general->mode = "+mntb";
+	general->deletable = 0;
+	general->nb_users = 0;
+	general->max_users = max_in_channel;
+	// channel.insert(std::pair<std::string, s_Channel *>("#General", general));
+	channels["#General"] = general;
 }
 
 ChannelList::~ChannelList()
