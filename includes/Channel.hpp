@@ -16,4 +16,6 @@ typedef struct	t_Channel
 	bool							deletable;
 	std::string						topic;
 	int								nb_users;
+	string							channel_key;
+	int								max_users;
 }				s_Channel;

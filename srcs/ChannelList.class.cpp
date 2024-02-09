@@ -47,9 +47,14 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 			// Check if user is banned
 			if (it->second->banlist.find(user->getNickname()) != it->second->banlist.end())
 				return ERR_BANNEDFROMCHAN;
-			if(it->second->nb_users > max_in_channel)
+			if(it->second->mode.find("l") != string::npos && it->second->nb_users > it->second->max_users)
 				return ERR_CHANNELISFULL;
+			if(it->second->mode.find("i") != string::npos)
+				return ERR_INVITEONLYCHAN;
+			if(it->second->mode.find("k") != string::npos)
+				return ERR_BADCHANNELKEY;
 
+			// JOIN CHANNEL
 			it->second->users[user->getNickname()] = user;
 			if (user->isAdmin())
 				it->second->prefix.insert(std::pair<std::string, int>(user->getNickname(), 2));
@@ -75,6 +80,8 @@ int ChannelList::joinChannel(userInfos* user, std::string channel_name)
 			new_channel->mode = "+mntlb";	// mod, no msg from out, topic protect, limit, ban
 			new_channel->deletable = 1;
 			new_channel->nb_users = 1;
+			new_channel->max_users = max_in_channel;
+			new_channel->channel_key = "";
 			channels.insert(std::pair<std::string, s_Channel *>(channel_name, new_channel));
 			_term->prtTmColor("Channel " + channel_name + " created", Terminal::BRIGHT_BLUE);
 			new_channel->users[user->getNickname()] = user;
@@ -103,6 +110,7 @@ int ChannelList::partChannel(userInfos* user, std::string channel_name)
 
 	itchan->second->users.erase(ituser);	// remove user from channel's user list
 	--itchan->second->nb_users;
+	user->rmChannelFromList(itchan->second);
 	if(itchan->second->nb_users <= 0 && itchan->second->deletable)    //suprimer le chan si vide
 	{
 		delete itchan->second;
@@ -349,22 +357,51 @@ int ChannelList::setMode(userInfos* user, string& channel_name, string& mode, st
 	else
 		return ERR_UNKNOWNMODE;
 
+	// Need i (invite) t (topic protection) k (key) o (operator) l (limit)
+	// maybe n (no external messages) m (moderated)
 	for (size_t i = 1; i < mode.length(); ++i){
-		if (mode[i] == 'n' || mode[i] == 't' || mode[i] == 'm' || mode[i] == 'l'){
-			if (set == 1  && it->second->mode.find(mode[i]) == string::npos)
-				it->second->mode += mode[i];
-			else if (set == -1)
-				it->second->mode.erase(it->second->mode.find(mode[i]), 1);
 
-		} else if (mode[i] == 'b'){
-			if (!target) return ERR_NEEDMOREPARAMS;
-			if (set == 1){
-				// BAN USER
+		if (set == 1){	// Those mode requiere a parameter
+			if (args.length() <= 0 && (mode[i] == 'k' || mode[i] == 'o' || mode[i] == 'l' || mode[i] == 'b')){
+				return ERR_NEEDMOREPARAMS;
+
+			} else if (mode[i] == 'k'){	// Set password
+				it->second->channel_key = args;
+
+			} else if (mode[i] == 'l'){
+				int max_users = stoi(args);
+				if (max_users < 1) return ERR_NEEDMOREPARAMS;
+				it->second->max_users = stoi(args);
+
+			} else if (mode[i] == 'o'){	// Set operator
+				if (it->second->prefix.find(args) == it->second->prefix.end())
+					return ERR_USERNOTINCHANNEL;
+				it->second->prefix[args] = 2;
+
+			} else if (mode[i] == 'b'){
+				if (!target) return ERR_NEEDMOREPARAMS;
 				return banUser(target, channel_name);
-			} else if (set == -1){
-				// UNBAN USER
-				return unbanUser(target, channel_name);
 			}
+
+			// Add mode to channel
+			if (it->second->mode.find(mode[i]) == string::npos)
+				it->second->mode += mode[i];
+
+
+		} else if (set == -1){	// Unset mode
+			if (mode[i] == 'b'){	// UNBAN USER
+				if (!target) return ERR_NEEDMOREPARAMS;
+				return unbanUser(target, channel_name);
+
+			} else if (mode[i] == 'o'){	// Remove operator
+				if (it->second->prefix.find(args) == it->second->prefix.end())
+					return ERR_USERNOTINCHANNEL;
+				it->second->prefix[args] = 0;
+			}
+
+			// Remove mode from channel
+			if (it->second->mode.find(mode[i]) != string::npos)
+				it->second->mode.erase(it->second->mode.find(mode[i]), 1);
 		}
 	}
 	return 0;
