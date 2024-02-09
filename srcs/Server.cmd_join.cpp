@@ -43,6 +43,7 @@ void Server::cmd_join(int fd, vector<string> tokens){
 				toks.push_back(channel);
 				toks.push_back(_channels->getUsersNicksInChan(channel));
 				cmd_names(fd, toks);
+				sendServerMessage(fd, RPL_TOPIC, user->getNickname() + " " + channel + " :" + chan->topic);
 				break;
 		}
 	}
