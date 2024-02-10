@@ -25,6 +25,7 @@ SRCS = 	srcs/main.cpp				\
 		srcs/Server.cmd_privmsg.cpp	\
 		srcs/Server.cmd_quit.cpp	\
 		srcs/Server.cmd_topic.cpp	\
+		srcs/Server.cmd_unband.cpp	\
 		srcs/Server.cmd_user.cpp	\
 		srcs/Server.cmd_userhost.cpp \
 		srcs/Server.cmd_who.cpp		\
