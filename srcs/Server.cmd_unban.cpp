@@ -12,8 +12,13 @@ void Server::cmd_unban(int fd, vector<string> tokens){
 		return;
 	}
 	if (tokens[1].size() > 7 && tokens[1].size() < 16){
-		_bans_ip.erase(std::remove(_bans_ip.begin(), _bans_ip.end(), tokens[1]), _bans_ip.end());
-		_term.prtTmColor("UNBAN: " + tokens[1] + " removed from banned list\n", Terminal::GREEN);
+		for(size_t i = 0; i < _bans_ip.size(); i++){
+			if (tokens[1] == _bans_ip[i]){
+				_bans_ip.erase(_bans_ip.begin() + i);
+				_term.prtTmColor("UNBAN: " + tokens[1] + " removed from banned list\n", Terminal::GREEN);
+				return;
+			}
+		}
 	} else {
 		_term.prtTmColor("UNBAN: Invalid ip\n", Terminal::RED);
 	}
