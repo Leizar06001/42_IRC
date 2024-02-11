@@ -33,8 +33,8 @@ void Server::analyseCommands(int fd, vector<string>& tokens){
 		&Server::cmd_list
 	};
 	std::string cmds[] = {"CAP", "PASS", "NICK", "USER", "PING", "PONG", "PRIVMSG", "WHO", "WHOIS",
-		"NAMES", "QUIT", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "PART", "BAN", "USERHOST", "NOTICE",
-		"UNBAND", "LIST"};
+		"NAMES", "QUIT", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "PART", "SERVBAN", "USERHOST", "NOTICE",
+		"SERVUNBAN", "LIST"};
 
 	userInfos* user = _users->getUserByFd(fd);
 	if (!user) return;
