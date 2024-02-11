@@ -37,7 +37,10 @@ void Server::cmd_mode(int fd, vector<string> tokens){
 					else if (ret == ERR_USERNOTINCHANNEL)
 						sendServerMessage(fd, ERR_USERNOTINCHANNEL, ":The targeted user is not in this channel");
 					else if (ret == 0){
-						sendRawMsgToList(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " MODE " + tokens[1] + " " + tokens[2] + " " + tokens[3], chan->users);
+						if (tokens.size() > 3)
+							sendRawMsgToList(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " MODE " + tokens[1] + " " + tokens[2] + " " + tokens[3], chan->users);
+						else
+							sendRawMsgToList(fd, ":" + user->getNickname() + "!" + user->getUsername() + "@" + _servername + " MODE " + tokens[1] + " " + tokens[2], chan->users);
 					}
 				}
 			} else {	// SHOW MODES
