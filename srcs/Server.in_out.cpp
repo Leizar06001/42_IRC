@@ -10,6 +10,13 @@ int Server::pollFds(int timeout){
 }
 
 void Server::readSockets(void){
+	fd_set read_fds;
+	FD_ZERO(&read_fds);
+	for(int i = 0; i <= MAX_CLIENTS; ++i){
+		if(_fds[i].fd >= 0){
+			FD_SET(_fds[i].fd, &read_fds);
+		}
+	}
 	if (pollFds(250) > 0){
 		// Check for new clients
 		if (_fds[0].revents & POLLIN){
