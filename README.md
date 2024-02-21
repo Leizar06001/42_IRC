@@ -40,3 +40,4 @@ It will send warnings to the user, kick him of the channel after few warnings. I
 "CAP", "PASS", "NICK", "USER", "PING", "PONG", "PRIVMSG", "WHO", "WHOIS",	"NAMES", "QUIT", "JOIN", "KICK", "INVITE", "TOPIC", "MODE", "PART", "SERVBAN", "USERHOST", "NOTICE", "SERVUNBAN", "LIST"
 
 ### A glimpse of the server at work
+![til](./irc.png)
