@@ -1,6 +1,6 @@
 NAME = irc_server
 
-CC = c++
+CC = g++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
 SRCS = 	srcs/main.cpp				\
